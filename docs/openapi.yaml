@@ -1,0 +1,233 @@
+openapi: 3.1.0
+info:
+  title: CariSpek Recommendation & Catalog API
+  version: 1.0.0
+  description: >
+    Dokumentasi resmi OpenAPI 3.1.0 untuk backend CariSpek (Kelompok 7A - Tim NEXORA).
+    Menyediakan layanan katalog 450 laptop/PC dan mesin rekomendasi berbasis algoritma Simple Additive Weighting (SAW).
+servers:
+  - url: https://nexora-backend.ddev.site/api/v1
+    description: DDEV Local Development Server
+  - url: http://localhost:8000/api/v1
+    description: Fallback Local PHP Server
+
+paths:
+  /config:
+    get:
+      summary: Mendapatkan konfigurasi identitas brand dinamis
+      operationId: getBrandConfig
+      responses:
+        '200':
+          description: Konfigurasi berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponse'
+
+  /health:
+    get:
+      summary: Health check backend dan database
+      operationId: getHealth
+      responses:
+        '200':
+          description: Server dalam kondisi sehat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+
+  /categories:
+    get:
+      summary: Mendapatkan 7 kategori persona usecase mahasiswa
+      operationId: getCategories
+      responses:
+        '200':
+          description: Daftar kategori berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesResponse'
+
+  /devices:
+    get:
+      summary: Mengambil daftar katalog perangkat dengan filter dan pencarian
+      operationId: getDevices
+      parameters:
+        - name: category_id
+          in: query
+          schema:
+            type: string
+          description: Filter kode kategori (misal CAT-02)
+        - name: brand
+          in: query
+          schema:
+            type: string
+          description: Filter nama brand (misal Lenovo, ASUS)
+        - name: max_price
+          in: query
+          schema:
+            type: integer
+          description: Batas harga maksimum (IDR)
+        - name: min_ram
+          in: query
+          schema:
+            type: integer
+          description: Minimal kapasitas RAM dalam GB
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Kata kunci pencarian model atau spesifikasi
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Daftar perangkat berhasil difilter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceListResponse'
+
+  /devices/{id}:
+    get:
+      summary: Detail spesifikasi satu perangkat
+      operationId: getDeviceDetail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detail perangkat ditemukan
+        '404':
+          description: Perangkat tidak ditemukan
+
+  /recommendations:
+    post:
+      summary: Menghitung rekomendasi laptop via Algoritma SAW
+      operationId: calculateRecommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationRequest'
+      responses:
+        '200':
+          description: Rekomendasi berhasil dihitung
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+        '422':
+          description: Validasi input gagal
+
+components:
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status_code:
+          type: integer
+        message:
+          type: string
+        meta:
+          type: object
+
+    ConfigResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                app_name:
+                  type: string
+                brand_name:
+                  type: string
+                tagline:
+                  type: string
+                logo_url:
+                  type: string
+
+    CategoriesResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  computing_profile:
+                    type: string
+                  target_persona:
+                    type: string
+
+    RecommendationRequest:
+      type: object
+      required:
+        - budget_max
+        - category_id
+      properties:
+        budget_min:
+          type: integer
+          default: 0
+        budget_max:
+          type: integer
+        category_id:
+          type: string
+          example: "CAT-02"
+        preferred_device_type:
+          type: string
+          enum: ["Laptop", "PC Rakitan", "Laptop 2-in-1", "Mini PC"]
+        priority_focus:
+          type: string
+          enum: ["performance", "battery", "display", "budget", "portability"]
+
+    RecommendationResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                top_recommendations:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      rank:
+                        type: integer
+                      match_score:
+                        type: number
+                      device:
+                        type: object
+                      reasoning:
+                        type: string
+
+    DeviceListResponse:
+      allOf:
+        - $ref: '#/components/schemas/BaseResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+            pagination:
+              type: object
