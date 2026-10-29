@@ -20,6 +20,8 @@ import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 import { DownloadSimpleIcon } from "@phosphor-icons/react/dist/ssr/DownloadSimple";
 import { SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { EyeIcon } from "@phosphor-icons/react/dist/ssr/Eye";
+import { ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr/ArrowSquareOut";
+import { ImageIcon } from "@phosphor-icons/react/dist/ssr/Image";
 import { SunIcon } from "@phosphor-icons/react/dist/ssr/Sun";
 import { MoonIcon } from "@phosphor-icons/react/dist/ssr/Moon";
 import { SparkleIcon } from "@phosphor-icons/react/dist/ssr/Sparkle";
@@ -80,6 +82,8 @@ export default function AdminPage() {
   // Full Edit / Add Modal State
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editingLaptop, setEditingLaptop] = React.useState<CatalogLaptop | null>(null);
+  const [previewError, setPreviewError] = React.useState(false);
+  const [showImagePreview, setShowImagePreview] = React.useState(true);
 
   // Table Mouse Drag-to-Scroll State
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -422,6 +426,8 @@ export default function AdminPage() {
       Cons_Kekurangan: "",
       Link_Gambar: "",
     });
+    setPreviewError(false);
+    setShowImagePreview(true);
     setIsAddModalOpen(true);
   };
 
@@ -449,6 +455,8 @@ export default function AdminPage() {
       Cons_Kekurangan: item.Cons_Kekurangan || "",
       Link_Gambar: item.Link_Gambar || "",
     });
+    setPreviewError(false);
+    setShowImagePreview(true);
     setIsAddModalOpen(true);
   };
 
@@ -1792,18 +1800,133 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-slate-500 font-bold mb-1">URL Gambar Perangkat</label>
-                  <input
-                    type="url"
-                    value={formData.Link_Gambar}
-                    onChange={(e) => setFormData({ ...formData, Link_Gambar: e.target.value })}
-                    placeholder="https://images.tokopedia.net/..."
-                    className={`w-full h-10 px-3 rounded-xl border outline-none ${
-                      isDark ? "bg-slate-950 border-slate-700 text-white" : "bg-slate-50 border-slate-300 text-slate-900"
-                    }`}
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-slate-500 font-bold">URL Gambar Perangkat</label>
+                    <div className="flex items-center gap-2">
+                      {formData.Link_Gambar && (
+                        <a
+                          href={formData.Link_Gambar}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                        >
+                          <ArrowSquareOutIcon className="w-3.5 h-3.5" />
+                          <span>Tes Link</span>
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setShowImagePreview(!showImagePreview)}
+                        className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border flex items-center gap-1 transition-colors cursor-pointer ${
+                          showImagePreview
+                            ? isDark
+                              ? "bg-emerald-950/60 border-emerald-700 text-emerald-300"
+                              : "bg-emerald-50 border-emerald-200 text-emerald-700"
+                            : isDark
+                              ? "bg-slate-800 border-slate-700 text-slate-400"
+                              : "bg-slate-100 border-slate-300 text-slate-600"
+                        }`}
+                      >
+                        <EyeIcon className="w-3 h-3" />
+                        <span>{showImagePreview ? "Sembunyikan" : "Preview"}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="relative flex items-center">
+                    <input
+                      type="url"
+                      value={formData.Link_Gambar}
+                      onChange={(e) => {
+                        setFormData({ ...formData, Link_Gambar: e.target.value });
+                        setPreviewError(false);
+                      }}
+                      placeholder="https://images.tokopedia.net/..."
+                      className={`w-full h-10 pl-3 pr-24 rounded-xl border outline-none font-mono text-xs ${
+                        isDark ? "bg-slate-950 border-slate-700 text-white" : "bg-slate-50 border-slate-300 text-slate-900"
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowImagePreview(true);
+                        setPreviewError(false);
+                      }}
+                      className={`absolute right-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
+                        isDark ? "bg-slate-800 hover:bg-slate-700 text-emerald-400" : "bg-emerald-100 hover:bg-emerald-200 text-emerald-800"
+                      }`}
+                    >
+                      <ImageIcon className="w-3.5 h-3.5" />
+                      <span>Preview</span>
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {/* Live Image Preview Card */}
+              {showImagePreview && formData.Link_Gambar.trim() && (
+                <div className={`p-3.5 rounded-2xl border transition-all ${
+                  isDark ? "bg-slate-950/70 border-slate-800" : "bg-slate-50 border-slate-200"
+                }`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <ImageIcon className={`w-4 h-4 ${previewError ? "text-rose-500" : "text-emerald-500"}`} />
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                        Live Preview Gambar
+                      </span>
+                    </div>
+                    {previewError ? (
+                      <span className="text-[11px] font-bold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                        Gambar Gagal Dimuat
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        URL Gambar Valid
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className={`relative w-36 h-28 shrink-0 rounded-xl overflow-hidden border flex items-center justify-center p-2 shadow-inner ${
+                      isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+                    }`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={formData.Link_Gambar}
+                        alt="Preview Laptop"
+                        onError={() => setPreviewError(true)}
+                        onLoad={() => setPreviewError(false)}
+                        className={`max-w-full max-h-full object-contain transition-opacity duration-200 ${
+                          previewError ? "hidden" : "block"
+                        }`}
+                      />
+                      {previewError && (
+                        <div className="text-center p-2 text-rose-500 flex flex-col items-center">
+                          <XIcon className="w-6 h-6 mb-1 text-rose-500" />
+                          <span className="text-[10px] font-bold leading-tight">Gagal memuat gambar</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 text-xs min-w-0">
+                      <p className={`font-bold mb-1 truncate ${isDark ? "text-slate-200" : "text-slate-800"}`}>
+                        {formData.Brand} {formData.Model_Seri || "Nama Model"}
+                      </p>
+                      <p className="text-[11px] text-slate-400 font-mono break-all line-clamp-2 mb-2">
+                        {formData.Link_Gambar}
+                      </p>
+                      {previewError ? (
+                        <p className="text-[11px] text-rose-500 font-medium">
+                          Pastikan URL dapat diakses secara publik (Direct Image URL dari CDN / Tokopedia / Shopee / Unsplash).
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-emerald-600 font-medium">
+                          Gambar terverifikasi dan siap ditampilkan pada katalog rekomendasi serta dashboard mahasiswa.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Row 8: Pros & Cons */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
