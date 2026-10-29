@@ -81,6 +81,39 @@ export default function AdminPage() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editingLaptop, setEditingLaptop] = React.useState<CatalogLaptop | null>(null);
 
+  // Table Mouse Drag-to-Scroll State
+  const tableContainerRef = React.useRef<HTMLDivElement>(null);
+  const [isDraggingTable, setIsDraggingTable] = React.useState(false);
+  const [dragStartX, setDragStartX] = React.useState(0);
+  const [dragScrollLeft, setDragScrollLeft] = React.useState(0);
+
+  const handleTableMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!tableContainerRef.current) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button") || target.closest("input") || target.closest("select") || target.closest("a")) {
+      return;
+    }
+    setIsDraggingTable(true);
+    setDragStartX(e.pageX - tableContainerRef.current.offsetLeft);
+    setDragScrollLeft(tableContainerRef.current.scrollLeft);
+  };
+
+  const handleTableMouseLeave = () => {
+    setIsDraggingTable(false);
+  };
+
+  const handleTableMouseUp = () => {
+    setIsDraggingTable(false);
+  };
+
+  const handleTableMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingTable || !tableContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - tableContainerRef.current.offsetLeft;
+    const walk = (x - dragStartX) * 1.5;
+    tableContainerRef.current.scrollLeft = dragScrollLeft - walk;
+  };
+
   // All 20 exact dataset fields according to devices-catalog.json
   const [formData, setFormData] = React.useState({
     ID_Perangkat: "",
@@ -787,105 +820,124 @@ export default function AdminPage() {
         ? "bg-[#0b1120] text-slate-100 selection:bg-emerald-500 selection:text-slate-950"
         : "bg-[#faf8ff] text-slate-900 selection:bg-emerald-200 selection:text-emerald-950"
     }`}>
-      {/* 1. TOP COMMAND BAR */}
-      <header className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors shadow-2xs ${
+      {/* 1. UPGRADED ENTERPRISE TASKBAR HEADER */}
+      <header className={`sticky top-0 z-40 backdrop-blur-xl border-b transition-colors shadow-2xs ${
         isDark
-          ? "bg-slate-900/95 border-slate-800"
-          : "bg-white/95 border-slate-200/90"
+          ? "bg-slate-900/90 border-slate-800/80"
+          : "bg-white/90 border-slate-200/80"
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2.5 group">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-17 flex items-center justify-between gap-4">
+          {/* Left: Brand + Status Pill + Cloud Info */}
+          <div className="flex items-center gap-3.5">
+            <Link href="/" className="flex items-center gap-3 group shrink-0">
               <Image
                 src="/brand/speco-logo.png"
                 alt="SPECO"
-                width={110}
-                height={36}
+                width={112}
+                height={38}
+                priority
                 className={`h-8 w-auto object-contain transition-transform group-hover:scale-105 ${
                   isDark ? "brightness-0 invert" : ""
                 }`}
               />
-              <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border ${
-                isDark
-                  ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                  : "bg-emerald-100 text-emerald-900 border-emerald-300"
-              }`}>
-                Staff Engine
-              </span>
             </Link>
 
-            <div className={`hidden sm:flex items-center gap-2 text-xs font-mono pl-3 border-l ${
-              isDark ? "border-slate-800 text-slate-400" : "border-slate-200 text-slate-500"
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wide border transition-all ${
+              isDark
+                ? "bg-emerald-950/70 text-emerald-400 border-emerald-500/30"
+                : "bg-emerald-50 text-emerald-800 border-emerald-200"
             }`}>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-semibold">Supabase Cloud Online</span>
-              <span className="text-slate-400">•</span>
-              <span className={`font-bold ${isDark ? "text-slate-200" : "text-slate-800"}`}>
-                {laptops.length} Laptop Terverifikasi
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
+              <span>STAFF CONSOLE</span>
+            </span>
+
+            <div className={`hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium transition-colors ${
+              isDark ? "bg-slate-950/60 border-slate-800 text-slate-300" : "bg-slate-50 border-slate-200/80 text-slate-600"
+            }`}>
+              <DatabaseIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span className="font-semibold text-slate-800 dark:text-slate-200">Supabase Cloud Online</span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span className="font-mono text-[11px] text-emerald-700 dark:text-emerald-400 font-bold">{laptops.length} Laptop Terverifikasi</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Theme Toggle Button (Light <-> Dark) */}
+          {/* Right: Actions Group */}
+          <div className="flex items-center gap-2.5">
+            {/* Theme Toggle Pill */}
             <button
               onClick={toggleTheme}
-              className={`p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
+              className={`h-9 px-3 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
                 isDark
                   ? "bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700"
-                  : "bg-slate-100 hover:bg-slate-200/80 text-slate-800 border-slate-200"
+                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
               }`}
               title={isDark ? "Ganti ke Mode Terang (Light Mode)" : "Ganti ke Mode Gelap (Dark Mode)"}
             >
-              {isDark ? <SunIcon className="w-4 h-4 text-amber-400" /> : <MoonIcon className="w-4 h-4 text-slate-700" />}
-              <span className="hidden sm:inline">{isDark ? "Terang" : "Gelap"}</span>
+              {isDark ? <SunIcon className="w-4 h-4 text-amber-400" /> : <MoonIcon className="w-4 h-4 text-slate-600" />}
+              <span className="hidden sm:inline font-semibold">{isDark ? "Terang" : "Gelap"}</span>
             </button>
 
-            <button
-              onClick={handleExportXLSX}
-              className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-colors cursor-pointer ${
-                isDark
-                  ? "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
-                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-2xs"
-              }`}
-              title="Unduh Berkas Excel Lengkap"
-            >
-              <DownloadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden md:inline">Ekspor Excel (.xlsx)</span>
-            </button>
+            {/* Segmented Export Group */}
+            <div className={`hidden sm:flex items-center rounded-xl border p-0.5 shadow-2xs transition-colors ${
+              isDark ? "bg-slate-950 border-slate-800" : "bg-white border-slate-200"
+            }`}>
+              <button
+                onClick={handleExportXLSX}
+                className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  isDark ? "hover:bg-slate-800 text-slate-300" : "hover:bg-slate-100 text-slate-700"
+                }`}
+                title="Ekspor seluruh dataset ke Excel (.xlsx)"
+              >
+                <DownloadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Excel</span>
+              </button>
+              <span className={`h-4 w-px ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+              <button
+                onClick={handleExportSQL}
+                className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  isDark ? "hover:bg-slate-800 text-slate-300" : "hover:bg-slate-100 text-slate-700"
+                }`}
+                title="Ekspor dump skema SQL"
+              >
+                <DatabaseIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <span>SQL</span>
+              </button>
+            </div>
 
-            <button
-              onClick={handleExportSQL}
-              className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-colors cursor-pointer ${
-                isDark
-                  ? "bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
-                  : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-2xs"
-              }`}
-              title="Unduh Script Dump SQL"
-            >
-              <DatabaseIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-              <span className="hidden md:inline">Ekspor SQL (.sql)</span>
-            </button>
-
+            {/* Tambah Perangkat Primary CTA */}
             <button
               onClick={handleAddNewClick}
-              className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-1.5 transition-colors shadow-md shadow-emerald-700/20 cursor-pointer"
+              className="h-9 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shadow-emerald-700/20 hover:shadow-lg hover:shadow-emerald-700/30 cursor-pointer"
             >
-              <PlusIcon weight="bold" className="w-3.5 h-3.5" />
+              <PlusIcon weight="bold" className="w-4 h-4" />
               <span>Tambah Perangkat</span>
             </button>
 
-            <button
-              onClick={handleLogoutAdmin}
-              className={`p-2 rounded-xl border transition-colors ml-1 cursor-pointer ${
-                isDark
-                  ? "bg-slate-800/80 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border-slate-700/80"
-                  : "bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border-slate-200"
-              }`}
-              title="Keluar dari Portal Staff"
-            >
-              <SignOutIcon className="w-4 h-4" />
-            </button>
+            {/* Staff Avatar & Logout Group */}
+            <div className={`flex items-center gap-2 pl-2 border-l ${
+              isDark ? "border-slate-800" : "border-slate-200"
+            }`}>
+              <div
+                className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-900 text-white flex items-center justify-center font-black text-xs shadow-2xs"
+                title="Mas Affif (Project Lead & Data Engineer)"
+              >
+                MA
+              </div>
+              <button
+                onClick={handleLogoutAdmin}
+                className={`h-8 w-8 rounded-xl border flex items-center justify-center transition-colors cursor-pointer ${
+                  isDark
+                    ? "bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border-slate-700"
+                    : "bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 border-slate-200 shadow-2xs"
+                }`}
+                title="Keluar dari Portal Staff"
+              >
+                <SignOutIcon className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -1108,11 +1160,21 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* 4. REALTIME DATA TABLE WITH STICKY FIRST COLUMN (NEVER CLIPPED) */}
+        {/* 4. REALTIME DATA TABLE WITH STICKY FIRST COLUMN & MOUSE DRAG SCROLL */}
         <div className={`rounded-3xl border overflow-hidden shadow-lg transition-colors ${
           isDark ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200/90"
         }`}>
-          <div className="overflow-x-auto relative">
+          <div
+            ref={tableContainerRef}
+            onMouseDown={handleTableMouseDown}
+            onMouseLeave={handleTableMouseLeave}
+            onMouseUp={handleTableMouseUp}
+            onMouseMove={handleTableMouseMove}
+            className={`overflow-x-auto relative transition-all ${
+              isDraggingTable ? "cursor-grabbing select-none" : "cursor-grab"
+            }`}
+            title="Klik & tahan mouse untuk menggeser tabel (drag-to-scroll)"
+          >
             <table className="w-full text-left text-xs border-collapse">
               <thead className={`border-b text-[10px] uppercase font-mono tracking-wider ${
                 isDark ? "bg-slate-950 text-slate-400 border-slate-800" : "bg-slate-50 text-slate-600 border-slate-200"
@@ -1362,33 +1424,29 @@ export default function AdminPage() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                onClick={() => handleStartInlineEdit(l)}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                  isDark ? "hover:bg-slate-800 text-slate-400 hover:text-emerald-400" : "hover:bg-slate-200 text-slate-500 hover:text-emerald-800"
-                                }`}
-                                title="Edit Cepat Baris Ini"
-                              >
-                                <PencilSimpleIcon className="w-4 h-4" />
-                              </button>
+                            <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => handleEditClick(l)}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                  isDark ? "hover:bg-slate-800 text-slate-400 hover:text-white" : "hover:bg-slate-200 text-slate-500 hover:text-slate-900"
+                                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
+                                  isDark
+                                    ? "bg-slate-800 hover:bg-emerald-500/20 text-slate-200 hover:text-emerald-400 border border-slate-700 hover:border-emerald-500/40"
+                                    : "bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200"
                                 }`}
-                                title="Edit Lengkap 20 Field Dataset"
+                                title="Edit Spesifikasi Lengkap Perangkat (20 Field)"
                               >
-                                <EyeIcon className="w-4 h-4" />
+                                <PencilSimpleIcon className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+                                <span>Edit</span>
                               </button>
                               <button
                                 onClick={() => handleDeleteClick(l.ID_Perangkat)}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                  isDark ? "hover:bg-slate-800 text-slate-400 hover:text-red-400" : "hover:bg-slate-200 text-slate-500 hover:text-red-600"
+                                className={`p-1.5 rounded-xl transition-colors cursor-pointer border ${
+                                  isDark
+                                    ? "bg-slate-800/80 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border-slate-700/80"
+                                    : "bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 border-slate-200 shadow-2xs"
                                 }`}
                                 title="Hapus Perangkat"
                               >
-                                <TrashIcon className="w-4 h-4" />
+                                <TrashIcon className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           )}
