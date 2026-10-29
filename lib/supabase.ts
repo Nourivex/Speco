@@ -53,10 +53,27 @@ export interface SupabaseLaptop {
 }
 
 /**
- * Mengambil daftar laptop dari Supabase jika terhubung,
- * atau null jika Supabase belum dikonfigurasi.
+ * Mengambil daftar laptop dari Supabase (Direct Server Endpoint & No-Cache)
  */
 export async function getLaptopsFromSupabase(): Promise<SupabaseLaptop[] | null> {
+  try {
+    // 1. Ambil dari server-side route dengan cache: no-store untuk memastikan data selalu aktual
+    if (typeof window !== "undefined") {
+      const res = await fetch(`/api/admin/laptops?_t=${Date.now()}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          return json.data as SupabaseLaptop[];
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Server endpoint fetch error, fallback ke direct client:", err);
+  }
+
+  // 2. Fallback ke Supabase client langsung
   if (!supabase) return null;
   try {
     const { data, error } = await supabase
@@ -76,32 +93,63 @@ export async function getLaptopsFromSupabase(): Promise<SupabaseLaptop[] | null>
 }
 
 /**
- * Insert laptop baru ke Supabase
+ * Insert laptop baru ke Supabase melalui secure server endpoint
  */
 export async function insertLaptopToSupabase(laptop: Partial<SupabaseLaptop>) {
-  if (!supabase) throw new Error("Supabase belum dikonfigurasi");
-  const { data, error } = await supabase.from("laptops").insert([laptop]).select();
-  if (error) throw error;
-  return data?.[0] as SupabaseLaptop;
+  const session = typeof window !== "undefined" ? localStorage.getItem("speco_admin_session") || "" : "";
+  const res = await fetch("/api/admin/laptops", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-session": session,
+    },
+    body: JSON.stringify({ laptop }),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || "Gagal menambahkan laptop ke database.");
+  }
+  return json.data as SupabaseLaptop;
 }
 
 /**
- * Update data laptop di Supabase
+ * Update data laptop di Supabase melalui secure server endpoint
  */
 export async function updateLaptopInSupabase(id: string, updates: Partial<SupabaseLaptop>) {
-  if (!supabase) throw new Error("Supabase belum dikonfigurasi");
-  const { data, error } = await supabase.from("laptops").update(updates).eq("id", id).select();
-  if (error) throw error;
-  return data?.[0] as SupabaseLaptop;
+  const session = typeof window !== "undefined" ? localStorage.getItem("speco_admin_session") || "" : "";
+  const res = await fetch("/api/admin/laptops", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-session": session,
+    },
+    body: JSON.stringify({ id, updates }),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || "Gagal memperbarui data laptop di database.");
+  }
+  return json.data as SupabaseLaptop;
 }
 
 /**
- * Hapus laptop dari Supabase
+ * Hapus laptop dari Supabase melalui secure server endpoint
  */
 export async function deleteLaptopFromSupabase(id: string) {
-  if (!supabase) throw new Error("Supabase belum dikonfigurasi");
-  const { error } = await supabase.from("laptops").delete().eq("id", id);
-  if (error) throw error;
+  const session = typeof window !== "undefined" ? localStorage.getItem("speco_admin_session") || "" : "";
+  const res = await fetch(`/api/admin/laptops?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: {
+      "x-admin-session": session,
+    },
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || "Gagal menghapus laptop dari database.");
+  }
   return true;
 }
 
