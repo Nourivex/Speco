@@ -62,6 +62,7 @@ class DeviceController extends Controller
             'price_idr' => $d->price_idr,
             'formatted_price' => 'Rp ' . number_format($d->price_idr, 0, ',', '.'),
             'purchase_platform' => $d->purchase_platform,
+            'image_url' => $d->image_url,
             'warranty' => $d->warranty,
             'usecase_tags' => $d->usecase_tags,
             'pros' => $d->pros,
@@ -141,6 +142,7 @@ class DeviceController extends Controller
                     'price_idr' => $device->price_idr,
                     'formatted_price' => 'Rp ' . number_format($device->price_idr, 0, ',', '.'),
                     'purchase_platform' => $device->purchase_platform,
+                    'image_url' => $device->image_url,
                     'warranty' => $device->warranty,
                 ],
                 'review' => [

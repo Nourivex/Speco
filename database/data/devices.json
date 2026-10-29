@@ -18,7 +18,8 @@
     "Status_Garansi_Resmi": "1 Tahun Resmi Advan Indonesia",
     "Rekomendasi_UseCase_Tag": "#skripsi-browsing #office",
     "Pros_Kelebihan": "Performa tinggi harga murah, layar bagus",
-    "Cons_Kekurangan": "RAM disolder, baterai standar"
+    "Cons_Kekurangan": "RAM disolder, baterai standar",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/14/c84fe72f-372f-4a72-a098-94d3aab15f2d.jpg.webp"
   },
   {
     "ID_Perangkat": "LP002",
@@ -39,7 +40,8 @@
     "Status_Garansi_Resmi": "1 Tahun Resmi Axioo Indonesia",
     "Rekomendasi_UseCase_Tag": "#skripsi-browsing #office",
     "Pros_Kelebihan": "Harga sangat terjangkau, RAM bisa diupgrade",
-    "Cons_Kekurangan": "Layar standar, build quality plastik"
+    "Cons_Kekurangan": "Layar standar, build quality plastik",
+    "Link_Gambar": "https://axiooworld.com/uploads/products/a6db26b9-a01e-40f2-a45a-79c275d6a4ed.png"
   },
   {
     "ID_Perangkat": "LP003",
@@ -60,7 +62,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Lenovo Indonesia",
     "Rekomendasi_UseCase_Tag": "#skripsi-browsing #office",
     "Pros_Kelebihan": "Brand terpercaya, build quality lumayan",
-    "Cons_Kekurangan": "Layar masih TN panel"
+    "Cons_Kekurangan": "Layar masih TN panel",
+    "Link_Gambar": "https://p3-ofp.static.pub//fes/cms/2024/04/29/09bkal2ihkgzk5u7ztpfx54w8xeitl660072.png"
   },
   {
     "ID_Perangkat": "LP004",
@@ -81,7 +84,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia",
     "Rekomendasi_UseCase_Tag": "#coding-web #office",
     "Pros_Kelebihan": "Ringan, baterai awet",
-    "Cons_Kekurangan": "Performa CPU standar, RAM disolder"
+    "Cons_Kekurangan": "Performa CPU standar, RAM disolder",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/7b6485d2-2950-485c-92c9-58692b928766/w800"
   },
   {
     "ID_Perangkat": "LP005",
@@ -102,7 +106,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi MSI Indonesia",
     "Rekomendasi_UseCase_Tag": "#coding-docker #multitasking",
     "Pros_Kelebihan": "RAM bisa diupgrade, port lengkap",
-    "Cons_Kekurangan": "Kipas agak berisik saat full load"
+    "Cons_Kekurangan": "Kipas agak berisik saat full load",
+    "Link_Gambar": "https://storage-asset.msi.com/global/picture/product/product_168974719493480c4e090deebe413ef445cef0ec7d.webp"
   },
   {
     "ID_Perangkat": "LP006",
@@ -123,7 +128,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Acer + 1 Tahun ADP",
     "Rekomendasi_UseCase_Tag": "#render-video #desain-grafis",
     "Pros_Kelebihan": "Layar OLED brilian, performa kencang",
-    "Cons_Kekurangan": "Baterai boros karena layar resolusi tinggi"
+    "Cons_Kekurangan": "Baterai boros karena layar resolusi tinggi",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/8/11c82b17-a5fb-47a9-9e99-9b2de47ba735.png.webp"
   },
   {
     "ID_Perangkat": "LP007",
@@ -144,7 +150,8 @@
     "Status_Garansi_Resmi": "2 Tahun Lenovo Premium Care + ADP",
     "Rekomendasi_UseCase_Tag": "#render-blender #gaming",
     "Pros_Kelebihan": "Performa gaming/render solid, pendingin bagus",
-    "Cons_Kekurangan": "Berat, baterai cepat habis"
+    "Cons_Kekurangan": "Berat, baterai cepat habis",
+    "Link_Gambar": "https://p3-ofp.static.pub/fes/cms/2023/03/17/4yhpixth1hb3surortvy598j94erfo019620.png"
   },
   {
     "ID_Perangkat": "LP008",
@@ -165,7 +172,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia + Perfect Warranty",
     "Rekomendasi_UseCase_Tag": "#render-blender #gaming",
     "Pros_Kelebihan": "GPU kencang untuk 3D, daya tahan baterai lumayan",
-    "Cons_Kekurangan": "Layar color gamut standar"
+    "Cons_Kekurangan": "Layar color gamut standar",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/06189b63-909c-4d7e-8d3c-e99f5b677f30/w800"
   },
   {
     "ID_Perangkat": "LP009",
@@ -186,7 +194,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi HP Indonesia + ADP",
     "Rekomendasi_UseCase_Tag": "#render-3d-ringan #gaming",
     "Pros_Kelebihan": "Desain kalem, harga masuk akal",
-    "Cons_Kekurangan": "RAM bawaan cuma 8GB, engsel layar agak goyang"
+    "Cons_Kekurangan": "RAM bawaan cuma 8GB, engsel layar agak goyang",
+    "Link_Gambar": "https://www.hp.com/content/dam/sites/omen/worldwide/laptops/2022-victus-15-intel/Hero%20Image%201.png"
   },
   {
     "ID_Perangkat": "LP010",
@@ -207,7 +216,8 @@
     "Status_Garansi_Resmi": "1 Tahun Resmi Apple Indonesia",
     "Rekomendasi_UseCase_Tag": "#desain-grafis #video-editing",
     "Pros_Kelebihan": "Performa kencang & silent, baterai luar biasa",
-    "Cons_Kekurangan": "RAM dan Storage tidak bisa diupgrade"
+    "Cons_Kekurangan": "RAM dan Storage tidak bisa diupgrade",
+    "Link_Gambar": "https://cdsassets.apple.com/live/SZLF0YNV/images/sp/111867_SP869-2022-macbook-air-m2-colors.png"
   },
   {
     "ID_Perangkat": "LP011",
@@ -228,7 +238,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#coding-docker #esports-gaming",
     "Pros_Kelebihan": "Value for money sangat tinggi, mudah diupgrade",
-    "Cons_Kekurangan": "Butuh beli monitor terpisah, tidak mobile"
+    "Cons_Kekurangan": "Butuh beli monitor terpisah, tidak mobile",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/aphluv/1997/1/1/f92a2ea3bdb9499e872dd0e5e34fc09c~.jpeg.webp"
   },
   {
     "ID_Perangkat": "LP012",
@@ -249,7 +260,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#render-blender #gaming",
     "Pros_Kelebihan": "Performa setara laptop 15 jutaan, upgradable",
-    "Cons_Kekurangan": "Butuh beli monitor terpisah, tidak mobile"
+    "Cons_Kekurangan": "Butuh beli monitor terpisah, tidak mobile",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/11/8/3a0306aa-0911-448a-a6d2-b221125c92e3.png.webp"
   },
   {
     "ID_Perangkat": "LP013",
@@ -270,7 +282,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia + ADP",
     "Rekomendasi_UseCase_Tag": "#kedokteran-anatomi #baterai-awet #ultrabook",
     "Pros_Kelebihan": "Layar OLED resolusi ultra tinggi cocok untuk visual atlas anatomi/radiologi, baterai tahan 12+ jam",
-    "Cons_Kekurangan": "RAM soldered tidak bisa diupgrade"
+    "Cons_Kekurangan": "RAM soldered tidak bisa diupgrade",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/caf912a5-5bc2-4a81-ac8f-6339e488f549/w800"
   },
   {
     "ID_Perangkat": "LP014",
@@ -291,7 +304,8 @@
     "Status_Garansi_Resmi": "3 Tahun Lenovo Premium Care + ADP",
     "Rekomendasi_UseCase_Tag": "#kedokteran-klinis #super-ringan #jurnal-pdf",
     "Pros_Kelebihan": "Sangat ringan di bawah 1 kg mudah dibawa stase/koas, layar sangat tajam",
-    "Cons_Kekurangan": "Port konektivitas terbatas Type-C"
+    "Cons_Kekurangan": "Port konektivitas terbatas Type-C",
+    "Link_Gambar": "https://p3-ofp.static.pub/fes/cms/2022/06/10/6nmqgtdgvf67evhsbqilrnnzxpvbjp125054.png"
   },
   {
     "ID_Perangkat": "LP015",
@@ -312,7 +326,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi HP Indonesia + ADP",
     "Rekomendasi_UseCase_Tag": "#kedokteran-koas #ringan-dibawa #baca-jurnal",
     "Pros_Kelebihan": "Bobot kurang dari 1 kg, layar 400 nits nyaman di ruangan terang, harga bersahabat",
-    "Cons_Kekurangan": "Tidak ada slot upgrade RAM"
+    "Cons_Kekurangan": "Tidak ada slot upgrade RAM",
+    "Link_Gambar": "https://jp.ext.hp.com/content/dam/jp-ext-hp-com/jp/ja/ec/notebooks/personal/pavilion_aero_13_be/images/move_g3_top_full.jpg"
   },
   {
     "ID_Perangkat": "LP016",
@@ -333,7 +348,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Acer Indonesia + 1 Tahun ADP",
     "Rekomendasi_UseCase_Tag": "#kedokteran-viewer3d #riset-kesehatan",
     "Pros_Kelebihan": "Layar OLED 100% DCI-P3 akurat untuk gambar histologi dan anatomi, NPU AI",
-    "Cons_Kekurangan": "Suhu bodi terasa hangat saat rendering gambar 3D"
+    "Cons_Kekurangan": "Suhu bodi terasa hangat saat rendering gambar 3D",
+    "Link_Gambar": "https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/img/VqbcmM/2024/9/10/d57dfde6-656a-437f-ac88-a920edb006df.jpg~tplv-aphluv4xwc-white-pad-v1:250:250.jpg"
   },
   {
     "ID_Perangkat": "LP017",
@@ -354,7 +370,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi Lenovo Onsite Service",
     "Rekomendasi_UseCase_Tag": "#akuntansi-excel #spss-statistik #tahan-banting",
     "Pros_Kelebihan": "Keyboard ThinkPad legendaris terbaik untuk olah ribuan baris Excel, RAM bisa diupgrade",
-    "Cons_Kekurangan": "Layar standar 45% NTSC"
+    "Cons_Kekurangan": "Layar standar 45% NTSC",
+    "Link_Gambar": "https://p2-ofp.static.pub//fes/cms/2024/04/01/z8bgj58grdworyvk3yeebxfrwtaehq192566.png"
   },
   {
     "ID_Perangkat": "LP018",
@@ -375,7 +392,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi HP Indonesia",
     "Rekomendasi_UseCase_Tag": "#akuntansi-numpad #olah-data-excel",
     "Pros_Kelebihan": "Dilengkapi dedicated full numpad fisik untuk input data finansial cepat, RAM upgradeable",
-    "Cons_Kekurangan": "Bodi agak lebar karena ukuran 15.6 inch"
+    "Cons_Kekurangan": "Bodi agak lebar karena ukuran 15.6 inch",
+    "Link_Gambar": "https://br-media.hptiendaenlinea.com/catalog/product/cache/b3b166914d87ce343d4dc5ec5117b502/c/0/c07973357_4.png"
   },
   {
     "ID_Perangkat": "LP019",
@@ -396,7 +414,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi ASUS Onsite Service",
     "Rekomendasi_UseCase_Tag": "#bisnis-presentasi #kantor-kampus",
     "Pros_Kelebihan": "Standar ketahanan militer MIL-STD 810H, garansi on-site resmi panjang",
-    "Cons_Kekurangan": "Performa CPU standar untuk tugas kantor"
+    "Cons_Kekurangan": "Performa CPU standar untuk tugas kantor",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/8278cea6-079e-4bb1-9c72-c39611d25dc6/w800"
   },
   {
     "ID_Perangkat": "LP020",
@@ -417,7 +436,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia",
     "Rekomendasi_UseCase_Tag": "#hukum-skripsi #baca-kasus #dokumen-sidang",
     "Pros_Kelebihan": "Harga terjangkau, webcam privacy shutter, sertifikasi anti-bakteri",
-    "Cons_Kekurangan": "Bezel layar agak tebal"
+    "Cons_Kekurangan": "Bezel layar agak tebal",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/d7dac694-ccb7-416e-acea-0c776a878760/w800"
   },
   {
     "ID_Perangkat": "LP021",
@@ -438,7 +458,8 @@
     "Status_Garansi_Resmi": "1 Tahun Garansi Resmi",
     "Rekomendasi_UseCase_Tag": "#kedokteran-catatan-stylus #anatomi-drawing",
     "Pros_Kelebihan": "Layar sentuh mendukung stylus pen untuk anotasi organ tubuh langsung pada slide, sangat ringkas",
-    "Cons_Kekurangan": "Keyboard cover dan stylus dijual terpisah"
+    "Cons_Kekurangan": "Keyboard cover dan stylus dijual terpisah",
+    "Link_Gambar": "https://support.microsoft.com/en-us/surface/media/surface-pro-9-side.png"
   },
   {
     "ID_Perangkat": "LP022",
@@ -459,7 +480,8 @@
     "Status_Garansi_Resmi": "2 Tahun Lenovo Premium Care",
     "Rekomendasi_UseCase_Tag": "#komunikasi-media #multitasking-tab #nonton-video",
     "Pros_Kelebihan": "Layar OLED jernih untuk media review, CPU 8-core gesit untuk multitasking banyak aplikasi",
-    "Cons_Kekurangan": "RAM onboard disolder"
+    "Cons_Kekurangan": "RAM onboard disolder",
+    "Link_Gambar": "https://p4-ofp.static.pub//fes/cms/2024/09/16/6b41yin3taay4m7wtg07zqibtd4o5r688553.png"
   },
   {
     "ID_Perangkat": "LP023",
@@ -480,7 +502,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Acer Indonesia + 1 Tahun ADP",
     "Rekomendasi_UseCase_Tag": "#pelajar-sma #cbt-online #office-canva",
     "Pros_Kelebihan": "Layar IPS WUXGA rasio 16:10 lega untuk tugas dokumen, RAM dan SSD masih bisa diupgrade",
-    "Cons_Kekurangan": "Prosesor N100 hanya untuk beban kerja ringan dan administrasi"
+    "Cons_Kekurangan": "Prosesor N100 hanya untuk beban kerja ringan dan administrasi",
+    "Link_Gambar": "https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/img/VqbcmM/2025/1/18/a20cb6c9-6016-48ab-a1cb-9606e15342de.jpg"
   },
   {
     "ID_Perangkat": "LP024",
@@ -501,7 +524,8 @@
     "Status_Garansi_Resmi": "1 Tahun Resmi Axioo Indonesia + ADP",
     "Rekomendasi_UseCase_Tag": "#pelajar-smk #tugas-sekolah #google-workspace",
     "Pros_Kelebihan": "Harga sangat ramah kantong pelajar, layar sudah panel IPS dan slot RAM SODIMM bisa diupgrade",
-    "Cons_Kekurangan": "Kapasitas SSD bawaan 256GB relatif terbatas, kualitas speaker standar"
+    "Cons_Kekurangan": "Kapasitas SSD bawaan 256GB relatif terbatas, kualitas speaker standar",
+    "Link_Gambar": "https://axiooworld.com/uploads/products/d34831bd-2893-44a0-92c1-7bebdd7be26d.jpg"
   },
   {
     "ID_Perangkat": "LP025",
@@ -522,7 +546,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Lenovo Indonesia",
     "Rekomendasi_UseCase_Tag": "#pelajar-sma #elearning-zoom #mengetik-tugas",
     "Pros_Kelebihan": "Bodi ringkas dan ringan dibawa ke sekolah, baterai irit untuk ujian CBT dan streaming edukasi",
-    "Cons_Kekurangan": "Panel layar masih TN dengan sudut pandang sempit, RAM LPDDR5 disolder"
+    "Cons_Kekurangan": "Panel layar masih TN dengan sudut pandang sempit, RAM LPDDR5 disolder",
+    "Link_Gambar": "https://p1-ofp.static.pub/medias/bWFzdGVyfHJvb3R8NTUzMDYyfGltYWdlL3BuZ3xoMWUvaDMxLzEyODE3NjgwNDY1OTUwLnBuZ3w1M2E2Nzk5NWI3NWNkOTNlZGVhZjdiMmRhNjNhNGIxZGJkOTJiOWU3ZTFmZGIxOWZjNGNmYWYxYzUzOTVlODU1/lenovo-laptops-ideapad-1i-gen-7-14-AMD-hero.png"
   },
   {
     "ID_Perangkat": "LP026",
@@ -2174,7 +2199,7 @@
     "RAM_GB": "8.0",
     "Upgradeable_RAM": "Tidak",
     "Storage_GB_Tipe": "256GB SSD NVMe",
-    "Layar_Ukuran_Panel_ColorGamut": "14\" FHD (1920x1080) IPS Touch 360\u00b0",
+    "Layar_Ukuran_Panel_ColorGamut": "14\" FHD (1920x1080) IPS Touch 360°",
     "Bobot_kg": "1.5",
     "Estimasi_Harga_Pasar_IDR": "5899000.0",
     "Platform_Rekomendasi_Beli": "Shopee Mall (Advan Official Store)",
@@ -6745,7 +6770,7 @@
     "Kategori_Target": "Mobilitas & Riset Klinis",
     "Target_Mahasiswa_Jurusan": "Mahasiswa Medis, Keperawatan, Farmasi & Kebidanan",
     "Brand": "Dynabook",
-    "Model_Seri": "Port\u00e9g\u00e9 X30L-K (0.9kg)",
+    "Model_Seri": "Portégé X30L-K (0.9kg)",
     "Tipe_Perangkat": "Laptop",
     "Processor_CPU": "Intel Core i5-1240P",
     "Kartu_Grafis_GPU": "Intel Iris Xe Graphics",
@@ -8943,7 +8968,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Dell ProSupport Onsite",
     "Rekomendasi_UseCase_Tag": "#manajemen-keuangan #numpad-murah #garansi-onsite",
     "Pros_Kelebihan": "Keyboard lega dengan numeric keypad terdedikasi, engsel drop-hinge mengangkat keyboard untuk sirkulasi udara dan posisi ketik nyaman",
-    "Cons_Kekurangan": "Port charger masih tipe barel konvensional"
+    "Cons_Kekurangan": "Port charger masih tipe barel konvensional",
+    "Link_Gambar": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/vostro-notebooks/15-3500/media-gallery/archive/notebook-vostro-15-3500-black-gallery-1.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=555"
   },
   {
     "ID_Perangkat": "LP427",
@@ -8964,7 +8990,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Lenovo Premium Care",
     "Rekomendasi_UseCase_Tag": "#ekonomi-olahdata #spss-regresi #layar-300nits",
     "Pros_Kelebihan": "Layar IPS 300 nits tajam bebas silau dipadu numpad fisik memudahkan entri ribuan kuesioner SPSS dan neraca saldo",
-    "Cons_Kekurangan": "Kapasitas baterai 38Wh standar untuk pemakaian di meja belajar"
+    "Cons_Kekurangan": "Kapasitas baterai 38Wh standar untuk pemakaian di meja belajar",
+    "Link_Gambar": "https://psrefstuff.lenovo.com/syspool/Sys/Image/IdeaPad/IdeaPad_3_15ALC6/Compressedimage/IdeaPad_3_15ALC6_CT1_01.png"
   },
   {
     "ID_Perangkat": "LP428",
@@ -8985,7 +9012,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi HP Indonesia",
     "Rekomendasi_UseCase_Tag": "#ekonomi-pembangunan #numpad-hemat #input-data-spss",
     "Pros_Kelebihan": "Laptop ber-numpad fisik harga ekonomis dengan SSD 512GB dan slot RAM SODIMM yang masih bisa diupgrade",
-    "Cons_Kekurangan": "Kinerja prosesor ditujukan untuk tugas input dan pengolahan data kantor"
+    "Cons_Kekurangan": "Kinerja prosesor ditujukan untuk tugas input dan pengolahan data kantor",
+    "Link_Gambar": "https://hp.widen.net/content/sgqtogy6xp/webp/sgqtogy6xp.png?dpi=72&color=ffffff00&w=270"
   },
   {
     "ID_Perangkat": "LP429",
@@ -9006,7 +9034,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi ASUS Onsite Service",
     "Rekomendasi_UseCase_Tag": "#bisnis-administrasi #numpad-hemat #garansi-onsite-3th",
     "Pros_Kelebihan": "Laptop bisnis ber-numpad fisik standar militer MIL-STD-810H termurah dengan garansi on-site 3 tahun dan slot ekspansi SODIMM",
-    "Cons_Kekurangan": "Prosesor hemat daya 4-core ditujukan untuk komputasi administratif"
+    "Cons_Kekurangan": "Prosesor hemat daya 4-core ditujukan untuk komputasi administratif",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/695663ab-72d8-4bc0-9eaf-e971c33872d2/w692"
   },
   {
     "ID_Perangkat": "LP430",
@@ -9027,7 +9056,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia + Perfect Warranty",
     "Rekomendasi_UseCase_Tag": "#tablet-gaming-ai #core-i9-portable #cuda-sub-1-2kg",
     "Pros_Kelebihan": "Tablet gaming super bertenaga 1.18 kg berprosesor 14-core Core i9 dan GPU RTX 3050 Ti untuk komputasi AI portable",
-    "Cons_Kekurangan": "RAM LPDDR5 onboard disolder permanen"
+    "Cons_Kekurangan": "RAM LPDDR5 onboard disolder permanen",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/34C1E26D-F64A-4B4F-8DAC-6C168F7C90E2/w250/fwebp"
   },
   {
     "ID_Perangkat": "LP431",
@@ -9048,7 +9078,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi Lenovo Premium Care + ADP",
     "Rekomendasi_UseCase_Tag": "#cuda-entry-murah #pyTorch-belajar #docker-pemula",
     "Pros_Kelebihan": "Pilihan laptop GPU CUDA termurah dengan pendinginan dual fan andal dan dual slot SODIMM DDR4 untuk mahasiswa IT",
-    "Cons_Kekurangan": "Kecerahan layar 250 nits standar ruangan kelas"
+    "Cons_Kekurangan": "Kecerahan layar 250 nits standar ruangan kelas",
+    "Link_Gambar": "https://psrefstuff.lenovo.com/syspool//Sys/Image/IdeaPad/IdeaPad_Gaming_3_15ACH6/Compressedimage/IdeaPad_Gaming_3_15ACH6_CT1_07.png"
   },
   {
     "ID_Perangkat": "LP432",
@@ -9069,7 +9100,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi HP Indonesia + ADP",
     "Rekomendasi_UseCase_Tag": "#ai-entry #cuda-tensor #compiling-12core",
     "Pros_Kelebihan": "Prosesor 12-core 16-thread gesit merender dan compiling container Docker multi-service dipadu GPU RTX 3050",
-    "Cons_Kekurangan": "Tingkat color gamut layar 45% NTSC standar untuk coding"
+    "Cons_Kekurangan": "Tingkat color gamut layar 45% NTSC standar untuk coding",
+    "Link_Gambar": "https://www.hp.com/content/dam/sites/omen/worldwide/laptops/2022-victus-15-intel/Hero%20Image%201.png"
   },
   {
     "ID_Perangkat": "LP433",
@@ -9090,7 +9122,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi Acer Indonesia + 1 Tahun ADP",
     "Rekomendasi_UseCase_Tag": "#layar-qhd-165hz #cuda-rtx3060 #aeroblade-3d-fan",
     "Pros_Kelebihan": "Kipas logam AeroBlade 3D Fan menjaga suhu tetap stabil saat training model neural network berjam-jam nonstop",
-    "Cons_Kekurangan": "Bobot cukup berat (2.5 kg) dengan charger 230W"
+    "Cons_Kekurangan": "Bobot cukup berat (2.5 kg) dengan charger 230W",
+    "Link_Gambar": "https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/img/VqbcmM/2024/9/10/d57dfde6-656a-437f-ac88-a920edb006df.jpg~tplv-aphluv4xwc-white-pad-v1:250:250.jpg"
   },
   {
     "ID_Perangkat": "LP434",
@@ -9111,7 +9144,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi MSI Indonesia",
     "Rekomendasi_UseCase_Tag": "#vram-8gb-sub-2kg #ai-dataset #docker-multiservice",
     "Pros_Kelebihan": "Bobot di bawah 2 kg untuk laptop ber-GPU RTX 4060 8GB VRAM dengan sasis semi-transparan futuristik cocok untuk anak IT",
-    "Cons_Kekurangan": "TGP GPU dibatasi 45W untuk menjaga ketipisan bodi"
+    "Cons_Kekurangan": "TGP GPU dibatasi 45W untuk menjaga ketipisan bodi",
+    "Link_Gambar": "https://storage-asset.msi.com/global/picture/product/product_1666230671cfcf9af85b2fed6bd4d725febb0677a6.webp"
   },
   {
     "ID_Perangkat": "LP435",
@@ -9132,7 +9166,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia + Perfect Warranty",
     "Rekomendasi_UseCase_Tag": "#vram-16gb-monster #llm-local-training #flagship-ultimate",
     "Pros_Kelebihan": "GPU RTX 4090 16GB VRAM dan CPU 16-core 32-thread terkencang sanggup menjalankan fine-tuning LLM LLaMA-70B lokal",
-    "Cons_Kekurangan": "Bobot 3.0 kg dan harga kelas sultan untuk laboratorium AI riset"
+    "Cons_Kekurangan": "Bobot 3.0 kg dan harga kelas sultan untuk laboratorium AI riset",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/8991224D-716A-4ECE-A5FD-5A007914F3EA/w250/fwebp"
   },
   {
     "ID_Perangkat": "LP436",
@@ -9153,7 +9188,8 @@
     "Status_Garansi_Resmi": "3 Tahun Premier Support Onsite + ADP",
     "Rekomendasi_UseCase_Tag": "#mobile-workstation-tipis #bodi-sub-1-9kg #sertifikasi-isv",
     "Pros_Kelebihan": "Workstation mobile tipis 1.86 kg berlayar 16:10 500 nits dengan GPU RTX 4060 dan sertifikasi ISV untuk stabilitas Docker",
-    "Cons_Kekurangan": "Investasi harga tinggi untuk kalangan software engineer profesional"
+    "Cons_Kekurangan": "Investasi harga tinggi untuk kalangan software engineer profesional",
+    "Link_Gambar": "https://p3-ofp.static.pub//fes/cms/2024/04/29/zsg0xo73hk703mpkoinw2usd69u3on297367.png"
   },
   {
     "ID_Perangkat": "LP437",
@@ -9174,7 +9210,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi ASUS Indonesia + Perfect Warranty",
     "Rekomendasi_UseCase_Tag": "#layar-sentuh-17inch #dkv-editing-video #audio-harman-kardon",
     "Pros_Kelebihan": "Kanvas layar sentuh 17.3 inch 165Hz 100% DCI-P3 luar biasa lapang untuk timeline Premiere Pro dan color grading video",
-    "Cons_Kekurangan": "Dimensi bodi 17.3 inch membutuhkan meja kerja berukuran luas"
+    "Cons_Kekurangan": "Dimensi bodi 17.3 inch membutuhkan meja kerja berukuran luas",
+    "Link_Gambar": "https://press.asus.com/assets/w_1200,h_630/32a57afc-8236-46fd-87fa-118589f568f6/defaultImg.bb7db14.jpg"
   },
   {
     "ID_Perangkat": "LP438",
@@ -9195,7 +9232,8 @@
     "Status_Garansi_Resmi": "3 Tahun Lenovo Premium Care + ADP",
     "Rekomendasi_UseCase_Tag": "#dkv-illustrator #animasi-aftereffects #bodi-ringan-1-49kg",
     "Pros_Kelebihan": "Layar 14.5 inch 16:10 100% sRGB dipadu GPU RTX 3050 6GB VRAM siap merender proyek After Effects dan Blender pemula",
-    "Cons_Kekurangan": "RAM 16GB LPDDR5 onboard disolder permanen"
+    "Cons_Kekurangan": "RAM 16GB LPDDR5 onboard disolder permanen",
+    "Link_Gambar": "https://psrefstuff.lenovo.com/syspool//Sys/Image/Yoga/Yoga_Pro_7_14ARP8/Compressedimage/Yoga_Pro_7_14ARP8_CT1_01.png"
   },
   {
     "ID_Perangkat": "LP439",
@@ -9216,7 +9254,8 @@
     "Status_Garansi_Resmi": "2 Tahun Resmi MSI Indonesia",
     "Rekomendasi_UseCase_Tag": "#arsitektur-sketchup #autocad-rendering #layar-qhd-16-10",
     "Pros_Kelebihan": "Layar 16 inch rasio emas 16:10 100% DCI-P3 dipadu GPU RTX 4050 untuk modeling 3D SketchUp dan denah AutoCAD",
-    "Cons_Kekurangan": "Refresh rate layar standar 60Hz"
+    "Cons_Kekurangan": "Refresh rate layar standar 60Hz",
+    "Link_Gambar": "https://storage-asset.msi.com/global/picture/product/product_168973546008eba6e6fb846eef66e4cacf53fc4f61.webp"
   },
   {
     "ID_Perangkat": "LP440",
@@ -9237,7 +9276,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi Acer Indonesia + 1 Tahun ADP",
     "Rekomendasi_UseCase_Tag": "#akurasi-pantone #layar-3k-presisi #render-blender",
     "Pros_Kelebihan": "Layar 3K rasio 16:10 PANTONE Validated dengan Delta E < 2 dan pendingin Vortex Flow senyap di bawah 40 dBA saat rendering",
-    "Cons_Kekurangan": "Bobot 2.45 kg cukup padat di dalam tas"
+    "Cons_Kekurangan": "Bobot 2.45 kg cukup padat di dalam tas",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/8/11c82b17-a5fb-47a9-9e99-9b2de47ba735.png.webp"
   },
   {
     "ID_Perangkat": "LP441",
@@ -9258,7 +9298,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi HP Onsite Premier",
     "Rekomendasi_UseCase_Tag": "#arsitektur-revit #civil3d-pemetaan #rtx-ada-workstation",
     "Pros_Kelebihan": "Workstation mobile bersertifikasi ISV Autodesk dengan GPU profesional RTX 2000 Ada untuk rendering BIM Revit tanpa crash",
-    "Cons_Kekurangan": "Harga berada di level korporat profesional"
+    "Cons_Kekurangan": "Harga berada di level korporat profesional",
+    "Link_Gambar": "https://hp.widen.net/content/sgqtogy6xp/webp/sgqtogy6xp.png?dpi=72&color=ffffff00&w=270"
   },
   {
     "ID_Perangkat": "LP442",
@@ -9279,7 +9320,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi ASUS Indonesia + Perfect Warranty",
     "Rekomendasi_UseCase_Tag": "#workstation-xeon #layar-4k-oled #asus-dialpad-rotary",
     "Pros_Kelebihan": "Prosesor Intel Xeon kelas workstation dengan memori ECC, GPU RTX A3000 profesional, dan ASUS DialPad fisik putar",
-    "Cons_Kekurangan": "Konsumsi daya adaptor 240W cukup besar"
+    "Cons_Kekurangan": "Konsumsi daya adaptor 240W cukup besar",
+    "Link_Gambar": "https://dlcdnwebimgs.asus.com/gain/7f7f6ab9-1e50-4b35-8fda-a1c8cd1c15f0/w692"
   },
   {
     "ID_Perangkat": "LP443",
@@ -9300,7 +9342,8 @@
     "Status_Garansi_Resmi": "1 Tahun Resmi Apple Indonesia",
     "Rekomendasi_UseCase_Tag": "#colorist-grading #video-editing-4k #layar-xdr-120hz",
     "Pros_Kelebihan": "Layar Liquid Retina XDR 1000 nits sustained paling akurat di bawah 20 juta untuk color grading film dan editing video 4K ProRes",
-    "Cons_Kekurangan": "Port konektivitas tidak memiliki port USB Type-A konvensional"
+    "Cons_Kekurangan": "Port konektivitas tidak memiliki port USB Type-A konvensional",
+    "Link_Gambar": "https://cdsassets.apple.com/live/SZLF0YNV/images/sp/111902_mbp14-silver2.png"
   },
   {
     "ID_Perangkat": "LP444",
@@ -9321,7 +9364,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#pc-vram-16gb-amd #am5-futureproof #blender-cycles",
     "Pros_Kelebihan": "VRAM 16GB GDDR6 paling ekonomis untuk rendering scene 3D kompleks di Blender dan fine-tuning AI lokal di platform socket AM5",
-    "Cons_Kekurangan": "Membutuhkan pembelian monitor dan periferal tambahan secara mandiri"
+    "Cons_Kekurangan": "Membutuhkan pembelian monitor dan periferal tambahan secara mandiri",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/11/8/3a0306aa-0911-448a-a6d2-b221125c92e3.png.webp"
   },
   {
     "ID_Perangkat": "LP445",
@@ -9342,7 +9386,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#pc-sweetspot-sub-7jt #gaming-1080p #coding-fullstack",
     "Pros_Kelebihan": "Kombinasi CPU 6-core 12-thread dan GPU GTX 1660 Super 6GB sanggup melibas game esports dan komputasi kuliah teknik di bawah 7 juta",
-    "Cons_Kekurangan": "Belum mendukung fitur ray tracing RTX"
+    "Cons_Kekurangan": "Belum mendukung fitur ray tracing RTX",
+    "Link_Gambar": "https://images.tokopedia.net/img/cache/700/aphluv/1997/1/1/f92a2ea3bdb9499e872dd0e5e34fc09c~.jpeg.webp"
   },
   {
     "ID_Perangkat": "LP446",
@@ -9363,7 +9408,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#pc-apu-hemat-4jt #dual-channel-ram #kos-listrik-irit",
     "Pros_Kelebihan": "Solusi PC rakitan kos paling hemat daya (65 Watt) tanpa GPU diskrit, lancar coding Docker, komputasi Excel, dan game esports ringan",
-    "Cons_Kekurangan": "Grafis terintegrasi belum sanggup untuk render 3D berat"
+    "Cons_Kekurangan": "Grafis terintegrasi belum sanggup untuk render 3D berat",
+    "Link_Gambar": "https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/0520cdd12d8b4b20a86a9e37df8440f7~tplv-aphluv4xwc-white-pad-v1:250:250.jpeg"
   },
   {
     "ID_Perangkat": "LP447",
@@ -9384,7 +9430,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#pc-powerhouse-am5 #blender-cycles-fast #ai-cuda-tensor",
     "Pros_Kelebihan": "Performa kencang 8-core 16-thread arsitektur Zen 4 dipadu GPU RTX 4070 Super untuk rendering arsitektur Lumion dan simulasi AI",
-    "Cons_Kekurangan": "Konsumsi daya listrik 400 Watt saat full rendering"
+    "Cons_Kekurangan": "Konsumsi daya listrik 400 Watt saat full rendering",
+    "Link_Gambar": "https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/img/VqbcmM/2023/1/9/a464a417-378b-454e-b708-5704b1c10c53.jpg~tplv-aphluv4xwc-white-pad-v1:250:250.jpg"
   },
   {
     "ID_Perangkat": "LP448",
@@ -9405,7 +9452,8 @@
     "Status_Garansi_Resmi": "Garansi Per-Komponen 1-3 Tahun",
     "Rekomendasi_UseCase_Tag": "#pc-budget-sub-4jt #multi-monitor #tugas-kantor",
     "Pros_Kelebihan": "Biaya di bawah 4 juta sudah dapat CPU 4-core 8-thread dengan discrete GPU untuk dual-monitor browsing materi dan SPSS",
-    "Cons_Kekurangan": "Performa grafis hanya untuk display multi-monitor dan tugas komputasi dasar"
+    "Cons_Kekurangan": "Performa grafis hanya untuk display multi-monitor dan tugas komputasi dasar",
+    "Link_Gambar": "https://p16-oec-sg.ibyteimg.com/tos-alisg-i-aphluv4xwc-sg/4b790b9e2a26440aabcd7f179341ca14~tplv-aphluv4xwc-white-pad-v1:250:250.jpeg"
   },
   {
     "ID_Perangkat": "LP449",
@@ -9426,7 +9474,8 @@
     "Status_Garansi_Resmi": "3 Tahun Resmi Dell ProSupport Onsite",
     "Rekomendasi_UseCase_Tag": "#pc-builtup-enterprise #sff-ringkas-kos #garansi-onsite-3th",
     "Pros_Kelebihan": "Sasis Small Form Factor (SFF) hemat tempat meja kos ditenagai prosesor 12-core Core i7 dan garansi on-site enterprise 3 tahun",
-    "Cons_Kekurangan": "Menggunakan grafis terintegrasi Intel UHD 770"
+    "Cons_Kekurangan": "Menggunakan grafis terintegrasi Intel UHD 770",
+    "Link_Gambar": "https://i.dell.com/is/image/DellContent/content/dam/ss2/products/desktops-and-all-in-ones/optiplex/7000-tsff/media-gallery/optiplex-7000sff-gallery-4.psd?fmt=png-alpha&pscan=auto&scl=1&hei=320&wid=320"
   },
   {
     "ID_Perangkat": "LP450",
@@ -9447,6 +9496,7 @@
     "Status_Garansi_Resmi": "1 Tahun Garansi Resmi Distributor",
     "Rekomendasi_UseCase_Tag": "#mini-pc-ryzen9 #dual-usb4 #ram-32gb-ddr5",
     "Pros_Kelebihan": "Bodi mini metal ringkas berprosesor 8-core Ryzen 9 dengan grafis Radeon 680M, RAM 32GB DDR5, dan dual port USB4 40Gbps",
-    "Cons_Kekurangan": "Membutuhkan monitor eksternal dan periferal kabel/bluetooth"
+    "Cons_Kekurangan": "Membutuhkan monitor eksternal dan periferal kabel/bluetooth",
+    "Link_Gambar": "https://refurbished.minisforum.com/cdn/shop/files/UM690PRO3.webp?v=1785403179&width=1946"
   }
 ]

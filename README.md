@@ -1,14 +1,15 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="CariSpek - Speco Logo">
+  <img src="public/brand/speco-logo.png" width="280" alt="Speco Logo">
 </p>
 
-<h1 align="center">CariSpek: Sistem Pendukung Keputusan (SPK) Pemilihan Laptop</h1>
+<h1 align="center">Speco: Sistem Pendukung Keputusan (SPK) Pemilihan Laptop</h1>
 
 <p align="center">
   <strong>Implementasi Algoritma Simple Additive Weighting (SAW) untuk Rekomendasi Laptop Berbasis Profil Jurusan dan Anggaran Mahasiswa</strong>
 </p>
 
 <p align="center">
+  <a href="https://speco.nour.web.id"><img src="https://img.shields.io/badge/Live%20Demo-speco.nour.web.id-blue?style=for-the-badge&logo=vercel" alt="Live Demo"></a>
   <a href="#susunan-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/Tim-NEXORA%20Kelompok%207A-blue?style=for-the-badge" alt="Tim NEXORA"></a>
   <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Backend-Laravel%2012%20%7C%20PHP%208.4-red?style=for-the-badge&logo=laravel" alt="Laravel"></a>
   <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Frontend-Next.js%2016%20%7C%20React%2019-black?style=for-the-badge&logo=next.js" alt="Next.js"></a>
@@ -41,7 +42,7 @@ Pemilihan laptop untuk kebutuhan akademik sering kali menghadapi dua masalah uta
 1. **Under-specification**: Perangkat tidak sanggup menjalankan perangkat lunak perkuliahan (misal: IDE kompilasi berat, emulator Android, atau render 3D CAD) karena kapasitas RAM atau prosesor tidak mencukupi.
 2. **Over-budgeting**: Pengguna membeli laptop dengan harga tinggi untuk spesifikasi berlebih yang tidak digunakan dalam aktivitas studinya.
 
-CariSpek menyelesaikan permasalahan ini dengan menerapkan pendekatan **Multi-Attribute Decision Making (MADM)** melalui algoritma **Simple Additive Weighting (SAW)**. Sistem menyaring 450 unit laptop di pasar Indonesia dan menghasilkan skor kesesuaian matematis berdasarkan batasan dana dan kebutuhan jurusan pengguna.
+Speco menyelesaikan permasalahan ini dengan menerapkan pendekatan **Multi-Attribute Decision Making (MADM)** melalui algoritma **Simple Additive Weighting (SAW)**. Sistem menyaring 450 unit laptop di pasar Indonesia dan menghasilkan skor kesesuaian matematis berdasarkan batasan dana dan kebutuhan jurusan pengguna.
 
 ---
 

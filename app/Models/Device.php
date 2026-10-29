@@ -37,6 +37,7 @@ class Device extends Model
         'purchase_platform',
         'warranty',
         'usecase_tags',
+        'image_url',
         'pros',
         'cons',
     ];

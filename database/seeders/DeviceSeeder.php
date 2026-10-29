@@ -117,6 +117,7 @@ class DeviceSeeder extends Seeder
                     'purchase_platform' => $d['Platform_Rekomendasi_Beli'] ?? null,
                     'warranty' => $d['Status_Garansi_Resmi'] ?? null,
                     'usecase_tags' => $d['Rekomendasi_UseCase_Tag'] ?? null,
+                    'image_url' => !empty($d['Link_Gambar']) ? trim($d['Link_Gambar']) : null,
                     'pros' => $d['Pros_Kelebihan'] ?? null,
                     'cons' => $d['Cons_Kekurangan'] ?? null,
                 ]

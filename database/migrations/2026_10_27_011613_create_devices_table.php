@@ -42,6 +42,7 @@ return new class extends Migration
             $table->string('usecase_tags')->nullable();
             
             // Qualitative Analysis
+            $table->text('image_url')->nullable();
             $table->text('pros')->nullable();
             $table->text('cons')->nullable();
             

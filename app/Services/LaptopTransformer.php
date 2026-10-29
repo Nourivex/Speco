@@ -89,11 +89,12 @@ class LaptopTransformer
             'targetPersonas' => $targetPersonas,
             'pros' => !empty($pros) ? array_values($pros) : ['Performa tangguh di kelasnya', 'Desain ringkas'],
             'cons' => !empty($cons) ? array_values($cons) : ['Baterai standar untuk mobilitas tinggi'],
-            'imageUrl' => "/images/laptops/{$shape}-{$color}-34.webp",
+            'imageUrl' => !empty($device->image_url) ? $device->image_url : "/images/laptops/{$shape}-{$color}-34.webp",
             'image' => [
                 'shape' => $shape,
                 'color' => $color,
             ],
+            'customImageUrl' => !empty($device->image_url) ? $device->image_url : null,
             'marketplaceUrl' => $device->purchase_platform ?: 'https://tokopedia.com',
             'isMock' => false,
         ];

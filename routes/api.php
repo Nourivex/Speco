@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| CariSpek RESTful API Routes (v1 & Headless Frontend Integration)
+| Speco RESTful API Routes (v1 & Headless Frontend Integration)
 | Single Source of Truth Branding via config('brand')
 |--------------------------------------------------------------------------
 */
