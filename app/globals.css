@@ -1,0 +1,410 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Layar lebar yang cukup tinggi untuk section ter-pin (isi muat satu layar) dan tanpa reduced motion.
+   Di layar pendek (mis. laptop 1366×768) section ter-pin memakai tata letak statis agar tidak keluar section. */
+@custom-variant tall {
+  @media (min-width: 64rem) and (min-height: 50rem) and (prefers-reduced-motion: no-preference) {
+    @slot;
+  }
+}
+
+/*
+ * Design token NEXORA — PRD §22, diperluas untuk redesign "Live Spec" (docs/archive/REDESIGN.md §10–13).
+ * Light mode saja; dark mode masuk Nice to have (PRD §31).
+ */
+
+:root {
+  /* Ramp biru (REDESIGN §10), digeser ke rona kobalt sejak R4 agar semua blue-* menyatu dengan
+     bidang kobalt (disetujui Fahren, Okt 2026). blue-700 = kobalt-600 = primary. */
+  --blue-50: #eef1ff;
+  --blue-100: #dde3ff;
+  --blue-200: #c5d0ff;
+  --blue-400: #6f8bff;
+  --blue-600: #1f4bff;
+  --blue-700: #0034eb;
+  --blue-800: #0026ad;
+  --blue-950: #00176b;
+
+  /* Tinta untuk section gelap (maks. satu per layar) dan kertas */
+  --ink-950: #0a0f1c;
+  --ink-900: #111827;
+  --ink-700: #374151;
+  --paper-50: #f9fafb;
+  --paper-100: #f4f5f7;
+
+  /* Bidang kobalt + aksen sinyal (redesign "Kalimat terbelah", disetujui Fahren 25 Okt 2026).
+     Kobalt dipakai sebagai bidang penuh (hero, Analisis, CTA). Kuning hanya untuk aksi utama. */
+  --cobalt-100: #c5d0ff;
+  --cobalt-400: #6f8bff;
+  --cobalt-600: #0034eb;
+  --cobalt-700: #002fd6;
+  --cobalt-800: #0026ad;
+  --cobalt-950: #00176b;
+  --signal: #f3e91f;
+  --signal-hover: #e4da16;
+  --signal-active: #d4ca12;
+  --signal-ink: #111111;
+
+  /* Landing "Editorial Tech" (brief redesign landing, disetujui Fahren Okt 2026): UI netral hangat,
+     foto jadi sumber warna, kuning = aksi utama, biru = data/fungsional (skor, progres, pilihan). */
+  --canvas: #f7f5f0;
+  --canvas-line: #dcdad2;
+  --ink-strong: #111111;
+  --ink-soft: #62625c;
+  --data-blue: #1238f5;
+
+  /* Bidang di belakang render laptop: sama persis dengan latar render (REDESIGN §24) */
+  --studio: #eef0f4;
+
+  /* Warna PRD §22 */
+  --bg: #ffffff;
+  --surface: #f7f7f8;
+  --border: #e4e4e7;
+  --text: #18181b;
+  --text-muted: #52525b;
+  /* Primary = kobalt sejak R4 (disetujui Fahren, Okt 2026); dulu blue-700 PRD. */
+  --primary: var(--cobalt-600);
+  --primary-soft: var(--blue-50);
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  --info: #0369a1;
+  --success-soft: #f0fdf4;
+  --warning-soft: #fffbeb;
+  --danger-soft: #fef2f2;
+  --info-soft: #f0f9ff;
+
+  /* State turunan (bukan warna aksen baru): hover/active (REDESIGN §14) */
+  --primary-hover: var(--cobalt-700);
+  --primary-active: var(--cobalt-800);
+  --surface-hover: #efeff1;
+  --border-strong: #d4d4d8;
+
+  /* Motion (REDESIGN §13); nilai yang sama ada di lib/motion.ts untuk Motion */
+  --motion-fast: 140ms;
+  --motion-medium: 240ms;
+  --motion-slow: 560ms;
+
+  /* Variabel shadcn diarahkan ke token yang sama */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--bg);
+  --card-foreground: var(--text);
+  --popover: var(--bg);
+  --popover-foreground: var(--text);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--surface);
+  --accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--primary);
+
+  /* Radius dasar shadcn = 8px (tombol & input, PRD §22) */
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-surface-hover: var(--surface-hover);
+  --color-border-strong: var(--border-strong);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-success-soft: var(--success-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-info-soft: var(--info-soft);
+
+  --color-blue-50: var(--blue-50);
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-400: var(--blue-400);
+  --color-blue-600: var(--blue-600);
+  --color-blue-700: var(--blue-700);
+  --color-blue-800: var(--blue-800);
+  --color-blue-950: var(--blue-950);
+  --color-ink-950: var(--ink-950);
+  --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
+  --color-paper-50: var(--paper-50);
+  --color-paper-100: var(--paper-100);
+  --color-studio: var(--studio);
+  --color-cobalt-100: var(--cobalt-100);
+  --color-cobalt-400: var(--cobalt-400);
+  --color-cobalt-600: var(--cobalt-600);
+  --color-cobalt-700: var(--cobalt-700);
+  --color-cobalt-800: var(--cobalt-800);
+  --color-cobalt-950: var(--cobalt-950);
+  --color-signal: var(--signal);
+  --color-signal-hover: var(--signal-hover);
+  --color-signal-active: var(--signal-active);
+  --color-signal-ink: var(--signal-ink);
+  --color-canvas: var(--canvas);
+  --color-canvas-line: var(--canvas-line);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--ink-soft);
+  --color-data-blue: var(--data-blue);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Font PRD §22: Plus Jakarta Sans + JetBrains Mono (next/font di app/layout.tsx) */
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /* Radius PRD §22 */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-modal: 16px;
+}
+
+@theme {
+  /* Shadow PRD §22: hanya dua level */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+  /* Motion PRD §22/§25, kurva dari REDESIGN §13 */
+  --default-transition-duration: 140ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Skala tipografi PRD §22, diperbesar sesuai REDESIGN §11 (mobile-first, desktop mulai md = 768px) */
+@utility type-display {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  @media (width >= 48rem) {
+    font-size: 3.5rem;
+    line-height: 3.75rem;
+  }
+}
+/* Headline hero (REDESIGN §11): 44 → 64 → 80px. 80px baru di xl agar "kebutuhanmu." muat setengah kolom. */
+@utility type-display-xl {
+  font-size: 2.75rem;
+  line-height: 2.875rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  @media (width >= 48rem) {
+    font-size: 4rem;
+    line-height: 4.125rem;
+  }
+  @media (width >= 80rem) {
+    font-size: 5rem;
+    line-height: 5rem;
+  }
+}
+@utility type-h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  @media (width >= 48rem) {
+    font-size: 2.5rem;
+    line-height: 2.875rem;
+  }
+}
+@utility type-h2 {
+  font-size: 1.5rem;
+  line-height: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  @media (width >= 48rem) {
+    font-size: 1.75rem;
+    line-height: 2.125rem;
+  }
+}
+@utility type-h3 {
+  font-size: 1.125rem;
+  line-height: 1.625rem;
+  font-weight: 600;
+  @media (width >= 48rem) {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+}
+@utility type-body-l {
+  font-size: 1.0625rem;
+  line-height: 1.625rem;
+  font-weight: 400;
+  @media (width >= 48rem) {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+@utility type-body {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+}
+@utility type-small {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+}
+@utility type-micro {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+/* Skor kecocokan di payoff (REDESIGN §11): hanya Best Match */
+@utility type-numeric-xl {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: 4rem;
+  line-height: 4rem;
+  letter-spacing: -0.04em;
+  @media (width >= 48rem) {
+    font-size: 6rem;
+    line-height: 6rem;
+  }
+}
+
+/* Grid PRD §22: konten max 1200px, margin mobile 16px, gutter 24px */
+@utility page-container {
+  width: 100%;
+  max-width: calc(1200px + 3rem);
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 48rem) {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* Angka spek & skor sejajar (PRD §22) */
+@utility num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-bg text-text type-body antialiased;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Focus PRD §28: ring 2px primary + offset 2px, tidak pernah dihilangkan */
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  /* REDESIGN §25: di section gelap ring memakai blue-400 agar tetap kontras */
+  [data-tone="dark"] :focus-visible {
+    outline-color: var(--blue-400);
+  }
+  /* Di bidang kobalt ring memakai kuning sinyal (kontras dengan kobalt dan dengan tombol putih) */
+  [data-tone="cobalt"] :focus-visible {
+    outline-color: var(--signal);
+  }
+}
+
+/* PRD §25: item baru di panel ringkasan masuk dengan highlight singkat */
+@keyframes nexora-flash {
+  from {
+    background-color: var(--primary-soft);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@utility animate-flash {
+  animation: nexora-flash 1.2s ease-out;
+}
+
+/* Garis progres slide hero (pergantian otomatis memakai animationend-nya) */
+@keyframes nexora-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Gambar bergerak pelan (foto suasana, render CTA) */
+@keyframes nexora-drift {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.08) translate3d(-1.5%, -1%, 0);
+  }
+}
+@utility animate-drift {
+  animation: nexora-drift 18s ease-in-out infinite alternate;
+}
+
+/* Visual laptop "SPECO bukan toko": melayang sangat halus (−5 px), mati saat reduced motion */
+@keyframes nexora-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+@utility animate-float {
+  animation: nexora-float 5s ease-in-out infinite;
+}
+
+/* PRD §22/§28: semua animasi dimatikan saat prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
