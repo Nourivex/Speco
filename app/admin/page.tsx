@@ -1519,21 +1519,22 @@ export default function AdminPage() {
           5. MODAL FORM TAMBAH / EDIT LENGKAP (ALL 20 DATASET FIELDS) - DUAL THEME
       ============================================================================== */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className={`border rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-8 transition-colors ${
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+          <div className={`border rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl transition-colors overflow-hidden ${
             isDark ? "bg-slate-900 border-slate-700 text-white" : "bg-white border-slate-200 text-slate-900"
           }`}>
-            <div className={`flex items-center justify-between pb-4 border-b ${
-              isDark ? "border-slate-800" : "border-slate-100"
+            {/* Modal Header: Sticky Top with ID Badge & Close Button */}
+            <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
+              isDark ? "border-slate-800 bg-slate-900" : "border-slate-100 bg-white"
             }`}>
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold border ${
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold border shrink-0 ${
                   isDark ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-emerald-100 text-emerald-800 border-emerald-200"
                 }`}>
                   <DatabaseIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className={`text-lg font-black ${isDark ? "text-white" : "text-slate-900"}`}>
+                  <h3 className={`text-base sm:text-lg font-black leading-tight ${isDark ? "text-white" : "text-slate-900"}`}>
                     {editingLaptop ? "Perbarui Data Spesifikasi Perangkat" : "Tambah Perangkat Baru ke Dataset"}
                   </h3>
                   <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -1542,16 +1543,20 @@ export default function AdminPage() {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className={`p-2 rounded-xl transition-colors ${
+                className={`p-2 rounded-xl transition-colors cursor-pointer ${
                   isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
                 }`}
+                title="Tutup Modal"
               >
                 <XIcon className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitForm} className="space-y-4 text-xs">
+            {/* Modal Form with Scrollable Content Body */}
+            <form onSubmit={handleSubmitForm} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
               {/* Row 1: Brand & Device Type & Category */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
@@ -1956,32 +1961,33 @@ export default function AdminPage() {
                   />
                 </div>
               </div>
+            </div>
 
-              {/* Modal Action Buttons */}
-              <div className={`pt-4 border-t flex items-center justify-end gap-3 ${
-                isDark ? "border-slate-800" : "border-slate-100"
-              }`}>
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className={`px-4 py-2.5 rounded-xl font-bold transition-colors cursor-pointer ${
-                    isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                  }`}
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-700/20 transition-colors"
-                >
-                  {loading && (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  )}
-                  <span>Simpan ke Database Supabase</span>
-                </button>
-              </div>
-            </form>
+            {/* Modal Action Buttons: Sticky Bottom */}
+            <div className={`px-6 py-4 border-t flex items-center justify-end gap-3 shrink-0 ${
+              isDark ? "border-slate-800 bg-slate-900" : "border-slate-100 bg-slate-50"
+            }`}>
+              <button
+                type="button"
+                onClick={() => setIsAddModalOpen(false)}
+                className={`px-4 py-2.5 rounded-xl font-bold transition-colors cursor-pointer ${
+                  isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-slate-200/80 hover:bg-slate-200 text-slate-700"
+                }`}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-700/20 transition-colors"
+              >
+                {loading && (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                )}
+                <span>Simpan ke Database Supabase</span>
+              </button>
+            </div>
+          </form>
           </div>
         </div>
       )}
