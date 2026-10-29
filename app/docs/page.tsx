@@ -17,7 +17,7 @@ import { BrandIcon } from "@/components/ui/brand-icon";
 
 const SECTIONS = [
   { id: "ringkasan", label: "Ringkasan & Visi Sistem", icon: BookOpenTextIcon },
-  { id: "tim", label: "Struktur Tim NEXORA", icon: UsersThreeIcon },
+  { id: "tim", label: "Struktur TIM SPECO", icon: UsersThreeIcon },
   { id: "saw", label: "Formulasi Matematis SAW", icon: CalculatorIcon },
   { id: "database", label: "Arsitektur Basis Data", icon: DatabaseIcon },
   { id: "api", label: "Standar Kontrak API", icon: CodeIcon },
@@ -50,7 +50,7 @@ export default function DocsPage() {
                 Dokumentasi Resmi
               </span>
               <span className="text-xs text-slate-500 font-semibold hidden md:inline">
-                NEXORA (Kelompok 7A) • Rekayasa Perangkat Lunak
+                TIM SPECO (Kelompok 7A) • Rekayasa Perangkat Lunak
               </span>
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function DocsPage() {
               </section>
             )}
 
-            {/* SECTION 2: STRUKTUR TIM NEXORA */}
+            {/* SECTION 2: STRUKTUR TIM SPECO */}
             {activeSection === "tim" && (
               <section className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
                 <div>
@@ -197,7 +197,7 @@ export default function DocsPage() {
                     Bab 2: Manajemen Tim
                   </span>
                   <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight">
-                    Susunan Tim Pengembang NEXORA (Kelompok 7A)
+                    Susunan Tim Pengembang TIM SPECO (Kelompok 7A)
                   </h1>
                   <p className="text-sm text-slate-600 mt-1.5">
                     Mata Kuliah Rekayasa Perangkat Lunak (RPL) - Universitas Harkat Negeri.

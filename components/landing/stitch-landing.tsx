@@ -325,6 +325,12 @@ export function StitchLanding() {
                 Katalog Brand
               </a>
               <Link
+                href="/dashboard"
+                className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg"
+              >
+                Riwayat & Dashboard
+              </Link>
+              <Link
                 href="/docs"
                 className="px-3.5 py-2 text-xs font-bold text-emerald-800 hover:bg-emerald-50 transition-all rounded-lg flex items-center gap-1.5"
               >
@@ -1276,7 +1282,7 @@ export function StitchLanding() {
               </div>
               <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
                 Platform rekomendasi laptop berbasis data dan algoritma SAW untuk mahasiswa Indonesia.
-                Dibuat oleh Tim NEXORA (Kelompok 7A) untuk Mata Kuliah Rekayasa Perangkat Lunak.
+                Dibuat oleh TIM SPECO (Kelompok 7A) untuk Mata Kuliah Rekayasa Perangkat Lunak - Universitas Harkat Negeri.
               </p>
               <div className="flex items-center gap-2 pt-1">
                 <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold">
@@ -1311,7 +1317,7 @@ export function StitchLanding() {
                 <a href="https://github.com/Nourivex/Speco" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700 transition-colors">
                   GitHub Nourivex/Speco
                 </a>
-                <span className="text-slate-400">Tim NEXORA (Kelompok 7A)</span>
+                <span className="text-slate-400">TIM SPECO (Kelompok 7A)</span>
               </nav>
             </div>
           </div>

@@ -19,6 +19,8 @@ import { LockKeyIcon } from "@phosphor-icons/react/dist/ssr/LockKey";
 import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 import { DownloadSimpleIcon } from "@phosphor-icons/react/dist/ssr/DownloadSimple";
 import { SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
+import { EyeIcon } from "@phosphor-icons/react/dist/ssr/Eye";
+import { FunnelIcon } from "@phosphor-icons/react/dist/ssr/Funnel";
 import { formatRupiah } from "@/lib/format";
 import { BrandIcon, GoogleLogoIcon } from "@/components/ui/brand-icon";
 import {
@@ -50,10 +52,17 @@ export default function AdminPage() {
   const [search, setSearch] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState<"all" | "laptop" | "minipc">("all");
   const [brandFilter, setBrandFilter] = React.useState<string>("all");
+  const [jurusanFilter, setJurusanFilter] = React.useState<string>("all");
+  const [kategoriFilter, setKategoriFilter] = React.useState<string>("all");
+  const [sortOption, setSortOption] = React.useState<"default" | "price-asc" | "price-desc" | "ram-desc" | "weight-asc">("default");
   const [loading, setLoading] = React.useState(false);
   const [statusMsg, setStatusMsg] = React.useState<string | null>(null);
 
-  // In-line Editing State
+  // Pagination State
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [itemsPerPage, setItemsPerPage] = React.useState(25);
+
+  // In-line Quick Editing State
   const [inlineEditingId, setInlineEditingId] = React.useState<string | null>(null);
   const [inlineValues, setInlineValues] = React.useState<{
     price: string;
@@ -67,9 +76,11 @@ export default function AdminPage() {
   const [isAddModalOpen, setIsAddModalOpen] = React.useState(false);
   const [editingLaptop, setEditingLaptop] = React.useState<CatalogLaptop | null>(null);
 
-  // Form State
+  // All 20 exact dataset fields according to devices-catalog.json
   const [formData, setFormData] = React.useState({
     ID_Perangkat: "",
+    Kategori_Target: "Teknik/Informatika",
+    Target_Mahasiswa_Jurusan: "Informatika / Sains Data",
     Brand: "Advan",
     Model_Seri: "",
     Tipe_Perangkat: "Laptop",
@@ -78,14 +89,15 @@ export default function AdminPage() {
     RAM_GB: "16",
     Upgradeable_RAM: "Ya",
     Storage_GB_Tipe: "512GB SSD NVMe",
-    Layar_Ukuran_Panel_ColorGamut: "14 inci IPS FHD",
+    Layar_Ukuran_Panel_ColorGamut: "14 inci IPS FHD 100% sRGB",
     Bobot_kg: "1.4",
     Estimasi_Harga_Pasar_IDR: "7000000",
-    Status_Garansi_Resmi: "1 Tahun Resmi",
     Platform_Rekomendasi_Beli: "Tokopedia Official",
-    Link_Gambar: "",
+    Status_Garansi_Resmi: "1 Tahun Resmi Indonesia",
+    Rekomendasi_UseCase_Tag: "#coding #skripsi",
     Pros_Kelebihan: "",
     Cons_Kekurangan: "",
+    Link_Gambar: "",
   });
 
   // Cek Status Admin Saat Mount
@@ -164,293 +176,410 @@ export default function AdminPage() {
     fetchSupabaseData();
   }, [isAdminAuthenticated]);
 
-  // Handle Admin Passkey Verification dari Database
+  // Handle Login Admin Form Gate
   const handlePasskeySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const key = passkeyInput.trim();
-    const isValid = await verifyPasskeyFromDatabase(key);
-    if (isValid) {
-      setIsAdminAuthenticated(true);
-      localStorage.setItem("speco_admin_session", "authorized_lead_affif");
-      setAuthError(null);
-    } else {
-      setAuthError("Passkey Admin tidak cocok dengan database Supabase. Akses ditolak.");
+    setAuthError(null);
+    setLoading(true);
+
+    try {
+      const isValid = await verifyPasskeyFromDatabase(passkeyInput);
+      if (isValid) {
+        localStorage.setItem("speco_admin_session", "authorized_lead_affif");
+        localStorage.setItem(
+          "speco_user_session",
+          JSON.stringify({
+            name: "Admin Otoritas",
+            email: "admin@speco.id",
+            role: "admin",
+          })
+        );
+        setIsAdminAuthenticated(true);
+      } else {
+        setAuthError("Passkey ditolak atau tidak terdaftar di sistem.");
+      }
+    } catch {
+      setAuthError("Gagal menghubungi server verifikasi.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAdminLogout = () => {
+  const handleLogoutAdmin = () => {
     localStorage.removeItem("speco_admin_session");
     setIsAdminAuthenticated(false);
   };
 
-  // Filtered List
-  const filteredList = React.useMemo(() => {
-    return laptops.filter((item) => {
-      // Type Filter
-      const isMini =
-        item.Tipe_Perangkat?.toLowerCase().includes("mini") ||
-        item.Tipe_Perangkat?.toLowerCase().includes("desktop") ||
-        item.Model_Seri.toLowerCase().includes("mini");
+  // Filter & Search Logic
+  const filteredLaptops = React.useMemo(() => {
+    let result = [...laptops];
 
-      if (typeFilter === "laptop" && isMini) return false;
-      if (typeFilter === "minipc" && !isMini) return false;
+    // Filter Type
+    if (typeFilter === "laptop") {
+      result = result.filter((l) => (l.Tipe_Perangkat || "Laptop").toLowerCase().includes("laptop"));
+    } else if (typeFilter === "minipc") {
+      result = result.filter((l) => (l.Tipe_Perangkat || "").toLowerCase().includes("mini"));
+    }
 
-      // Brand Filter
-      if (brandFilter !== "all" && item.Brand.toLowerCase() !== brandFilter.toLowerCase()) {
-        return false;
-      }
+    // Filter Brand
+    if (brandFilter !== "all") {
+      result = result.filter((l) => l.Brand.toLowerCase() === brandFilter.toLowerCase());
+    }
 
-      // Search Query
-      if (!search.trim()) return true;
+    // Filter Jurusan
+    if (jurusanFilter !== "all") {
+      result = result.filter((l) => (l.Target_Mahasiswa_Jurusan || "").toLowerCase().includes(jurusanFilter.toLowerCase()));
+    }
+
+    // Filter Kategori
+    if (kategoriFilter !== "all") {
+      result = result.filter((l) => (l.Kategori_Target || "").toLowerCase().includes(kategoriFilter.toLowerCase()));
+    }
+
+    // Search Query
+    if (search.trim()) {
       const q = search.toLowerCase();
-      return (
-        item.ID_Perangkat.toLowerCase().includes(q) ||
-        item.Brand.toLowerCase().includes(q) ||
-        item.Model_Seri.toLowerCase().includes(q) ||
-        item.Processor_CPU.toLowerCase().includes(q) ||
-        item.Kartu_Grafis_GPU.toLowerCase().includes(q)
+      result = result.filter(
+        (l) =>
+          l.ID_Perangkat.toLowerCase().includes(q) ||
+          l.Model_Seri.toLowerCase().includes(q) ||
+          l.Processor_CPU.toLowerCase().includes(q) ||
+          l.Kartu_Grafis_GPU.toLowerCase().includes(q) ||
+          (l.Target_Mahasiswa_Jurusan || "").toLowerCase().includes(q) ||
+          l.Brand.toLowerCase().includes(q)
       );
-    });
-  }, [laptops, search, typeFilter, brandFilter]);
+    }
 
-  // Statistik Realtime
-  const stats = React.useMemo(() => {
+    // Sort
+    if (sortOption === "price-asc") {
+      result.sort((a, b) => (Number(a.Estimasi_Harga_Pasar_IDR) || 0) - (Number(b.Estimasi_Harga_Pasar_IDR) || 0));
+    } else if (sortOption === "price-desc") {
+      result.sort((a, b) => (Number(b.Estimasi_Harga_Pasar_IDR) || 0) - (Number(a.Estimasi_Harga_Pasar_IDR) || 0));
+    } else if (sortOption === "ram-desc") {
+      result.sort((a, b) => (Number(b.RAM_GB) || 0) - (Number(a.RAM_GB) || 0));
+    } else if (sortOption === "weight-asc") {
+      result.sort((a, b) => (Number(a.Bobot_kg) || 0) - (Number(b.Bobot_kg) || 0));
+    }
+
+    return result;
+  }, [laptops, search, typeFilter, brandFilter, jurusanFilter, kategoriFilter, sortOption]);
+
+  // Pagination Slicing
+  const totalPages = Math.ceil(filteredLaptops.length / itemsPerPage) || 1;
+  const paginatedLaptops = React.useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredLaptops.slice(start, start + itemsPerPage);
+  }, [filteredLaptops, currentPage, itemsPerPage]);
+
+  // Hitung Metrik Dashboard
+  const metrics = React.useMemo(() => {
     const total = laptops.length;
-    const miniPcs = laptops.filter(
-      (l) =>
-        l.Tipe_Perangkat?.toLowerCase().includes("mini") ||
-        l.Tipe_Perangkat?.toLowerCase().includes("desktop") ||
-        l.Model_Seri.toLowerCase().includes("mini")
-    ).length;
-    const laptopsOnly = total - miniPcs;
-    const localBrands = laptops.filter((l) =>
-      ["axioo", "advan", "zyrex"].includes(l.Brand.toLowerCase())
-    ).length;
-    const avgPrice = total > 0 ? laptops.reduce((acc, l) => acc + l.numericPrice, 0) / total : 0;
-    return { total, miniPcs, laptopsOnly, localBrands, avgPrice };
+    const countLaptop = laptops.filter((l) => (l.Tipe_Perangkat || "Laptop").toLowerCase().includes("laptop")).length;
+    const countMiniPc = laptops.filter((l) => (l.Tipe_Perangkat || "").toLowerCase().includes("mini")).length;
+    const totalHarga = laptops.reduce((acc, curr) => acc + (Number(curr.Estimasi_Harga_Pasar_IDR) || 0), 0);
+    const avgHarga = total > 0 ? Math.round(totalHarga / total) : 0;
+    const countLokal = laptops.filter((l) => ["axioo", "advan", "zyrex"].includes(l.Brand.toLowerCase())).length;
+
+    return { total, countLaptop, countMiniPc, avgHarga, countLokal };
   }, [laptops]);
 
-  // Handle In-line Edit Start
-  const startInlineEdit = (item: CatalogLaptop) => {
+  // Quick In-Line Editing Handlers
+  const handleStartInlineEdit = (item: CatalogLaptop) => {
     setInlineEditingId(item.ID_Perangkat);
     setInlineValues({
-      price: String(item.numericPrice),
-      ram: String(item.numericRam),
-      storage: item.Storage_GB_Tipe,
-      warranty: item.Status_Garansi_Resmi,
+      price: String(item.Estimasi_Harga_Pasar_IDR || ""),
+      ram: String(item.RAM_GB || ""),
+      storage: item.Storage_GB_Tipe || "",
+      warranty: item.Status_Garansi_Resmi || "",
     });
   };
 
-  // Handle In-line Edit Save
-  const saveInlineEdit = async (id: string) => {
-    setSavingInlineId(id);
-    const numericPrice = parseFloat(inlineValues.price) || 0;
-    const numericRam = parseInt(inlineValues.ram, 10) || 8;
+  const handleCancelInlineEdit = () => {
+    setInlineEditingId(null);
+  };
 
+  const handleSaveInlineEdit = async (id: string) => {
+    setSavingInlineId(id);
     try {
+      const target = laptops.find((l) => l.ID_Perangkat === id);
+      if (!target) return;
+
+      const updatedItem: CatalogLaptop = {
+        ...target,
+        Estimasi_Harga_Pasar_IDR: inlineValues.price,
+        RAM_GB: inlineValues.ram,
+        Storage_GB_Tipe: inlineValues.storage,
+        Status_Garansi_Resmi: inlineValues.warranty,
+        numericPrice: Number(inlineValues.price) || target.numericPrice,
+        numericRam: Number(inlineValues.ram) || target.numericRam,
+      };
+
+      // Sinkron ke Supabase jika aktif
       if (isSupabaseConfigured) {
-        await updateLaptopInSupabase(id, {
-          price_idr: numericPrice,
-          ram_gb: numericRam,
-          storage: inlineValues.storage,
-          warranty: inlineValues.warranty,
-        });
+        try {
+          await updateLaptopInSupabase(id, {
+            price_idr: Number(inlineValues.price) || 0,
+            ram_gb: Number(inlineValues.ram) || 8,
+            storage: inlineValues.storage,
+            warranty: inlineValues.warranty,
+          });
+        } catch (e) {
+          console.warn("Gagal update realtime ke Supabase:", e);
+        }
       }
 
-      // Update local state
-      setLaptops((prev) =>
-        prev.map((item) =>
-          item.ID_Perangkat === id
-            ? {
-                ...item,
-                numericPrice,
-                Estimasi_Harga_Pasar_IDR: inlineValues.price,
-                numericRam,
-                RAM_GB: inlineValues.ram,
-                Storage_GB_Tipe: inlineValues.storage,
-                Status_Garansi_Resmi: inlineValues.warranty,
-              }
-            : item
-        )
-      );
-
-      setStatusMsg(`Data ${id} berhasil disinkronkan ke Supabase secara realtime.`);
+      setLaptops((prev) => prev.map((l) => (l.ID_Perangkat === id ? updatedItem : l)));
       setInlineEditingId(null);
-    } catch (err: any) {
-      alert("Gagal menyimpan update in-line: " + err.message);
+      setStatusMsg(`Berhasil memperbarui data perangkat ${id} secara realtime.`);
+      setTimeout(() => setStatusMsg(null), 3000);
+    } catch {
+      setStatusMsg("Gagal menyimpan perubahan inline.");
     } finally {
       setSavingInlineId(null);
-      setTimeout(() => setStatusMsg(null), 3000);
     }
   };
 
-  // Handle Submit Form Tambah / Edit Modal
+  // Full Edit / Add Handlers
+  const handleAddNewClick = () => {
+    setEditingLaptop(null);
+    const nextIdNum = laptops.length + 1;
+    const generatedId = `LP${String(nextIdNum).padStart(3, "0")}`;
+
+    setFormData({
+      ID_Perangkat: generatedId,
+      Kategori_Target: "Teknik/Informatika",
+      Target_Mahasiswa_Jurusan: "Informatika / Sains Data",
+      Brand: "Advan",
+      Model_Seri: "",
+      Tipe_Perangkat: "Laptop",
+      Processor_CPU: "",
+      Kartu_Grafis_GPU: "",
+      RAM_GB: "16",
+      Upgradeable_RAM: "Ya",
+      Storage_GB_Tipe: "512GB SSD NVMe",
+      Layar_Ukuran_Panel_ColorGamut: "14 inci IPS FHD 100% sRGB",
+      Bobot_kg: "1.4",
+      Estimasi_Harga_Pasar_IDR: "7000000",
+      Platform_Rekomendasi_Beli: "Tokopedia Official",
+      Status_Garansi_Resmi: "1 Tahun Resmi Advan Indonesia",
+      Rekomendasi_UseCase_Tag: "#coding #skripsi",
+      Pros_Kelebihan: "",
+      Cons_Kekurangan: "",
+      Link_Gambar: "",
+    });
+    setIsAddModalOpen(true);
+  };
+
+  const handleEditClick = (item: CatalogLaptop) => {
+    setEditingLaptop(item);
+    setFormData({
+      ID_Perangkat: item.ID_Perangkat,
+      Kategori_Target: item.Kategori_Target || "Teknik/Informatika",
+      Target_Mahasiswa_Jurusan: item.Target_Mahasiswa_Jurusan || "Informatika / Sains Data",
+      Brand: item.Brand,
+      Model_Seri: item.Model_Seri,
+      Tipe_Perangkat: item.Tipe_Perangkat || "Laptop",
+      Processor_CPU: item.Processor_CPU,
+      Kartu_Grafis_GPU: item.Kartu_Grafis_GPU,
+      RAM_GB: String(item.RAM_GB),
+      Upgradeable_RAM: item.Upgradeable_RAM || "Ya",
+      Storage_GB_Tipe: item.Storage_GB_Tipe,
+      Layar_Ukuran_Panel_ColorGamut: item.Layar_Ukuran_Panel_ColorGamut,
+      Bobot_kg: String(item.Bobot_kg),
+      Estimasi_Harga_Pasar_IDR: String(item.Estimasi_Harga_Pasar_IDR),
+      Platform_Rekomendasi_Beli: item.Platform_Rekomendasi_Beli || "Tokopedia Official",
+      Status_Garansi_Resmi: item.Status_Garansi_Resmi,
+      Rekomendasi_UseCase_Tag: item.Rekomendasi_UseCase_Tag || "#coding",
+      Pros_Kelebihan: item.Pros_Kelebihan || "",
+      Cons_Kekurangan: item.Cons_Kekurangan || "",
+      Link_Gambar: item.Link_Gambar || "",
+    });
+    setIsAddModalOpen(true);
+  };
+
+  const handleDeleteClick = async (id: string) => {
+    if (!confirm(`Hapus permanen perangkat ${id} dari database katalog?`)) return;
+
+    setLoading(true);
+    try {
+      if (isSupabaseConfigured) {
+        await deleteLaptopFromSupabase(id);
+      }
+      setLaptops((prev) => prev.filter((l) => l.ID_Perangkat !== id));
+      setStatusMsg(`Perangkat ${id} berhasil dihapus dari database.`);
+      setTimeout(() => setStatusMsg(null), 3000);
+    } catch {
+      setStatusMsg("Gagal menghapus perangkat.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const payload: Partial<SupabaseLaptop> = {
-        id: editingLaptop ? editingLaptop.ID_Perangkat : formData.ID_Perangkat || `DEV${Date.now().toString().slice(-4)}`,
-        brand: formData.Brand,
-        model: formData.Model_Seri,
-        cpu: formData.Processor_CPU,
-        gpu: formData.Kartu_Grafis_GPU,
-        ram_gb: parseInt(formData.RAM_GB, 10) || 8,
-        ram_upgradable: formData.Upgradeable_RAM.toLowerCase().includes("ya"),
-        storage: formData.Storage_GB_Tipe,
-        display: formData.Layar_Ukuran_Panel_ColorGamut,
-        weight_kg: parseFloat(formData.Bobot_kg) || 1.4,
-        price_idr: parseFloat(formData.Estimasi_Harga_Pasar_IDR) || 7000000,
-        warranty: formData.Status_Garansi_Resmi,
-        buy_url: formData.Platform_Rekomendasi_Beli,
-        image_url: formData.Link_Gambar,
-        pros: formData.Pros_Kelebihan,
-        cons: formData.Cons_Kekurangan,
-        device_type: formData.Tipe_Perangkat,
+      const itemToSave: CatalogLaptop = {
+        ID_Perangkat: formData.ID_Perangkat,
+        Kategori_Target: formData.Kategori_Target,
+        Target_Mahasiswa_Jurusan: formData.Target_Mahasiswa_Jurusan,
+        Brand: formData.Brand,
+        Model_Seri: formData.Model_Seri,
+        Tipe_Perangkat: formData.Tipe_Perangkat,
+        Processor_CPU: formData.Processor_CPU,
+        Kartu_Grafis_GPU: formData.Kartu_Grafis_GPU,
+        RAM_GB: formData.RAM_GB,
+        Upgradeable_RAM: formData.Upgradeable_RAM,
+        Storage_GB_Tipe: formData.Storage_GB_Tipe,
+        Layar_Ukuran_Panel_ColorGamut: formData.Layar_Ukuran_Panel_ColorGamut,
+        Bobot_kg: formData.Bobot_kg,
+        Estimasi_Harga_Pasar_IDR: formData.Estimasi_Harga_Pasar_IDR,
+        Platform_Rekomendasi_Beli: formData.Platform_Rekomendasi_Beli,
+        Status_Garansi_Resmi: formData.Status_Garansi_Resmi,
+        Rekomendasi_UseCase_Tag: formData.Rekomendasi_UseCase_Tag,
+        Pros_Kelebihan: formData.Pros_Kelebihan,
+        Cons_Kekurangan: formData.Cons_Kekurangan,
+        Link_Gambar: formData.Link_Gambar,
+        numericPrice: Number(formData.Estimasi_Harga_Pasar_IDR) || 0,
+        numericRam: Number(formData.RAM_GB) || 8,
+        numericWeight: Number(formData.Bobot_kg) || 1.4,
       };
 
-      if (editingLaptop) {
-        if (isSupabaseConfigured) {
-          await updateLaptopInSupabase(editingLaptop.ID_Perangkat, payload);
-        }
-        setLaptops((prev) =>
-          prev.map((item) =>
-            item.ID_Perangkat === editingLaptop.ID_Perangkat
-              ? {
-                  ...item,
-                  ...formData,
-                  numericPrice: parseFloat(formData.Estimasi_Harga_Pasar_IDR) || 0,
-                  numericRam: parseInt(formData.RAM_GB, 10) || 8,
-                  numericWeight: parseFloat(formData.Bobot_kg) || 1.4,
-                }
-              : item
-          )
-        );
-        setStatusMsg("Perangkat berhasil diperbarui di katalog & database!");
-      } else {
-        if (isSupabaseConfigured) {
-          await insertLaptopToSupabase(payload);
-        }
-        const newCatItem: CatalogLaptop = {
-          ...formData,
-          Kategori_Target: "Mahasiswa",
-          Target_Mahasiswa_Jurusan: "Semua Jurusan",
-          Rekomendasi_UseCase_Tag: "#kuliah",
-          numericPrice: parseFloat(formData.Estimasi_Harga_Pasar_IDR) || 0,
-          numericRam: parseInt(formData.RAM_GB, 10) || 8,
-          numericWeight: parseFloat(formData.Bobot_kg) || 1.4,
+      if (isSupabaseConfigured) {
+        const supabasePayload: Partial<SupabaseLaptop> = {
+          id: formData.ID_Perangkat,
+          brand: formData.Brand,
+          model: formData.Model_Seri,
+          device_type: formData.Tipe_Perangkat,
+          category: formData.Kategori_Target,
+          major_target: formData.Target_Mahasiswa_Jurusan,
+          cpu: formData.Processor_CPU,
+          gpu: formData.Kartu_Grafis_GPU,
+          ram_gb: Number(formData.RAM_GB) || 8,
+          ram_upgradable: formData.Upgradeable_RAM.toLowerCase() === "ya",
+          storage: formData.Storage_GB_Tipe,
+          display: formData.Layar_Ukuran_Panel_ColorGamut,
+          weight_kg: Number(formData.Bobot_kg) || 1.4,
+          price_idr: Number(formData.Estimasi_Harga_Pasar_IDR) || 0,
+          buy_url: formData.Platform_Rekomendasi_Beli,
+          warranty: formData.Status_Garansi_Resmi,
+          usecase_tag: formData.Rekomendasi_UseCase_Tag,
+          pros: formData.Pros_Kelebihan,
+          cons: formData.Cons_Kekurangan,
+          image_url: formData.Link_Gambar,
         };
-        setLaptops([newCatItem, ...laptops]);
-        setStatusMsg("Perangkat baru berhasil ditambahkan ke database!");
+
+        if (editingLaptop) {
+          await updateLaptopInSupabase(formData.ID_Perangkat, supabasePayload);
+        } else {
+          await insertLaptopToSupabase(supabasePayload as any);
+        }
+      }
+
+      if (editingLaptop) {
+        setLaptops((prev) =>
+          prev.map((l) => (l.ID_Perangkat === formData.ID_Perangkat ? itemToSave : l))
+        );
+        setStatusMsg(`Data perangkat ${formData.ID_Perangkat} berhasil diperbarui.`);
+      } else {
+        setLaptops((prev) => [itemToSave, ...prev]);
+        setStatusMsg(`Perangkat baru ${formData.ID_Perangkat} berhasil ditambahkan.`);
       }
 
       setIsAddModalOpen(false);
-      setEditingLaptop(null);
+      setTimeout(() => setStatusMsg(null), 3000);
     } catch (err: any) {
-      alert("Gagal menyimpan data: " + err.message);
+      alert(`Gagal menyimpan data: ${err?.message || "Kesalahan internal"}`);
     } finally {
       setLoading(false);
-      setTimeout(() => setStatusMsg(null), 3000);
     }
   };
 
-  // Handle Hapus
-  const handleDelete = async (id: string) => {
-    if (!confirm(`Hapus permanen perangkat ${id} dari database?`)) return;
+  // Export to Excel (.xlsx) Handlers
+  const handleExportXLSX = () => {
     try {
-      if (isSupabaseConfigured) {
-        await deleteLaptopFromSupabase(id);
-      }
-      setLaptops((prev) => prev.filter((item) => item.ID_Perangkat !== id));
-      setStatusMsg(`Perangkat ${id} berhasil dihapus.`);
-      setTimeout(() => setStatusMsg(null), 3000);
-    } catch (err: any) {
-      alert("Gagal menghapus: " + err.message);
-    }
-  };
-
-  // Open Edit Modal
-  const openEdit = (laptop: CatalogLaptop) => {
-    setEditingLaptop(laptop);
-    setFormData({
-      ID_Perangkat: laptop.ID_Perangkat,
-      Brand: laptop.Brand,
-      Model_Seri: laptop.Model_Seri,
-      Tipe_Perangkat: laptop.Tipe_Perangkat || "Laptop",
-      Processor_CPU: laptop.Processor_CPU,
-      Kartu_Grafis_GPU: laptop.Kartu_Grafis_GPU,
-      RAM_GB: String(laptop.RAM_GB),
-      Upgradeable_RAM: laptop.Upgradeable_RAM,
-      Storage_GB_Tipe: laptop.Storage_GB_Tipe,
-      Layar_Ukuran_Panel_ColorGamut: laptop.Layar_Ukuran_Panel_ColorGamut,
-      Bobot_kg: String(laptop.Bobot_kg),
-      Estimasi_Harga_Pasar_IDR: String(laptop.numericPrice),
-      Status_Garansi_Resmi: laptop.Status_Garansi_Resmi,
-      Platform_Rekomendasi_Beli: laptop.Platform_Rekomendasi_Beli,
-      Link_Gambar: laptop.Link_Gambar,
-      Pros_Kelebihan: laptop.Pros_Kelebihan || "",
-      Cons_Kekurangan: laptop.Cons_Kekurangan || "",
-    });
-    setIsAddModalOpen(true);
-  };
-
-  // EXPORT 1: Export to Excel (.xlsx)
-  const exportToExcel = () => {
-    try {
-      const rows = laptops.map((item) => ({
-        "ID Perangkat": item.ID_Perangkat,
-        "Brand": item.Brand,
-        "Model / Seri": item.Model_Seri,
-        "Tipe Perangkat": item.Tipe_Perangkat || "Laptop",
-        "Processor / CPU": item.Processor_CPU,
-        "Kartu Grafis / GPU": item.Kartu_Grafis_GPU,
-        "RAM (GB)": item.numericRam,
-        "RAM Upgradable": item.Upgradeable_RAM,
-        "Storage": item.Storage_GB_Tipe,
-        "Layar": item.Layar_Ukuran_Panel_ColorGamut,
-        "Bobot (kg)": item.numericWeight,
-        "Harga Pasar (Rp)": item.numericPrice,
-        "Status Garansi": item.Status_Garansi_Resmi,
-        "Target Mahasiswa": item.Target_Mahasiswa_Jurusan,
-        "Kelebihan": item.Pros_Kelebihan,
-        "Kekurangan": item.Cons_Kekurangan,
-        "Platform Pembelian": item.Platform_Rekomendasi_Beli,
+      const exportData = laptops.map((l) => ({
+        ID_Perangkat: l.ID_Perangkat,
+        Kategori_Target: l.Kategori_Target,
+        Target_Mahasiswa_Jurusan: l.Target_Mahasiswa_Jurusan,
+        Brand: l.Brand,
+        Model_Seri: l.Model_Seri,
+        Tipe_Perangkat: l.Tipe_Perangkat,
+        Processor_CPU: l.Processor_CPU,
+        Kartu_Grafis_GPU: l.Kartu_Grafis_GPU,
+        RAM_GB: l.RAM_GB,
+        Upgradeable_RAM: l.Upgradeable_RAM,
+        Storage_GB_Tipe: l.Storage_GB_Tipe,
+        Layar_Ukuran_Panel_ColorGamut: l.Layar_Ukuran_Panel_ColorGamut,
+        Bobot_kg: l.Bobot_kg,
+        Estimasi_Harga_Pasar_IDR: l.Estimasi_Harga_Pasar_IDR,
+        Platform_Rekomendasi_Beli: l.Platform_Rekomendasi_Beli,
+        Status_Garansi_Resmi: l.Status_Garansi_Resmi,
+        Rekomendasi_UseCase_Tag: l.Rekomendasi_UseCase_Tag,
+        Pros_Kelebihan: l.Pros_Kelebihan,
+        Cons_Kekurangan: l.Cons_Kekurangan,
+        Link_Gambar: l.Link_Gambar,
       }));
 
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Katalog SPECO 2026");
-      XLSX.writeFile(workbook, `SPECO_Katalog_Laptop_Mahasiswa_${Date.now()}.xlsx`);
-      setStatusMsg("File Excel (.xlsx) berhasil diekspor!");
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Katalog_Laptop");
+      XLSX.writeFile(wb, `SPECO_Dataset_450_Laptop_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      setStatusMsg("Berkas Excel (.xlsx) berhasil diunduh.");
       setTimeout(() => setStatusMsg(null), 3000);
-    } catch (e: any) {
-      alert("Gagal ekspor Excel: " + e.message);
+    } catch {
+      alert("Gagal mengekspor file Excel.");
     }
   };
 
-  // EXPORT 2: Export to SQL Dump (.sql)
-  const exportToSql = () => {
+  // Export to SQL (.sql) Handlers
+  const handleExportSQL = () => {
     try {
-      let sql = `-- ==============================================================================\n`;
-      sql += `-- SPECO DATABASE EXPORT - KATALOG 450 LAPTOP & MINI PC MAHASISWA 2026\n`;
-      sql += `-- Tanggal Export: ${new Date().toISOString()}\n`;
-      sql += `-- Platform: SPECO Laptop Advisor (NEXORA 7A)\n`;
-      sql += `-- ==============================================================================\n\n`;
-      sql += `INSERT INTO public.laptops (\n`;
-      sql += `  id, brand, model, cpu, gpu, ram_gb, ram_upgradable, storage, display, weight_kg, price_idr, warranty, buy_url, pros, cons, device_type\n`;
-      sql += `) VALUES\n`;
+      let sql = `-- =============================================================================\n`;
+      sql += `-- SPECO DATABASE DUMP - 450 LAPTOP & DESKTOP MAHASISWA\n`;
+      sql += `-- Export Date: ${new Date().toISOString()}\n`;
+      sql += `-- Platform: SPECO Laptop Advisor (TIM SPECO 7A)\n`;
+      sql += `-- =============================================================================\n\n`;
+
+      sql += `CREATE TABLE IF NOT EXISTS public.laptops (\n`;
+      sql += `  id VARCHAR(50) PRIMARY KEY,\n`;
+      sql += `  brand VARCHAR(100) NOT NULL,\n`;
+      sql += `  model VARCHAR(255) NOT NULL,\n`;
+      sql += `  device_type VARCHAR(50) DEFAULT 'Laptop',\n`;
+      sql += `  category VARCHAR(100),\n`;
+      sql += `  major_target VARCHAR(150),\n`;
+      sql += `  cpu VARCHAR(200) NOT NULL,\n`;
+      sql += `  gpu VARCHAR(200) NOT NULL,\n`;
+      sql += `  ram_gb NUMERIC NOT NULL,\n`;
+      sql += `  ram_upgradable BOOLEAN DEFAULT true,\n`;
+      sql += `  storage VARCHAR(200) NOT NULL,\n`;
+      sql += `  display VARCHAR(200) NOT NULL,\n`;
+      sql += `  weight_kg NUMERIC NOT NULL,\n`;
+      sql += `  price_idr NUMERIC NOT NULL,\n`;
+      sql += `  buy_url TEXT,\n`;
+      sql += `  warranty VARCHAR(150),\n`;
+      sql += `  usecase_tag TEXT,\n`;
+      sql += `  pros TEXT,\n`;
+      sql += `  cons TEXT,\n`;
+      sql += `  image_url TEXT,\n`;
+      sql += `  created_at TIMESTAMPTZ DEFAULT NOW()\n`;
+      sql += `);\n\n`;
+
+      sql += `INSERT INTO public.laptops (id, brand, model, device_type, category, major_target, cpu, gpu, ram_gb, ram_upgradable, storage, display, weight_kg, price_idr, buy_url, warranty, usecase_tag, pros, cons, image_url)\nVALUES\n`;
 
       const values = laptops.map((l) => {
-        const escapeSql = (str: string | undefined) =>
-          `'${(str || "").replace(/'/g, "''")}'`;
-        const isUpgradable = l.Upgradeable_RAM.toLowerCase().includes("ya") ? "true" : "false";
+        const esc = (str: any) => `'${String(str || "").replace(/'/g, "''")}'`;
+        const num = (val: any) => Number(val) || 0;
+        const bool = (val: any) => (String(val).toLowerCase() === "ya" ? "true" : "false");
 
-        return `  (${escapeSql(l.ID_Perangkat)}, ${escapeSql(l.Brand)}, ${escapeSql(l.Model_Seri)}, ${escapeSql(l.Processor_CPU)}, ${escapeSql(l.Kartu_Grafis_GPU)}, ${l.numericRam}, ${isUpgradable}, ${escapeSql(l.Storage_GB_Tipe)}, ${escapeSql(l.Layar_Ukuran_Panel_ColorGamut)}, ${l.numericWeight}, ${l.numericPrice}, ${escapeSql(l.Status_Garansi_Resmi)}, ${escapeSql(l.Platform_Rekomendasi_Beli)}, ${escapeSql(l.Pros_Kelebihan)}, ${escapeSql(l.Cons_Kekurangan)}, ${escapeSql(l.Tipe_Perangkat || "Laptop")})`;
+        return `  (${esc(l.ID_Perangkat)}, ${esc(l.Brand)}, ${esc(l.Model_Seri)}, ${esc(l.Tipe_Perangkat || "Laptop")}, ${esc(l.Kategori_Target)}, ${esc(l.Target_Mahasiswa_Jurusan)}, ${esc(l.Processor_CPU)}, ${esc(l.Kartu_Grafis_GPU)}, ${num(l.RAM_GB)}, ${bool(l.Upgradeable_RAM)}, ${esc(l.Storage_GB_Tipe)}, ${esc(l.Layar_Ukuran_Panel_ColorGamut)}, ${num(l.Bobot_kg)}, ${num(l.Estimasi_Harga_Pasar_IDR)}, ${esc(l.Platform_Rekomendasi_Beli)}, ${esc(l.Status_Garansi_Resmi)}, ${esc(l.Rekomendasi_UseCase_Tag)}, ${esc(l.Pros_Kelebihan)}, ${esc(l.Cons_Kekurangan)}, ${esc(l.Link_Gambar)})`;
       });
 
       sql += values.join(",\n");
       sql += `\nON CONFLICT (id) DO UPDATE SET\n`;
+      sql += `  brand = EXCLUDED.brand,\n`;
+      sql += `  model = EXCLUDED.model,\n`;
       sql += `  price_idr = EXCLUDED.price_idr,\n`;
       sql += `  ram_gb = EXCLUDED.ram_gb,\n`;
       sql += `  storage = EXCLUDED.storage,\n`;
@@ -458,129 +587,136 @@ export default function AdminPage() {
 
       const blob = new Blob([sql], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `speco_laptops_dump_${Date.now()}.sql`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `SPECO_Database_Dump_${new Date().toISOString().slice(0, 10)}.sql`;
+      link.click();
       URL.revokeObjectURL(url);
-
-      setStatusMsg("File SQL Dump (.sql) berhasil diekspor!");
+      setStatusMsg("Berkas SQL (.sql) berhasil diekspor.");
       setTimeout(() => setStatusMsg(null), 3000);
-    } catch (e: any) {
-      alert("Gagal ekspor SQL: " + e.message);
+    } catch {
+      alert("Gagal mengekspor file SQL.");
     }
   };
 
-  // RENDER ADMIN GATE JIKA BELUM TERAUTENTIKASI
+  // Auth Checking Spinner
   if (authChecking) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
+      <div className="min-h-screen bg-[#0b1120] text-slate-100 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-slate-400 font-semibold tracking-wider uppercase">
-            Memverifikasi Akses Admin...
-          </span>
+          <span className="text-xs text-slate-400 font-mono">Memeriksa hak akses otoritas staff...</span>
         </div>
       </div>
     );
   }
 
+  // Jika Belum Terautentikasi: Tampilkan Auth Gate Otoritas Staff
   if (!isAdminAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex flex-col justify-center items-center px-4 py-12 antialiased selection:bg-emerald-500">
-        <div className="w-full max-w-md bg-slate-900/90 border border-slate-800 backdrop-blur-xl rounded-3xl p-8 shadow-2xl space-y-6">
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center mb-2">
-              <Image
-                src="/brand/speco-logo.png"
-                alt="SPECO"
-                width={140}
-                height={50}
-                priority
-                className="h-10 w-auto object-contain brightness-110"
-              />
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <ShieldCheckIcon className="w-5 h-5 text-emerald-400" />
-              <h1 className="text-lg font-black tracking-tight text-white uppercase">
-                Portal Kontrol Admin
-              </h1>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Area terbatas khusus Project Lead & Admin Database SPECO.
-              Harap masukkan Passkey Admin untuk mengakses data realtime.
-            </p>
+      <div className="min-h-screen bg-[#0b1120] text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-slate-950 font-sans">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+          <Link href="/" className="inline-flex items-center justify-center mb-6">
+            <Image
+              src="/brand/speco-logo.png"
+              alt="SPECO"
+              width={140}
+              height={50}
+              priority
+              className="h-10 w-auto object-contain brightness-0 invert"
+            />
+          </Link>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold uppercase tracking-wider mb-2">
+            <ShieldCheckIcon className="w-4 h-4" />
+            <span>Staff Command Console</span>
           </div>
+          <h2 className="text-2xl font-black text-white tracking-tight">
+            Portal Manajemen Database Staff
+          </h2>
+          <p className="mt-1 text-xs text-slate-400">
+            Akses dibatasi khusus tim pengembang data SPECO (Kelompok 7A).
+          </p>
+        </div>
 
-          {authError && (
-            <div className="p-3.5 rounded-xl bg-red-950/60 border border-red-800/80 text-xs text-red-200 font-semibold text-center">
-              {authError}
-            </div>
-          )}
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
+          <div className="bg-slate-900/90 backdrop-blur-md py-8 px-6 sm:px-10 rounded-3xl shadow-2xl border border-slate-800 space-y-6">
+            {authError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold">
+                {authError}
+              </div>
+            )}
 
-          {/* Google OAuth Login Button */}
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                await signInWithGoogle(`${window.location.origin}/admin`);
-              } catch (e: any) {
-                setAuthError(e.message || "Gagal masuk dengan Google Admin.");
-              }
-            }}
-            className="w-full h-11 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs tracking-wide transition-all shadow-md flex items-center justify-center gap-2.5 cursor-pointer"
-          >
-            <GoogleLogoIcon className="w-4 h-4" />
-            <span>Masuk dengan Google (Akun Admin)</span>
-          </button>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  setLoading(true);
+                  await signInWithGoogle(`${window.location.origin}/admin`);
+                } catch (e: any) {
+                  setAuthError(e.message || "Gagal login Google.");
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full h-11 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs flex items-center justify-center gap-2.5 transition-all shadow-md cursor-pointer"
+            >
+              <GoogleLogoIcon className="w-4 h-4" />
+              <span>Masuk dengan Google (Akun Admin)</span>
+            </button>
 
-          <div className="relative my-2">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-800" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-slate-900 text-slate-400 font-semibold text-[11px]">
-                Atau Masuk dengan Passkey Otoritas
-              </span>
-            </div>
-          </div>
-
-          <form onSubmit={handlePasskeySubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-300 mb-1.5">
-                Passkey Admin
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  required
-                  value={passkeyInput}
-                  onChange={(e) => setPasskeyInput(e.target.value)}
-                  placeholder="Masukkan passkey admin..."
-                  className="w-full h-11 px-3.5 pl-10 rounded-xl bg-slate-800/80 border border-slate-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-xs text-white placeholder:text-slate-500 outline-none transition-all"
-                />
-                <LockKeyIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-800" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-3 bg-slate-900 text-slate-500 font-semibold font-mono">
+                  Atau via Passkey Otoritas
+                </span>
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs tracking-wide transition-all shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <ShieldCheckIcon className="w-4 h-4" />
-              <span>Verifikasi Passkey Admin</span>
-            </button>
-          </form>
+            <form onSubmit={handlePasskeySubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5 font-mono">
+                  Passkey Otoritas Staff
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    required
+                    value={passkeyInput}
+                    onChange={(e) => setPasskeyInput(e.target.value)}
+                    placeholder="Masukkan passkey staff..."
+                    className="w-full h-11 px-3.5 pl-10 rounded-xl bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs text-white placeholder:text-slate-500 outline-none font-mono"
+                  />
+                  <LockKeyIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
+                </div>
+              </div>
 
-          <div className="pt-2 border-t border-slate-800/80 text-center">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-xs tracking-wider uppercase transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {loading ? (
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <ShieldCheckIcon className="w-4 h-4" />
+                    <span>Verifikasi & Masuk Dashboard</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          <div className="mt-6 text-center">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-200 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors"
             >
               <ArrowLeftIcon className="w-3.5 h-3.5" />
-              <span>Kembali ke Beranda Publik</span>
+              <span>Kembali ke Beranda SPECO</span>
             </Link>
           </div>
         </div>
@@ -588,87 +724,66 @@ export default function AdminPage() {
     );
   }
 
-  // RENDER UTAMA SAAS ADMIN DASHBOARD
+  // ==============================================================================
+  // DASHBOARD STAFF RESMI (AUTHENTICATED)
+  // ==============================================================================
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans antialiased selection:bg-emerald-500 selection:text-white">
-      {/* 1. TOP EXECUTIVE APP BAR */}
-      <header className="sticky top-0 z-30 bg-slate-950/90 backdrop-blur-md border-b border-slate-800 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+    <div className="min-h-screen bg-[#0b1120] text-slate-100 font-sans selection:bg-emerald-500 selection:text-slate-950">
+      {/* 1. TOP COMMAND BAR */}
+      <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-2 group">
               <Image
                 src="/brand/speco-logo.png"
                 alt="SPECO"
-                width={130}
-                height={44}
-                priority
-                className="h-8.5 w-auto object-contain brightness-110"
+                width={100}
+                height={32}
+                className="h-7 w-auto object-contain brightness-0 invert"
               />
+              <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                Staff Engine
+              </span>
             </Link>
-            <div className="h-5 w-px bg-slate-800 hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-emerald-950/90 text-emerald-400 border border-emerald-800/80">
-                Admin Engine
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300 hidden md:inline-flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Supabase Online
-              </span>
+
+            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 pl-3 border-l border-slate-800">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Supabase Online</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-300 font-semibold">{laptops.length} Laptop</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
             <button
-              onClick={exportToExcel}
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-2 border border-slate-700 transition-all cursor-pointer shadow-sm"
-              title="Ekspor Seluruh Database ke Excel (.xlsx)"
+              onClick={handleExportXLSX}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer"
+              title="Unduh Berkas Excel Lengkap"
             >
-              <DownloadSimpleIcon className="w-4 h-4 text-emerald-400" />
-              <span className="hidden sm:inline">Ekspor</span> Excel (.xlsx)
+              <DownloadSimpleIcon className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Ekspor Excel (.xlsx)</span>
             </button>
 
             <button
-              onClick={exportToSql}
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-2 border border-slate-700 transition-all cursor-pointer shadow-sm"
-              title="Ekspor Dump SQL (.sql)"
+              onClick={handleExportSQL}
+              className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer"
+              title="Unduh Script Dump SQL"
             >
-              <DatabaseIcon className="w-4 h-4 text-sky-400" />
-              <span className="hidden sm:inline">Ekspor</span> SQL (.sql)
+              <DatabaseIcon className="w-3.5 h-3.5 text-teal-400" />
+              <span className="hidden sm:inline">Ekspor SQL (.sql)</span>
             </button>
 
             <button
-              onClick={() => {
-                setEditingLaptop(null);
-                setFormData({
-                  ID_Perangkat: `DEV${Date.now().toString().slice(-4)}`,
-                  Brand: "Advan",
-                  Model_Seri: "",
-                  Tipe_Perangkat: "Laptop",
-                  Processor_CPU: "",
-                  Kartu_Grafis_GPU: "",
-                  RAM_GB: "16",
-                  Upgradeable_RAM: "Ya",
-                  Storage_GB_Tipe: "512GB SSD NVMe",
-                  Layar_Ukuran_Panel_ColorGamut: "14 inci IPS FHD",
-                  Bobot_kg: "1.4",
-                  Estimasi_Harga_Pasar_IDR: "7000000",
-                  Status_Garansi_Resmi: "1 Tahun Resmi",
-                  Platform_Rekomendasi_Beli: "Tokopedia Official",
-                  Link_Gambar: "",
-                  Pros_Kelebihan: "",
-                  Cons_Kekurangan: "",
-                });
-                setIsAddModalOpen(true);
-              }}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black flex items-center gap-2 transition-all shadow-md shadow-emerald-950/40 cursor-pointer"
+              onClick={handleAddNewClick}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-black flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
             >
-              <PlusIcon className="w-4 h-4" />
+              <PlusIcon weight="bold" className="w-3.5 h-3.5" />
               <span>Tambah Perangkat</span>
             </button>
 
             <button
-              onClick={handleAdminLogout}
-              className="p-2 rounded-xl bg-slate-800/80 hover:bg-red-950/60 hover:text-red-400 text-slate-400 border border-slate-700 transition-all cursor-pointer"
+              onClick={handleLogoutAdmin}
+              className="p-2 rounded-xl bg-slate-800/80 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-700/80 transition-colors ml-1 cursor-pointer"
               title="Keluar dari Portal Admin"
             >
               <SignOutIcon className="w-4 h-4" />
@@ -677,343 +792,399 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* STATUS TOAST NOTIFICATION */}
-      {statusMsg && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-900/90 border border-emerald-600 text-emerald-100 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 backdrop-blur-md animate-in slide-in-from-bottom-3 text-xs font-bold">
-          <CheckCircleIcon className="w-5 h-5 text-emerald-400 shrink-0" />
-          <span>{statusMsg}</span>
-        </div>
-      )}
-
+      {/* 2. BODY WORKSPACE */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* 2. STATISTIC METRICS */}
+        {/* Status Toast Alert */}
+        {statusMsg && (
+          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center justify-between">
+            <span>{statusMsg}</span>
+            <button onClick={() => setStatusMsg(null)} className="text-slate-400 hover:text-white">
+              <XIcon className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* 4-BENTO METRIC OVERVIEW */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4.5 space-y-1">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">
               Total Perangkat
             </span>
-            <div className="text-2xl font-black text-white">{stats.total}</div>
-            <p className="text-[10px] text-slate-400">Sinkron dengan Database Supabase</p>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-3xl font-black text-white">{metrics.total}</span>
+              <span className="text-xs text-emerald-400 font-semibold font-mono">100% Aktif</span>
+            </div>
+            <span className="text-[11px] text-slate-500 mt-1 block">Sinkron dengan Database Supabase</span>
           </div>
 
-          <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4.5 space-y-1">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">
               Laptop Mahasiswa
             </span>
-            <div className="text-2xl font-black text-emerald-400">{stats.laptopsOnly}</div>
-            <p className="text-[10px] text-slate-400">Portabel untuk kuliah & lab</p>
-          </div>
-
-          <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4.5 space-y-1">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Mini PC & Dekstop Ringkas
-            </span>
-            <div className="text-2xl font-black text-sky-400">{stats.miniPcs}</div>
-            <p className="text-[10px] text-slate-400">Dukungan desktop hemat ruang</p>
-          </div>
-
-          <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4.5 space-y-1">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              Rata-rata Harga Pasar
-            </span>
-            <div className="text-2xl font-black text-amber-400">
-              {formatRupiah(Math.round(stats.avgPrice))}
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-3xl font-black text-emerald-400">{metrics.countLaptop}</span>
+              <span className="text-xs text-slate-400">Unit</span>
             </div>
-            <p className="text-[10px] text-slate-400">{stats.localBrands} Model Brand Lokal</p>
+            <span className="text-[11px] text-slate-500 mt-1 block">Portabel untuk kuliah & lab</span>
+          </div>
+
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">
+              Mini PC & Desktop Ringkas
+            </span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-3xl font-black text-teal-400">{metrics.countMiniPc}</span>
+              <span className="text-xs text-slate-400">Unit</span>
+            </div>
+            <span className="text-[11px] text-slate-500 mt-1 block">Dukungan desktop hemat ruang</span>
+          </div>
+
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4.5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block font-mono">
+              Rata-Rata Harga Pasar
+            </span>
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className="text-2xl font-black text-amber-400">{formatRupiah(metrics.avgHarga)}</span>
+            </div>
+            <span className="text-[11px] text-slate-500 mt-1 block">{metrics.countLokal} Model Brand Lokal</span>
           </div>
         </div>
 
-        {/* 3. CONTROLS, SEARCH & DEVICE TYPE TABS */}
-        <div className="bg-slate-850 border border-slate-700/80 rounded-2xl p-4 space-y-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            {/* Device Type Tabs */}
-            <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-slate-800 w-full sm:w-auto">
+        {/* 3. ADVANCED SEARCH & FILTER CONTROLS */}
+        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            {/* Type Filter Pills */}
+            <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 self-start">
               <button
-                onClick={() => setTypeFilter("all")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  typeFilter === "all"
-                    ? "bg-slate-700 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
+                type="button"
+                onClick={() => { setTypeFilter("all"); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  typeFilter === "all" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-white"
                 }`}
               >
                 Semua ({laptops.length})
               </button>
               <button
-                onClick={() => setTypeFilter("laptop")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  typeFilter === "laptop"
-                    ? "bg-emerald-600 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
+                type="button"
+                onClick={() => { setTypeFilter("laptop"); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  typeFilter === "laptop" ? "bg-emerald-600 text-slate-950" : "text-slate-400 hover:text-white"
                 }`}
               >
                 <LaptopIcon className="w-3.5 h-3.5" />
-                Laptop ({stats.laptopsOnly})
+                <span>Laptop ({metrics.countLaptop})</span>
               </button>
               <button
-                onClick={() => setTypeFilter("minipc")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
-                  typeFilter === "minipc"
-                    ? "bg-sky-600 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
+                type="button"
+                onClick={() => { setTypeFilter("minipc"); setCurrentPage(1); }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  typeFilter === "minipc" ? "bg-teal-600 text-slate-950" : "text-slate-400 hover:text-white"
                 }`}
               >
                 <DesktopIcon className="w-3.5 h-3.5" />
-                Mini PC ({stats.miniPcs})
+                <span>Mini PC ({metrics.countMiniPc})</span>
               </button>
             </div>
 
-            {/* Search Input */}
-            <div className="relative w-full sm:w-80">
+            {/* Search Input Bar */}
+            <div className="relative flex-1 max-w-md">
               <input
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari ID, seri, CPU, GPU..."
-                className="w-full h-10 px-3.5 pl-9 rounded-xl bg-slate-900 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 text-xs text-white placeholder:text-slate-500 outline-none transition-all"
+                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+                placeholder="Cari ID, seri, CPU, GPU, target jurusan..."
+                className="w-full h-10 px-3.5 pl-10 rounded-xl bg-slate-950 border border-slate-700/80 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs text-white placeholder:text-slate-500 outline-none"
               />
-              <MagnifyingGlassIcon className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+              <MagnifyingGlassIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"
+                  className="absolute right-3 top-3 text-slate-500 hover:text-white"
                 >
-                  <XIcon className="w-4 h-4" />
+                  <XIcon className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
           </div>
 
-          {/* Brand Filter Chips */}
+          {/* Secondary Filters Bar */}
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800 text-xs">
-            <span className="text-[11px] font-bold text-slate-400 mr-1">Brand:</span>
-            {["all", "Axioo", "Advan", "Zyrex", "ASUS", "Lenovo", "Acer", "Apple", "MSI", "HP", "Dell"].map(
-              (brand) => (
+            {/* Brand Pills */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-slate-500 uppercase mr-1">Brand:</span>
+              <button
+                type="button"
+                onClick={() => { setBrandFilter("all"); setCurrentPage(1); }}
+                className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-colors cursor-pointer ${
+                  brandFilter === "all" ? "bg-emerald-600 text-slate-950" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                }`}
+              >
+                Semua Brand
+              </button>
+              {["Axioo", "Advan", "Zyrex", "ASUS", "Lenovo", "Acer", "Apple", "MSI", "HP", "Dell"].map((b) => (
                 <button
-                  key={brand}
-                  onClick={() => setBrandFilter(brand)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                    brandFilter.toLowerCase() === brand.toLowerCase()
-                      ? "bg-emerald-600 text-white"
-                      : "bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800"
+                  key={b}
+                  type="button"
+                  onClick={() => { setBrandFilter(b); setCurrentPage(1); }}
+                  className={`px-2.5 py-1 rounded-lg font-bold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    brandFilter.toLowerCase() === b.toLowerCase()
+                      ? "bg-emerald-600 text-slate-950"
+                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                   }`}
                 >
-                  {brand === "all" ? "Semua Brand" : brand}
+                  <BrandIcon brand={b} useBrandColor className="w-3.5 h-3.5" />
+                  <span>{b}</span>
                 </button>
-              )
-            )}
+              ))}
+            </div>
+
+            {/* Jurusan Target Dropdown */}
+            <div className="ml-auto flex items-center gap-2">
+              <select
+                value={jurusanFilter}
+                onChange={(e) => { setJurusanFilter(e.target.value); setCurrentPage(1); }}
+                className="h-8 px-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-300 text-[11px] outline-none"
+              >
+                <option value="all">Semua Jurusan</option>
+                <option value="Informatika">Informatika / Sains Data</option>
+                <option value="Desain">Desain DKV / Animasi</option>
+                <option value="Teknik">Teknik Mesin / Elektro</option>
+                <option value="Bisnis">Ekonomi / Bisnis</option>
+                <option value="Non-Teknik">Non-Teknik / Umum</option>
+              </select>
+
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as any)}
+                className="h-8 px-2.5 rounded-lg bg-slate-950 border border-slate-700 text-slate-300 text-[11px] outline-none"
+              >
+                <option value="default">Urutkan: Default ID</option>
+                <option value="price-asc">Harga Termurah</option>
+                <option value="price-desc">Harga Tertinggi</option>
+                <option value="ram-desc">RAM Terbesar</option>
+                <option value="weight-asc">Bobot Teringan</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* 4. DATA TABLE WITH IN-LINE EDITING */}
-        <div className="bg-slate-850 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl">
+        {/* 4. REALTIME DATA TABLE WITH IN-LINE EDITING */}
+        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-[11px] uppercase tracking-wider text-slate-400 font-extrabold border-b border-slate-800">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px] font-mono">
                 <tr>
                   <th className="py-3.5 px-4">Perangkat & Tipe</th>
+                  <th className="py-3.5 px-4">Target Jurusan</th>
                   <th className="py-3.5 px-4">Processor & GPU</th>
-                  <th className="py-3.5 px-4">RAM</th>
-                  <th className="py-3.5 px-4">Storage</th>
-                  <th className="py-3.5 px-4">Harga Pasar (Realtime)</th>
-                  <th className="py-3.5 px-4">Garansi</th>
-                  <th className="py-3.5 px-4 text-right">Aksi</th>
+                  <th className="py-3.5 px-3">RAM</th>
+                  <th className="py-3.5 px-3">Storage</th>
+                  <th className="py-3.5 px-3">Layar & Bobot</th>
+                  <th className="py-3.5 px-4 text-emerald-400">Harga Pasar (Realtime)</th>
+                  <th className="py-3.5 px-3">Garansi</th>
+                  <th className="py-3.5 px-4 text-right">Aksi Staff</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {filteredList.length === 0 ? (
+              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                {paginatedLaptops.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-500">
-                      Tidak ada perangkat yang sesuai dengan filter pencarian.
+                    <td colSpan={9} className="py-12 text-center text-slate-500 font-mono">
+                      Tidak ada perangkat yang cocok dengan kriteria filter pencarian.
                     </td>
                   </tr>
                 ) : (
-                  filteredList.map((item) => {
-                    const isInline = inlineEditingId === item.ID_Perangkat;
-                    const isSaving = savingInlineId === item.ID_Perangkat;
-                    const isMini =
-                      item.Tipe_Perangkat?.toLowerCase().includes("mini") ||
-                      item.Tipe_Perangkat?.toLowerCase().includes("desktop") ||
-                      item.Model_Seri.toLowerCase().includes("mini");
+                  paginatedLaptops.map((l) => {
+                    const isInline = inlineEditingId === l.ID_Perangkat;
+                    const isSaving = savingInlineId === l.ID_Perangkat;
 
                     return (
                       <tr
-                        key={item.ID_Perangkat}
+                        key={l.ID_Perangkat}
                         className={`hover:bg-slate-800/40 transition-colors ${
-                          isInline ? "bg-slate-800/80 border-l-4 border-l-emerald-500" : ""
+                          isInline ? "bg-slate-800/70" : ""
                         }`}
                       >
                         {/* Perangkat & Tipe */}
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <BrandIcon brand={item.Brand} useBrandColor className="w-5 h-5 shrink-0" />
+                            <div className="w-9 h-9 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center shrink-0">
+                              <BrandIcon brand={l.Brand} useBrandColor className="w-4 h-4" />
+                            </div>
                             <div className="min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-white text-xs truncate">
-                                  {item.Model_Seri}
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-extrabold text-white text-xs truncate">
+                                  {l.Model_Seri}
                                 </span>
-                                {isMini ? (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-sky-950 text-sky-400 border border-sky-800">
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-slate-800 text-slate-400">
+                                  {l.ID_Perangkat}
+                                </span>
+                                {(l.Tipe_Perangkat || "").toLowerCase().includes("mini") && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-teal-500/20 text-teal-300 border border-teal-500/30">
                                     Mini PC
-                                  </span>
-                                ) : (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-slate-800 text-slate-400">
-                                    Laptop
                                   </span>
                                 )}
                               </div>
-                              <span className="text-[10px] text-slate-400 font-mono">
-                                {item.ID_Perangkat} • {item.Brand}
+                              <span className="text-[11px] text-slate-400 block mt-0.5">
+                                {l.Brand}
                               </span>
                             </div>
                           </div>
                         </td>
 
-                        {/* CPU & GPU */}
-                        <td className="py-3.5 px-4">
-                          <div className="font-semibold text-slate-200 truncate max-w-[200px]">
-                            {item.Processor_CPU}
-                          </div>
-                          <div className="text-[11px] text-slate-400 truncate max-w-[200px]">
-                            {item.Kartu_Grafis_GPU}
-                          </div>
+                        {/* Target Jurusan */}
+                        <td className="py-3 px-4">
+                          <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[10px] font-medium block w-fit truncate max-w-[150px]">
+                            {l.Target_Mahasiswa_Jurusan || "Semua Jurusan"}
+                          </span>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            {l.Kategori_Target || "Katalog Umum"}
+                          </span>
                         </td>
 
-                        {/* RAM (Inline Edit) */}
-                        <td className="py-3.5 px-4">
+                        {/* CPU & GPU */}
+                        <td className="py-3 px-4 font-mono text-[11px]">
+                          <span className="text-slate-200 block truncate max-w-[160px] font-medium" title={l.Processor_CPU}>
+                            {l.Processor_CPU}
+                          </span>
+                          <span className="text-slate-500 block truncate max-w-[160px]" title={l.Kartu_Grafis_GPU}>
+                            {l.Kartu_Grafis_GPU}
+                          </span>
+                        </td>
+
+                        {/* RAM */}
+                        <td className="py-3 px-3">
                           {isInline ? (
                             <input
                               type="number"
                               value={inlineValues.ram}
-                              onChange={(e) =>
-                                setInlineValues({ ...inlineValues, ram: e.target.value })
-                              }
-                              className="w-16 h-8 px-2 rounded-lg bg-slate-900 border border-emerald-500 text-xs font-bold text-white outline-none"
+                              onChange={(e) => setInlineValues({ ...inlineValues, ram: e.target.value })}
+                              className="w-16 h-7 px-1.5 rounded bg-slate-950 border border-emerald-500 text-xs text-white font-mono"
                             />
                           ) : (
-                            <div
-                              onClick={() => startInlineEdit(item)}
-                              className="font-bold text-slate-200 cursor-pointer hover:text-emerald-400 transition-colors"
-                              title="Klik untuk edit cepat"
-                            >
-                              {item.numericRam} GB
+                            <div className="flex items-center gap-1">
+                              <span className="font-extrabold text-white text-xs">{l.RAM_GB} GB</span>
+                              <span className={`text-[9px] px-1 rounded ${
+                                String(l.Upgradeable_RAM).toLowerCase() === "ya"
+                                  ? "bg-emerald-500/20 text-emerald-400"
+                                  : "bg-slate-800 text-slate-400"
+                              }`}>
+                                {String(l.Upgradeable_RAM).toLowerCase() === "ya" ? "Upgr" : "Sold"}
+                              </span>
                             </div>
                           )}
                         </td>
 
-                        {/* Storage (Inline Edit) */}
-                        <td className="py-3.5 px-4">
+                        {/* Storage */}
+                        <td className="py-3 px-3 text-[11px]">
                           {isInline ? (
                             <input
                               type="text"
                               value={inlineValues.storage}
-                              onChange={(e) =>
-                                setInlineValues({ ...inlineValues, storage: e.target.value })
-                              }
-                              className="w-28 h-8 px-2 rounded-lg bg-slate-900 border border-emerald-500 text-xs text-white outline-none"
+                              onChange={(e) => setInlineValues({ ...inlineValues, storage: e.target.value })}
+                              className="w-28 h-7 px-1.5 rounded bg-slate-950 border border-emerald-500 text-xs text-white"
                             />
                           ) : (
-                            <div
-                              onClick={() => startInlineEdit(item)}
-                              className="text-slate-300 truncate max-w-[120px] cursor-pointer hover:text-emerald-400 transition-colors"
-                              title="Klik untuk edit cepat"
-                            >
-                              {item.Storage_GB_Tipe}
-                            </div>
+                            <span className="truncate block max-w-[110px]" title={l.Storage_GB_Tipe}>
+                              {l.Storage_GB_Tipe}
+                            </span>
                           )}
                         </td>
 
-                        {/* Harga Pasar (Inline Edit) */}
-                        <td className="py-3.5 px-4">
+                        {/* Layar & Bobot */}
+                        <td className="py-3 px-3 text-[11px]">
+                          <span className="truncate block max-w-[120px] text-slate-300" title={l.Layar_Ukuran_Panel_ColorGamut}>
+                            {l.Layar_Ukuran_Panel_ColorGamut}
+                          </span>
+                          <span className="text-slate-500 block mt-0.5 font-mono">
+                            {l.Bobot_kg} kg
+                          </span>
+                        </td>
+
+                        {/* Harga Pasar (Realtime Inline Edit) */}
+                        <td className="py-3 px-4 font-mono font-bold">
                           {isInline ? (
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-slate-400 font-bold text-xs">Rp</span>
-                              <input
-                                type="number"
-                                value={inlineValues.price}
-                                onChange={(e) =>
-                                  setInlineValues({ ...inlineValues, price: e.target.value })
-                                }
-                                className="w-28 h-8 px-2 rounded-lg bg-slate-900 border border-emerald-500 text-xs font-extrabold text-emerald-400 outline-none"
-                              />
-                            </div>
+                            <input
+                              type="number"
+                              value={inlineValues.price}
+                              onChange={(e) => setInlineValues({ ...inlineValues, price: e.target.value })}
+                              className="w-28 h-7 px-2 rounded bg-slate-950 border border-emerald-500 text-xs text-emerald-400 font-mono font-bold"
+                            />
                           ) : (
-                            <div
-                              onClick={() => startInlineEdit(item)}
-                              className="font-extrabold text-emerald-400 cursor-pointer hover:underline"
-                              title="Klik untuk edit harga realtime"
+                            <button
+                              onClick={() => handleStartInlineEdit(l)}
+                              className="text-emerald-400 hover:text-emerald-300 hover:underline text-left"
+                              title="Klik untuk edit harga cepat"
                             >
-                              {formatRupiah(item.numericPrice)}
-                            </div>
+                              {formatRupiah(Number(l.Estimasi_Harga_Pasar_IDR) || 0)}
+                            </button>
                           )}
                         </td>
 
                         {/* Garansi */}
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-3 text-[11px]">
                           {isInline ? (
                             <input
                               type="text"
                               value={inlineValues.warranty}
-                              onChange={(e) =>
-                                setInlineValues({ ...inlineValues, warranty: e.target.value })
-                              }
-                              className="w-24 h-8 px-2 rounded-lg bg-slate-900 border border-emerald-500 text-xs text-white outline-none"
+                              onChange={(e) => setInlineValues({ ...inlineValues, warranty: e.target.value })}
+                              className="w-24 h-7 px-1.5 rounded bg-slate-950 border border-emerald-500 text-xs text-white"
                             />
                           ) : (
-                            <span className="text-slate-400">{item.Status_Garansi_Resmi}</span>
+                            <span className="truncate block max-w-[100px] text-slate-400" title={l.Status_Garansi_Resmi}>
+                              {l.Status_Garansi_Resmi}
+                            </span>
                           )}
                         </td>
 
-                        {/* Aksi */}
-                        <td className="py-3.5 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {isInline ? (
-                              <>
-                                <button
-                                  onClick={() => saveInlineEdit(item.ID_Perangkat)}
-                                  disabled={isSaving}
-                                  className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-all cursor-pointer"
-                                  title="Simpan Realtime ke Supabase"
-                                >
-                                  {isSaving ? (
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                  ) : (
-                                    <CheckIcon className="w-4 h-4" />
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => setInlineEditingId(null)}
-                                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer"
-                                  title="Batal"
-                                >
-                                  <XIcon className="w-4 h-4" />
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  onClick={() => startInlineEdit(item)}
-                                  className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold transition-all cursor-pointer"
-                                  title="Edit Cepat In-line"
-                                >
-                                  Edit Cepat
-                                </button>
-                                <button
-                                  onClick={() => openEdit(item)}
-                                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-emerald-400 transition-all cursor-pointer"
-                                  title="Edit Lengkap Detail"
-                                >
-                                  <PencilSimpleIcon className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(item.ID_Perangkat)}
-                                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-400 hover:text-red-400 transition-all cursor-pointer"
-                                  title="Hapus Perangkat"
-                                >
-                                  <TrashIcon className="w-4 h-4" />
-                                </button>
-                              </>
-                            )}
-                          </div>
+                        {/* Aksi Staff */}
+                        <td className="py-3 px-4 text-right">
+                          {isInline ? (
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => handleSaveInlineEdit(l.ID_Perangkat)}
+                                disabled={isSaving}
+                                className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 cursor-pointer"
+                                title="Simpan Perubahan Inline"
+                              >
+                                {isSaving ? (
+                                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <CheckIcon weight="bold" className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                              <button
+                                onClick={handleCancelInlineEdit}
+                                className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
+                                title="Batal"
+                              >
+                                <XIcon className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                onClick={() => handleStartInlineEdit(l)}
+                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-emerald-400 transition-colors"
+                                title="Edit Cepat Baris Ini"
+                              >
+                                <PencilSimpleIcon className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleEditClick(l)}
+                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                                title="Edit Lengkap Seluruh 20 Field Dataset"
+                              >
+                                <EyeIcon className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(l.ID_Perangkat)}
+                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-red-400 transition-colors"
+                                title="Hapus Perangkat"
+                              >
+                                <TrashIcon className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     );
@@ -1022,46 +1193,90 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Table Pagination Bar */}
+          <div className="p-4 bg-slate-950/80 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+            <div className="flex items-center gap-2">
+              <span>Menampilkan {filteredLaptops.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredLaptops.length)} dari {filteredLaptops.length} perangkat</span>
+              <span className="text-slate-600">|</span>
+              <span>Baris per halaman:</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                className="h-7 px-2 rounded bg-slate-900 border border-slate-700 text-slate-300 text-xs outline-none"
+              >
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Sebelumnya
+              </button>
+              <span className="px-2 font-mono font-bold text-white">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Berikutnya
+              </button>
+            </div>
+          </div>
         </div>
       </main>
 
-      {/* 5. MODAL FORM TAMBAH / EDIT LENGKAP */}
+      {/* ==============================================================================
+          5. MODAL FORM TAMBAH / EDIT LENGKAP (ALL 20 DATASET FIELDS)
+      ============================================================================== */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-8">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-700 rounded-3xl max-w-3xl w-full p-6 sm:p-8 shadow-2xl space-y-6 my-8">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-              <div>
-                <h3 className="text-lg font-black text-white">
-                  {editingLaptop ? "Perbarui Data Perangkat" : "Tambah Perangkat Baru"}
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  ID: {editingLaptop ? editingLaptop.ID_Perangkat : formData.ID_Perangkat}
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold">
+                  <DatabaseIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white">
+                    {editingLaptop ? "Perbarui Data Spesifikasi Perangkat" : "Tambah Perangkat Baru ke Dataset"}
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono mt-0.5">
+                    ID Perangkat: <span className="text-emerald-400 font-bold">{formData.ID_Perangkat}</span>
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white"
+                className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
               >
                 <XIcon className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSubmitForm} className="space-y-4 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Row 1: Brand & Device Type */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Brand</label>
+                  <label className="block text-slate-400 font-bold mb-1">Brand Resmi</label>
                   <select
                     value={formData.Brand}
                     onChange={(e) => setFormData({ ...formData, Brand: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   >
-                    {["Advan", "Axioo", "Zyrex", "ASUS", "Lenovo", "Acer", "Apple", "MSI", "HP", "Dell"].map(
-                      (b) => (
-                        <option key={b} value={b}>
-                          {b}
-                        </option>
-                      )
-                    )}
+                    {["Advan", "Axioo", "Zyrex", "ASUS", "Lenovo", "Acer", "Apple", "MSI", "HP", "Dell"].map((b) => (
+                      <option key={b} value={b}>
+                        {b}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -1070,26 +1285,57 @@ export default function AdminPage() {
                   <select
                     value={formData.Tipe_Perangkat}
                     onChange={(e) => setFormData({ ...formData, Tipe_Perangkat: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   >
                     <option value="Laptop">Laptop</option>
                     <option value="Mini PC">Mini PC / Desktop Ringkas</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Kategori Target</label>
+                  <select
+                    value={formData.Kategori_Target}
+                    onChange={(e) => setFormData({ ...formData, Kategori_Target: e.target.value })}
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
+                  >
+                    <option value="Teknik/Informatika">Teknik/Informatika</option>
+                    <option value="Multimedia/Desain">Multimedia/Desain</option>
+                    <option value="Dasar/Pelajar">Dasar/Pelajar</option>
+                    <option value="Bisnis/Produktivitas">Bisnis/Produktivitas</option>
+                    <option value="Gaming/Komputasi Berat">Gaming/Komputasi Berat</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-slate-400 font-bold mb-1">Model / Nama Seri</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.Model_Seri}
-                  onChange={(e) => setFormData({ ...formData, Model_Seri: e.target.value })}
-                  placeholder="Contoh: Workplus AMD Ryzen 5 6600H"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
-                />
+              {/* Row 2: Model & Target Mahasiswa Jurusan */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Model / Nama Seri Lengkap</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.Model_Seri}
+                    onChange={(e) => setFormData({ ...formData, Model_Seri: e.target.value })}
+                    placeholder="Contoh: Workplus AMD Ryzen 5 6600H"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Target Mahasiswa Jurusan</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.Target_Mahasiswa_Jurusan}
+                    onChange={(e) => setFormData({ ...formData, Target_Mahasiswa_Jurusan: e.target.value })}
+                    placeholder="Contoh: Informatika / Sains Data"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
+                  />
+                </div>
               </div>
 
+              {/* Row 3: CPU & GPU */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-400 font-bold mb-1">Processor / CPU</label>
@@ -1098,8 +1344,8 @@ export default function AdminPage() {
                     required
                     value={formData.Processor_CPU}
                     onChange={(e) => setFormData({ ...formData, Processor_CPU: e.target.value })}
-                    placeholder="AMD Ryzen 5 6600H"
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    placeholder="Contoh: AMD Ryzen 7 7730U"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none font-mono"
                   />
                 </div>
 
@@ -1110,12 +1356,13 @@ export default function AdminPage() {
                     required
                     value={formData.Kartu_Grafis_GPU}
                     onChange={(e) => setFormData({ ...formData, Kartu_Grafis_GPU: e.target.value })}
-                    placeholder="AMD Radeon 660M"
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    placeholder="Contoh: AMD Radeon Graphics / RTX 4050"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none font-mono"
                   />
                 </div>
               </div>
 
+              {/* Row 4: RAM, Upgradeable, Bobot */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-slate-400 font-bold mb-1">RAM (GB)</label>
@@ -1124,7 +1371,7 @@ export default function AdminPage() {
                     required
                     value={formData.RAM_GB}
                     onChange={(e) => setFormData({ ...formData, RAM_GB: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono outline-none"
                   />
                 </div>
 
@@ -1133,10 +1380,10 @@ export default function AdminPage() {
                   <select
                     value={formData.Upgradeable_RAM}
                     onChange={(e) => setFormData({ ...formData, Upgradeable_RAM: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   >
-                    <option value="Ya">Ya (Bisa Upgrade)</option>
-                    <option value="Tidak">Tidak (Soldered)</option>
+                    <option value="Ya">Ya (Slot SODIMM Tersedia)</option>
+                    <option value="Tidak">Tidak (Soldered Onboard)</option>
                   </select>
                 </div>
 
@@ -1148,21 +1395,22 @@ export default function AdminPage() {
                     required
                     value={formData.Bobot_kg}
                     onChange={(e) => setFormData({ ...formData, Bobot_kg: e.target.value })}
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white font-mono outline-none"
                   />
                 </div>
               </div>
 
+              {/* Row 5: Storage & Layar Panel */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">Storage</label>
+                  <label className="block text-slate-400 font-bold mb-1">Storage Kapasitas & Tipe</label>
                   <input
                     type="text"
                     required
                     value={formData.Storage_GB_Tipe}
                     onChange={(e) => setFormData({ ...formData, Storage_GB_Tipe: e.target.value })}
-                    placeholder="512GB SSD NVMe PCIe 4.0"
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    placeholder="Contoh: 512GB SSD NVMe PCIe 4.0"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   />
                 </div>
 
@@ -1172,27 +1420,35 @@ export default function AdminPage() {
                     type="text"
                     required
                     value={formData.Layar_Ukuran_Panel_ColorGamut}
-                    onChange={(e) =>
-                      setFormData({ ...formData, Layar_Ukuran_Panel_ColorGamut: e.target.value })
-                    }
-                    placeholder="14.0 inci IPS WUXGA 100% sRGB"
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    onChange={(e) => setFormData({ ...formData, Layar_Ukuran_Panel_ColorGamut: e.target.value })}
+                    placeholder="Contoh: 14 inci IPS FHD 100% sRGB"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Row 6: Harga Pasar, Platform Beli, Garansi */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-slate-400 font-bold mb-1">Estimasi Harga (IDR)</label>
                   <input
                     type="number"
                     required
                     value={formData.Estimasi_Harga_Pasar_IDR}
-                    onChange={(e) =>
-                      setFormData({ ...formData, Estimasi_Harga_Pasar_IDR: e.target.value })
-                    }
-                    placeholder="7299000"
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold outline-none"
+                    onChange={(e) => setFormData({ ...formData, Estimasi_Harga_Pasar_IDR: e.target.value })}
+                    placeholder="7000000"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-emerald-400 font-mono font-bold outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Platform Rekomendasi Beli</label>
+                  <input
+                    type="text"
+                    value={formData.Platform_Rekomendasi_Beli}
+                    onChange={(e) => setFormData({ ...formData, Platform_Rekomendasi_Beli: e.target.value })}
+                    placeholder="Tokopedia Official Store"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   />
                 </div>
 
@@ -1202,54 +1458,81 @@ export default function AdminPage() {
                     type="text"
                     required
                     value={formData.Status_Garansi_Resmi}
-                    onChange={(e) =>
-                      setFormData({ ...formData, Status_Garansi_Resmi: e.target.value })
-                    }
-                    placeholder="1 Tahun Resmi Advan Care"
-                    className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
+                    onChange={(e) => setFormData({ ...formData, Status_Garansi_Resmi: e.target.value })}
+                    placeholder="1 Tahun Resmi Indonesia"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-slate-400 font-bold mb-1">Kelebihan (Pros)</label>
-                <input
-                  type="text"
-                  value={formData.Pros_Kelebihan}
-                  onChange={(e) => setFormData({ ...formData, Pros_Kelebihan: e.target.value })}
-                  placeholder="Kencang, bodi aluminium, RAM DDR5 cepat"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
-                />
+              {/* Row 7: Tags & Image URL */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Rekomendasi UseCase Tag</label>
+                  <input
+                    type="text"
+                    value={formData.Rekomendasi_UseCase_Tag}
+                    onChange={(e) => setFormData({ ...formData, Rekomendasi_UseCase_Tag: e.target.value })}
+                    placeholder="#skripsi-browsing #office #coding"
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">URL Gambar Perangkat</label>
+                  <input
+                    type="url"
+                    value={formData.Link_Gambar}
+                    onChange={(e) => setFormData({ ...formData, Link_Gambar: e.target.value })}
+                    placeholder="https://images.tokopedia.net/..."
+                    className="w-full h-10 px-3 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-slate-400 font-bold mb-1">Kekurangan (Cons)</label>
-                <input
-                  type="text"
-                  value={formData.Cons_Kekurangan}
-                  onChange={(e) => setFormData({ ...formData, Cons_Kekurangan: e.target.value })}
-                  placeholder="Port USB Type-C hanya satu"
-                  className="w-full h-10 px-3 rounded-xl bg-slate-800 border border-slate-700 text-white outline-none"
-                />
+              {/* Row 8: Pros & Cons */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Kelebihan (Pros)</label>
+                  <textarea
+                    rows={2}
+                    value={formData.Pros_Kelebihan}
+                    onChange={(e) => setFormData({ ...formData, Pros_Kelebihan: e.target.value })}
+                    placeholder="Kinerja prosesor kencang, layar tajam, bodi aluminium"
+                    className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-400 font-bold mb-1">Kekurangan (Cons)</label>
+                  <textarea
+                    rows={2}
+                    value={formData.Cons_Kekurangan}
+                    onChange={(e) => setFormData({ ...formData, Cons_Kekurangan: e.target.value })}
+                    placeholder="RAM disolder, webcam standar 720p"
+                    className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white outline-none resize-none"
+                  />
+                </div>
               </div>
 
+              {/* Modal Action Buttons */}
               <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold"
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black flex items-center gap-2 cursor-pointer shadow-md transition-colors"
                 >
                   {loading && (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
                   )}
-                  <span>Simpan ke Database</span>
+                  <span>Simpan ke Database Supabase</span>
                 </button>
               </div>
             </form>

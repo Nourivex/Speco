@@ -320,7 +320,7 @@ export default function LoginPage() {
               <div className="p-3.5 rounded-2xl bg-slate-900 text-white text-xs space-y-1">
                 <div className="flex items-center gap-1.5 font-extrabold text-emerald-400">
                   <ShieldCheckIcon className="w-4 h-4" />
-                  <span>Area Khusus Otoritas Tim NEXORA</span>
+                  <span>Area Khusus Otoritas TIM SPECO</span>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-relaxed">
                   Login resmi menggunakan akun Google terdaftar Supabase atau kredensial Project Lead untuk mengakses Dashboard Manajemen 450 Laptop.

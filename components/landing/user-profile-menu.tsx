@@ -14,6 +14,7 @@ import { SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { SignInIcon } from "@phosphor-icons/react/dist/ssr/SignIn";
 import { UserPlusIcon } from "@phosphor-icons/react/dist/ssr/UserPlus";
 import { UserIcon } from "@phosphor-icons/react/dist/ssr/User";
+import { SparkleIcon } from "@phosphor-icons/react/dist/ssr/Sparkle";
 import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 import { getCurrentUser, signOutUser } from "@/lib/supabase";
 
@@ -135,7 +136,7 @@ export function UserProfileMenu({
             </span>
             {isAdmin ? (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300">
-                Admin Otoritas (NEXORA 7A)
+                Admin Otoritas (TIM SPECO 7A)
               </span>
             ) : isGuest ? (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
@@ -197,6 +198,21 @@ export function UserProfileMenu({
               )}
             </>
           )}
+
+          {/* Link Dashboard Mahasiswa */}
+          <Link
+            href="/dashboard"
+            onClick={onClose}
+            className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100/80 text-emerald-900 font-bold text-xs flex items-center justify-between transition-colors border border-emerald-200/80"
+          >
+            <span className="flex items-center gap-2">
+              <SparkleIcon className="w-4 h-4 text-emerald-700" />
+              <span>Dashboard Mahasiswa & Riwayat</span>
+            </span>
+            <span className="text-[10px] bg-emerald-700 text-white px-1.5 py-0.5 rounded font-mono">
+              Siswa
+            </span>
+          </Link>
 
           {/* Link Dokumentasi Lengkap Proyek */}
           <Link
