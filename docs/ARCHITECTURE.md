@@ -1,60 +1,74 @@
-# 📐 Arsitektur Sistem & Spesifikasi Teknis Backend
+# 📐 Arsitektur Sistem & Spesifikasi Teknis SPECO
 
-> Dokumen Arsitektur Resmi Proyek Rekayasa Perangkat Lunak (Kelompok 7A - Tim NEXORA)  
-> Penanggung Jawab: **Muhammad Affif (Mas Affif)** — Project Lead & Backend/Data Engineer
+> Dokumen Arsitektur Resmi Proyek Rekayasa Perangkat Lunak (TIM SPECO - Kelompok 7A)  
+> Penanggung Jawab: **Muhammad Affif (Mas Affif)** : Project Lead & Backend/Data Engineer
 
 ---
 
 ## 1. Ringkasan Sistem & Prinsip Desain
 
-Sistem ini adalah platform **Sistem Pendukung Keputusan (SPK)** pemilihan komputer dan laptop berbasis kebutuhan beban komputasi dan anggaran mahasiswa/pengguna. 
+Sistem ini adalah platform **Sistem Pendukung Keputusan (SPK)** pemilihan komputer dan laptop berbasis kebutuhan beban komputasi dan anggaran mahasiswa.
 
 ### Prinsip Utama:
-1. **Dynamic Branding**: Nama produk dan identitas visual bersifat *white-label configurable* (bersumber dari `config('brand')` / `.env`).
-2. **Decoupled Architecture**: Frontend (Next.js) dan Backend (Laravel RESTful API) terpisah secara bersih (*headless*).
-3. **Reproducible Local Dev**: Dijalankan di atas **DDEV** (Docker containerized) untuk konsistensi lingkungan pengembangan.
-4. **Data-Driven & Explainable**: Keputusan rekomendasi didasarkan pada metode **Simple Additive Weighting (SAW)** yang transparan dan dapat dijelaskan perhitungannya (*explainable AI/SPK*).
+1. **Dynamic Branding**: Nama produk dan identitas visual bersumber dari konfigurasi dinamis `brand.config` dan environment variable.
+2. **Unified Modern Serverless Architecture**: Menggabungkan antarmuka pengguna (Next.js 16 App Router) dan serverless route handlers (`/api/...`) dalam satu repositori terpadu yang terhubung langsung ke **Supabase Cloud (PostgreSQL Managed)**.
+3. **Zero-Maintenance Deployment**: Menghilangkan ketergantungan pada dedicated server atau VPS mandiri (Nginx/PHP-FPM/DDEV) sehingga sistem dapat langsung dideploy ke edge infrastructure dengan ketersediaan tinggi dan biaya operasional $0.
+4. **Data-Driven & Explainable**: Keputusan rekomendasi didasarkan pada metode **Simple Additive Weighting (SAW)** yang transparan dan dapat diverifikasi perhitungannya.
 
 ---
 
-## 2. Topologi Jaringan & Arsitektur Komunikasi
+## 2. Architecture Decision Record (ADR-001): Transisi dari Laravel ke Next.js & Supabase Cloud
 
-Berikut adalah diagram alur komunikasi antar service dalam ekosistem aplikasi:
+### Latar Belakang & Rasional Teknis:
+Pada perancangan awal, backend direncanakan menggunakan PHP Laravel 12 pada container lokal DDEV. Namun, saat memasuki fase evaluasi dan deployment produksi, tim mengidentifikasi sejumlah kendala:
+1. **Beban Operasional VPS/Dedicated Server**:
+   Laravel membutuhkan server mandiri dengan konfigurasi OS manual: runtime PHP 8.4, PHP-FPM, web server Nginx, SSL Certbot, supervisord, dan database MariaDB lokal. Hal ini memakan biaya sewa VPS bulanan dan rawan *downtime* saat demonstrasi proyek.
+2. **Overhead Latensi & Sinkronisasi CORS**:
+   Pemisahan server frontend dan backend menimbulkan latensi jaringan tambahan (*round-trip latency*) dan kompleksitas konfigurasi CORS.
+
+### Solusi yang Diterapkan:
+1. **Database PostgreSQL Supabase Cloud**:
+   450 data laptop dan matriks preferensi persona disimpan pada database managed Supabase Cloud kawasan Asia Tenggara (`ap-southeast-1`) dengan koneksi pooler PgBouncer, proteksi Row Level Security (RLS), dan automasi backup.
+2. **Route Handlers Next.js 16 sebagai Backend Engine**:
+   Logika bisnis, validasi request, kalkulasi algoritma SPK SAW, manipulasi database, serta batch import/merge Excel ditangani secara native oleh Route Handlers Next.js di sisi server Node.js dengan `SPECO_SUPABASE_SERVICE_ROLE_KEY`.
+3. **Deployment Serverless Tanpa VPS**:
+   Sistem dapat langsung di-deploy secara *serverless* (Vercel / Cloudflare) dengan *zero server maintenance*.
+
+### Topologi Arsitektur Terpadu:
 
 ```mermaid
 flowchart TD
-    subgraph Client["🖥️ Client Tier (Frontend - Fahren)"]
-        Browser["Web Browser (User / Mahasiswa)"]
-        NextApp["Next.js App Router (Port 3000)"]
-        MockData["Mock Data (Deprecated)"]
-        Browser --> NextApp
+    subgraph ClientTier["🖥️ Client Tier (Browser)"]
+        User["Mahasiswa / Pengguna"]
+        Staff["Admin / Staf Katalog"]
+        NextUI["Next.js 16 Frontend (App Router, Tailwind, shadcn)"]
+        User --> NextUI
+        Staff --> NextUI
     end
 
-    subgraph Gateway["🌐 Networking & Gateway"]
-        ReverseProxy["DDEV Nginx Router (*.ddev.site)"]
-        NextApp -- "HTTP REST (JSON) /api/*" --> ReverseProxy
-    end
-
-    subgraph Backend["⚙️ Backend Tier (Laravel - Mas Affif)"]
-        LaravelApp["Laravel 11/12 Core"]
-        BrandConfig["Brand Config (Single Source of Truth)"]
-        Controller["API Controllers"]
-        SawService["SawRecommendationService (SPK Engine)"]
+    subgraph ServerlessEngine["⚡ Unified Serverless Backend (Next.js 16)"]
+        APIRoute["Route Handlers (/api/*)"]
+        AuthModule["Admin Auth & Passkey Engine (/api/admin/*)"]
+        CatalogAPI["Katalog & Batch Merge Engine (/api/admin/laptops)"]
+        SawEngine["SAW Recommendation Engine (/api/recommendation)"]
         
-        ReverseProxy --> LaravelApp
-        BrandConfig --> LaravelApp
-        LaravelApp --> Controller
-        Controller --> SawService
+        NextUI --> APIRoute
+        APIRoute --> AuthModule
+        APIRoute --> CatalogAPI
+        APIRoute --> SawEngine
     end
 
-    subgraph DatabaseTier["🗄️ Database & Storage Tier"]
-        DB[(MySQL / MariaDB via DDEV)]
-        ExcelSource["Data Spek Komputer & Laptop Mahasiswa 2026.xlsx\n(450 Data & 7 Matriks)"]
-        Seeder["Database Seeder Pipeline"]
+    subgraph CloudDatabase["☁️ Managed Database Tier (Supabase Cloud - AWS Singapore)"]
+        PgBouncer["PgBouncer Pooler (Port 6543)"]
+        PostgresDB[(PostgreSQL Managed Database)]
+        RLS["Row Level Security Policies"]
+        AuthUsers["Supabase Auth (Google OAuth & JWT)"]
         
-        ExcelSource --> Seeder
-        Seeder --> DB
-        SawService <--> DB
+        CatalogAPI -- "Private Service Role" --> PostgresDB
+        AuthModule -- "Query admin_passkeys & admin_users" --> PostgresDB
+        SawEngine -- "Read Laptops & Persona Criteria" --> PgBouncer
+        PgBouncer --> PostgresDB
+        PostgresDB --- RLS
     end
 ```
 
