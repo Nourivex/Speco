@@ -135,6 +135,29 @@ export async function updateLaptopInSupabase(id: string, updates: Partial<Supaba
 }
 
 /**
+ * Batch Merge update beberapa laptop sekaligus ke Supabase via server route
+ */
+export async function batchMergeLaptopsToSupabase(
+  batch: Array<{ id: string; updates: Partial<SupabaseLaptop> }>
+) {
+  const session = typeof window !== "undefined" ? localStorage.getItem("speco_admin_session") || "" : "";
+  const res = await fetch("/api/admin/laptops", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-session": session,
+    },
+    body: JSON.stringify({ batch }),
+  });
+
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || "Gagal melakukan merge data ke database.");
+  }
+  return json;
+}
+
+/**
  * Hapus laptop dari Supabase melalui secure server endpoint
  */
 export async function deleteLaptopFromSupabase(id: string) {

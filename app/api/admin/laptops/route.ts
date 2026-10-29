@@ -174,6 +174,50 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json().catch(() => ({}));
+
+    // Mode 1: Batch Merge Data (Impor Excel / Bulk Update)
+    if (Array.isArray(body.batch) && body.batch.length > 0) {
+      let updatedCount = 0;
+      let errorCount = 0;
+      const chunkSize = 15;
+
+      for (let i = 0; i < body.batch.length; i += chunkSize) {
+        const chunk = body.batch.slice(i, i + chunkSize);
+        await Promise.all(
+          chunk.map(async (item: { id: string; updates: any }) => {
+            if (!item.id || !item.updates) return;
+            try {
+              const cleanUpdates = { ...item.updates };
+              delete cleanUpdates.id;
+              cleanUpdates.updated_at = new Date().toISOString();
+
+              const { error } = await supabaseAdmin
+                .from("laptops")
+                .update(cleanUpdates)
+                .eq("id", item.id);
+
+              if (error) {
+                console.error(`Gagal merge item ${item.id}:`, error);
+                errorCount++;
+              } else {
+                updatedCount++;
+              }
+            } catch {
+              errorCount++;
+            }
+          })
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `Merge data berhasil: ${updatedCount} perangkat diperbarui.${errorCount > 0 ? ` (${errorCount} gagal)` : ""}`,
+        updatedCount,
+        errorCount,
+      });
+    }
+
+    // Mode 2: Single Laptop Upsert
     const laptop = body.laptop || body;
 
     if (!laptop || !laptop.id || !laptop.brand || !laptop.model) {

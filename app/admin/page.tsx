@@ -18,6 +18,8 @@ import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 import { LockKeyIcon } from "@phosphor-icons/react/dist/ssr/LockKey";
 import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 import { DownloadSimpleIcon } from "@phosphor-icons/react/dist/ssr/DownloadSimple";
+import { UploadSimpleIcon } from "@phosphor-icons/react/dist/ssr/UploadSimple";
+import { WarningCircleIcon } from "@phosphor-icons/react/dist/ssr/WarningCircle";
 import { SignOutIcon } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { EyeIcon } from "@phosphor-icons/react/dist/ssr/Eye";
 import { ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr/ArrowSquareOut";
@@ -36,6 +38,7 @@ import {
   insertLaptopToSupabase,
   updateLaptopInSupabase,
   deleteLaptopFromSupabase,
+  batchMergeLaptopsToSupabase,
   SupabaseLaptop,
   isSupabaseConfigured,
   getCurrentUser,
@@ -61,6 +64,7 @@ export default function AdminPage() {
   const [brandFilter, setBrandFilter] = React.useState<string>("all");
   const [jurusanFilter, setJurusanFilter] = React.useState<string>("all");
   const [kategoriFilter, setKategoriFilter] = React.useState<string>("all");
+  const [completenessFilter, setCompletenessFilter] = React.useState<"all" | "missing_image" | "incomplete" | "complete">("all");
   const [sortOption, setSortOption] = React.useState<"default" | "price-asc" | "price-desc" | "ram-desc" | "weight-asc">("default");
   const [loading, setLoading] = React.useState(false);
   const [statusMsg, setStatusMsg] = React.useState<string | null>(null);
@@ -68,6 +72,19 @@ export default function AdminPage() {
   // Pagination State
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(25);
+
+  // Excel Import & Merge State
+  const [isImportModalOpen, setIsImportModalOpen] = React.useState(false);
+  const [importFileName, setImportFileName] = React.useState("");
+  const [importMergeList, setImportMergeList] = React.useState<Array<{
+    id: string;
+    brand: string;
+    model: string;
+    changes: Array<{ field: string; oldVal: string; newVal: string }>;
+    payload: Partial<SupabaseLaptop>;
+  }>>([]);
+  const [isMerging, setIsMerging] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // In-line Quick Editing State
   const [inlineEditingId, setInlineEditingId] = React.useState<string | null>(null);
@@ -298,6 +315,29 @@ export default function AdminPage() {
       result = result.filter((l) => (l.Kategori_Target || "").toLowerCase().includes(kategoriFilter.toLowerCase()));
     }
 
+    // Filter Status Kelengkapan Data (Audit Null / Kosong)
+    if (completenessFilter === "missing_image") {
+      result = result.filter((l) => !l.Link_Gambar || !l.Link_Gambar.trim());
+    } else if (completenessFilter === "incomplete") {
+      result = result.filter((l) => {
+        return (
+          !l.Link_Gambar || !l.Link_Gambar.trim() ||
+          !l.Pros_Kelebihan || !l.Pros_Kelebihan.trim() ||
+          !l.Cons_Kekurangan || !l.Cons_Kekurangan.trim() ||
+          !l.Rekomendasi_UseCase_Tag || !l.Rekomendasi_UseCase_Tag.trim()
+        );
+      });
+    } else if (completenessFilter === "complete") {
+      result = result.filter((l) => {
+        return (
+          Boolean(l.Link_Gambar && l.Link_Gambar.trim()) &&
+          Boolean(l.Pros_Kelebihan && l.Pros_Kelebihan.trim()) &&
+          Boolean(l.Cons_Kekurangan && l.Cons_Kekurangan.trim()) &&
+          Boolean(l.Rekomendasi_UseCase_Tag && l.Rekomendasi_UseCase_Tag.trim())
+        );
+      });
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -322,7 +362,7 @@ export default function AdminPage() {
     }
 
     return result;
-  }, [laptops, search, typeFilter, brandFilter, jurusanFilter, kategoriFilter, sortOption]);
+  }, [laptops, search, typeFilter, brandFilter, jurusanFilter, kategoriFilter, completenessFilter, sortOption]);
 
   // Pagination Slicing
   const totalPages = Math.ceil(filteredLaptops.length / itemsPerPage) || 1;
@@ -331,7 +371,7 @@ export default function AdminPage() {
     return filteredLaptops.slice(start, start + itemsPerPage);
   }, [filteredLaptops, currentPage, itemsPerPage]);
 
-  // Hitung Metrik Dashboard
+  // Hitung Metrik Dashboard & Audit Kelengkapan Data
   const metrics = React.useMemo(() => {
     const total = laptops.length;
     const countLaptop = laptops.filter((l) => (l.Tipe_Perangkat || "Laptop").toLowerCase().includes("laptop")).length;
@@ -340,7 +380,18 @@ export default function AdminPage() {
     const avgHarga = total > 0 ? Math.round(totalHarga / total) : 0;
     const countLokal = laptops.filter((l) => ["axioo", "advan", "zyrex"].includes(l.Brand.toLowerCase())).length;
 
-    return { total, countLaptop, countMiniPc, avgHarga, countLokal };
+    const missingImagesCount = laptops.filter((l) => !l.Link_Gambar || !l.Link_Gambar.trim()).length;
+    const incompleteCount = laptops.filter((l) => {
+      return (
+        !l.Link_Gambar || !l.Link_Gambar.trim() ||
+        !l.Pros_Kelebihan || !l.Pros_Kelebihan.trim() ||
+        !l.Cons_Kekurangan || !l.Cons_Kekurangan.trim() ||
+        !l.Rekomendasi_UseCase_Tag || !l.Rekomendasi_UseCase_Tag.trim()
+      );
+    }).length;
+    const completeCount = total - incompleteCount;
+
+    return { total, countLaptop, countMiniPc, avgHarga, countLokal, missingImagesCount, incompleteCount, completeCount };
   }, [laptops]);
 
   // Quick In-Line Editing Handlers
@@ -559,16 +610,19 @@ export default function AdminPage() {
     }
   };
 
-  // Export to Excel (.xlsx) Handlers
+  // Export to Excel (.xlsx) Handlers (Mendukung Ekspor Data Terfilter / Missing Data)
   const handleExportXLSX = () => {
     try {
-      const exportData = laptops.map((l) => ({
+      const isFiltered = completenessFilter !== "all" || brandFilter !== "all" || jurusanFilter !== "all" || search.trim() !== "";
+      const exportTarget = isFiltered ? filteredLaptops : laptops;
+
+      const exportData = exportTarget.map((l) => ({
         ID_Perangkat: l.ID_Perangkat,
-        Kategori_Target: l.Kategori_Target,
-        Target_Mahasiswa_Jurusan: l.Target_Mahasiswa_Jurusan,
         Brand: l.Brand,
         Model_Seri: l.Model_Seri,
         Tipe_Perangkat: l.Tipe_Perangkat,
+        Kategori_Target: l.Kategori_Target,
+        Target_Mahasiswa_Jurusan: l.Target_Mahasiswa_Jurusan,
         Processor_CPU: l.Processor_CPU,
         Kartu_Grafis_GPU: l.Kartu_Grafis_GPU,
         RAM_GB: l.RAM_GB,
@@ -588,11 +642,217 @@ export default function AdminPage() {
       const ws = XLSX.utils.json_to_sheet(exportData);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Katalog_Laptop");
-      XLSX.writeFile(wb, `SPECO_Dataset_450_Laptop_${new Date().toISOString().slice(0, 10)}.xlsx`);
-      setStatusMsg("Berkas Excel (.xlsx) berhasil diunduh.");
-      setTimeout(() => setStatusMsg(null), 3000);
+
+      let fileName = `SPECO_Dataset_${exportTarget.length}_Laptop_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      if (completenessFilter === "missing_image") {
+        fileName = `SPECO_Perlu_Dilengkapi_Gambar_${exportTarget.length}_Unit.xlsx`;
+      } else if (completenessFilter === "incomplete") {
+        fileName = `SPECO_Data_Belum_Lengkap_${exportTarget.length}_Unit.xlsx`;
+      }
+
+      XLSX.writeFile(wb, fileName);
+      setStatusMsg(`Berkas Excel (${exportTarget.length} data) berhasil diunduh: ${fileName}`);
+      setTimeout(() => setStatusMsg(null), 3500);
     } catch {
       alert("Gagal mengekspor file Excel.");
+    }
+  };
+
+  // Helper untuk mengekstrak nilai dari row Excel berdasarkan variasi nama kolom
+  const extractVal = (row: any, ...keys: string[]): string | undefined => {
+    for (const k of keys) {
+      if (row[k] !== undefined && row[k] !== null && String(row[k]).trim() !== "") {
+        return String(row[k]).trim();
+      }
+      const matched = Object.keys(row).find(
+        (rk) => rk.toLowerCase().replace(/[\s_-]/g, "") === k.toLowerCase().replace(/[\s_-]/g, "")
+      );
+      if (matched && row[matched] !== undefined && row[matched] !== null && String(row[matched]).trim() !== "") {
+        return String(row[matched]).trim();
+      }
+    }
+    return undefined;
+  };
+
+  // Upload & Parse Excel (.xlsx) untuk Melakukan Merge Data
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setImportFileName(file.name);
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const rawJson: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+      if (!rawJson || rawJson.length === 0) {
+        alert("File Excel kosong atau tidak memiliki baris data yang valid.");
+        return;
+      }
+
+      const mergeResults: Array<{
+        id: string;
+        brand: string;
+        model: string;
+        changes: Array<{ field: string; oldVal: string; newVal: string }>;
+        payload: Partial<SupabaseLaptop>;
+      }> = [];
+
+      for (const row of rawJson) {
+        const id = extractVal(row, "ID_Perangkat", "id", "ID", "id_perangkat");
+        if (!id) continue;
+
+        const existing = laptops.find((l) => l.ID_Perangkat.toLowerCase() === id.toLowerCase());
+        if (!existing) continue;
+
+        const changes: Array<{ field: string; oldVal: string; newVal: string }> = [];
+        const payload: Partial<SupabaseLaptop> = {};
+
+        // 1. Link Gambar
+        const newImg = extractVal(row, "Link_Gambar", "image_url", "Gambar", "Link Gambar", "URL Gambar");
+        if (newImg !== undefined && newImg !== (existing.Link_Gambar || "")) {
+          changes.push({
+            field: "URL Gambar",
+            oldVal: existing.Link_Gambar || "(Kosong)",
+            newVal: newImg,
+          });
+          payload.image_url = newImg;
+        }
+
+        // 2. Pros (Kelebihan)
+        const newPros = extractVal(row, "Pros_Kelebihan", "pros", "Kelebihan", "Pros");
+        if (newPros !== undefined && newPros !== (existing.Pros_Kelebihan || "")) {
+          changes.push({
+            field: "Kelebihan (Pros)",
+            oldVal: existing.Pros_Kelebihan || "(Kosong)",
+            newVal: newPros,
+          });
+          payload.pros = newPros;
+        }
+
+        // 3. Cons (Kekurangan)
+        const newCons = extractVal(row, "Cons_Kekurangan", "cons", "Kekurangan", "Cons");
+        if (newCons !== undefined && newCons !== (existing.Cons_Kekurangan || "")) {
+          changes.push({
+            field: "Kekurangan (Cons)",
+            oldVal: existing.Cons_Kekurangan || "(Kosong)",
+            newVal: newCons,
+          });
+          payload.cons = newCons;
+        }
+
+        // 4. Rekomendasi UseCase Tag
+        const newTag = extractVal(row, "Rekomendasi_UseCase_Tag", "usecase_tag", "Tag", "Tags");
+        if (newTag !== undefined && newTag !== (existing.Rekomendasi_UseCase_Tag || "")) {
+          changes.push({
+            field: "UseCase Tag",
+            oldVal: existing.Rekomendasi_UseCase_Tag || "(Kosong)",
+            newVal: newTag,
+          });
+          payload.usecase_tag = newTag;
+        }
+
+        // 5. Harga
+        const newPrice = extractVal(row, "Estimasi_Harga_Pasar_IDR", "price_idr", "Harga");
+        if (newPrice !== undefined && Number(newPrice) !== Number(existing.Estimasi_Harga_Pasar_IDR)) {
+          changes.push({
+            field: "Harga Pasar",
+            oldVal: formatRupiah(Number(existing.Estimasi_Harga_Pasar_IDR) || 0),
+            newVal: formatRupiah(Number(newPrice) || 0),
+          });
+          payload.price_idr = Number(newPrice);
+        }
+
+        // 6. Garansi
+        const newWarranty = extractVal(row, "Status_Garansi_Resmi", "warranty", "Garansi");
+        if (newWarranty !== undefined && newWarranty !== (existing.Status_Garansi_Resmi || "")) {
+          changes.push({
+            field: "Garansi",
+            oldVal: existing.Status_Garansi_Resmi || "(Kosong)",
+            newVal: newWarranty,
+          });
+          payload.warranty = newWarranty;
+        }
+
+        // 7. Platform Beli
+        const newBuyUrl = extractVal(row, "Platform_Rekomendasi_Beli", "buy_url", "Platform Beli");
+        if (newBuyUrl !== undefined && newBuyUrl !== (existing.Platform_Rekomendasi_Beli || "")) {
+          changes.push({
+            field: "Platform Beli",
+            oldVal: existing.Platform_Rekomendasi_Beli || "(Kosong)",
+            newVal: newBuyUrl,
+          });
+          payload.buy_url = newBuyUrl;
+        }
+
+        if (changes.length > 0) {
+          mergeResults.push({
+            id: existing.ID_Perangkat,
+            brand: existing.Brand,
+            model: existing.Model_Seri,
+            changes,
+            payload,
+          });
+        }
+      }
+
+      if (mergeResults.length === 0) {
+        alert("Tidak ditemukan perbedaan data antara berkas Excel yang diunggah dengan database katalog saat ini.");
+        return;
+      }
+
+      setImportMergeList(mergeResults);
+      setIsImportModalOpen(true);
+    } catch (err: any) {
+      alert(`Gagal membaca file Excel: ${err?.message || "Format file tidak didukung"}`);
+    } finally {
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  // Eksekusi Batch Merge ke Supabase
+  const handleExecuteMerge = async () => {
+    if (importMergeList.length === 0) return;
+    setIsMerging(true);
+
+    try {
+      const batchPayload = importMergeList.map((item) => ({
+        id: item.id,
+        updates: item.payload,
+      }));
+
+      const res = await batchMergeLaptopsToSupabase(batchPayload);
+
+      // Merge ke local state
+      setLaptops((prev) =>
+        prev.map((l) => {
+          const match = importMergeList.find((m) => m.id.toLowerCase() === l.ID_Perangkat.toLowerCase());
+          if (!match) return l;
+
+          return {
+            ...l,
+            Link_Gambar: match.payload.image_url !== undefined ? match.payload.image_url : l.Link_Gambar,
+            Pros_Kelebihan: match.payload.pros !== undefined ? match.payload.pros : l.Pros_Kelebihan,
+            Cons_Kekurangan: match.payload.cons !== undefined ? match.payload.cons : l.Cons_Kekurangan,
+            Rekomendasi_UseCase_Tag: match.payload.usecase_tag !== undefined ? match.payload.usecase_tag : l.Rekomendasi_UseCase_Tag,
+            Estimasi_Harga_Pasar_IDR: match.payload.price_idr !== undefined ? String(match.payload.price_idr) : l.Estimasi_Harga_Pasar_IDR,
+            numericPrice: match.payload.price_idr !== undefined ? match.payload.price_idr : l.numericPrice,
+            Status_Garansi_Resmi: match.payload.warranty !== undefined ? match.payload.warranty : l.Status_Garansi_Resmi,
+            Platform_Rekomendasi_Beli: match.payload.buy_url !== undefined ? match.payload.buy_url : l.Platform_Rekomendasi_Beli,
+          };
+        })
+      );
+
+      setStatusMsg(`Berhasil me-merge ${res.updatedCount || importMergeList.length} perangkat langsung ke database Supabase!`);
+      setIsImportModalOpen(false);
+      setImportMergeList([]);
+      setTimeout(() => setStatusMsg(null), 4000);
+    } catch (err: any) {
+      alert(`Gagal menjalankan merge: ${err?.message || "Kesalahan internal"}`);
+    } finally {
+      setIsMerging(false);
     }
   };
 
@@ -835,8 +1095,8 @@ export default function AdminPage() {
           : "bg-white/90 border-slate-200/80"
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-17 flex items-center justify-between gap-4">
-          {/* Left: Brand + Status Pill + Cloud Info */}
-          <div className="flex items-center gap-3.5">
+          {/* Left: Brand + Staff Engine Badge + Separator + Supabase Status */}
+          <div className="flex items-center gap-3.5 shrink-0">
             <Link href="/" className="flex items-center gap-3 group shrink-0">
               <Image
                 src="/brand/speco-logo.png"
@@ -850,102 +1110,123 @@ export default function AdminPage() {
               />
             </Link>
 
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold tracking-wide border transition-all ${
+            {/* Staff Engine Badge */}
+            <div className={`px-2.5 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase leading-tight border flex flex-col items-center justify-center shrink-0 ${
               isDark
                 ? "bg-emerald-950/70 text-emerald-400 border-emerald-500/30"
-                : "bg-emerald-50 text-emerald-800 border-emerald-200"
+                : "bg-emerald-100 text-emerald-800 border-emerald-200"
             }`}>
-              <span className="relative flex h-2 w-2">
+              <span>STAFF</span>
+              <span>ENGINE</span>
+            </div>
+
+            {/* Vertical Separator */}
+            <span className={`h-6 w-px shrink-0 ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+
+            {/* Realtime Supabase Connection Status */}
+            <div className="hidden md:flex items-center gap-2 text-xs font-mono shrink-0">
+              <span className="relative flex h-2 w-2 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span>STAFF CONSOLE</span>
-            </span>
-
-            <div className={`hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-medium transition-colors ${
-              isDark ? "bg-slate-950/60 border-slate-800 text-slate-300" : "bg-slate-50 border-slate-200/80 text-slate-600"
-            }`}>
-              <DatabaseIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span className="font-semibold text-slate-800 dark:text-slate-200">Supabase Cloud Online</span>
+              <span className={`font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                Supabase Cloud Online
+              </span>
               <span className="text-slate-300 dark:text-slate-700">•</span>
-              <span className="font-mono text-[11px] text-emerald-700 dark:text-emerald-400 font-bold">{laptops.length} Laptop Terverifikasi</span>
+              <span className={`font-bold ${isDark ? "text-emerald-400" : "text-emerald-700"}`}>
+                {laptops.length} Laptop Terverifikasi
+              </span>
             </div>
           </div>
 
           {/* Right: Actions Group */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 shrink-0">
             {/* Theme Toggle Pill */}
             <button
               onClick={toggleTheme}
-              className={`h-9 px-3 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all cursor-pointer shadow-2xs ${
+              className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all cursor-pointer shrink-0 shadow-2xs whitespace-nowrap ${
                 isDark
                   ? "bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700"
                   : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
               }`}
               title={isDark ? "Ganti ke Mode Terang (Light Mode)" : "Ganti ke Mode Gelap (Dark Mode)"}
             >
-              {isDark ? <SunIcon className="w-4 h-4 text-amber-400" /> : <MoonIcon className="w-4 h-4 text-slate-600" />}
-              <span className="hidden sm:inline font-semibold">{isDark ? "Terang" : "Gelap"}</span>
+              {isDark ? <SunIcon className="w-4 h-4 text-amber-400 shrink-0" /> : <MoonIcon className="w-4 h-4 text-slate-600 shrink-0" />}
+              <span className="font-semibold">{isDark ? "Terang" : "Gelap"}</span>
             </button>
 
-            {/* Segmented Export Group */}
-            <div className={`hidden sm:flex items-center rounded-xl border p-0.5 shadow-2xs transition-colors ${
+            {/* Unified Data Actions Group: Impor Excel | Ekspor Excel | SQL */}
+            <div className={`hidden sm:flex items-center rounded-xl border p-0.5 shadow-2xs shrink-0 transition-colors whitespace-nowrap ${
               isDark ? "bg-slate-950 border-slate-800" : "bg-white border-slate-200"
             }`}>
               <button
+                onClick={() => fileInputRef.current?.click()}
+                className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  isDark ? "hover:bg-slate-800 text-slate-300 hover:text-white" : "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
+                }`}
+                title="Unggah berkas Excel untuk merge pembaruan data"
+              >
+                <UploadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>Impor Excel</span>
+              </button>
+
+              <span className={`h-4 w-px ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+
+              <button
                 onClick={handleExportXLSX}
-                className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  isDark ? "hover:bg-slate-800 text-slate-300" : "hover:bg-slate-100 text-slate-700"
+                className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  isDark ? "hover:bg-slate-800 text-slate-300 hover:text-white" : "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
                 }`}
                 title="Ekspor seluruh dataset ke Excel (.xlsx)"
               >
-                <DownloadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Excel</span>
+                <DownloadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>Ekspor Excel</span>
               </button>
+
               <span className={`h-4 w-px ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+
               <button
                 onClick={handleExportSQL}
-                className={`h-8 px-3 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  isDark ? "hover:bg-slate-800 text-slate-300" : "hover:bg-slate-100 text-slate-700"
+                className={`h-8 px-2.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
+                  isDark ? "hover:bg-slate-800 text-slate-300 hover:text-white" : "hover:bg-slate-100 text-slate-700 hover:text-slate-900"
                 }`}
                 title="Ekspor dump skema SQL"
               >
-                <DatabaseIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <DatabaseIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
                 <span>SQL</span>
               </button>
             </div>
 
+            {/* Hidden Excel File Input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept=".xlsx, .xls"
+              className="hidden"
+            />
+
             {/* Tambah Perangkat Primary CTA */}
             <button
               onClick={handleAddNewClick}
-              className="h-9 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shadow-emerald-700/20 hover:shadow-lg hover:shadow-emerald-700/30 cursor-pointer"
+              className="h-9 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shadow-emerald-700/20 hover:shadow-lg hover:shadow-emerald-700/30 cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <PlusIcon weight="bold" className="w-4 h-4" />
+              <PlusIcon weight="bold" className="w-4 h-4 shrink-0" />
               <span>Tambah Perangkat</span>
             </button>
 
-            {/* Staff Avatar & Logout Group */}
-            <div className={`flex items-center gap-2 pl-2 border-l ${
-              isDark ? "border-slate-800" : "border-slate-200"
-            }`}>
-              <div
-                className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-900 text-white flex items-center justify-center font-black text-xs shadow-2xs"
-                title="Mas Affif (Project Lead & Data Engineer)"
-              >
-                MA
-              </div>
-              <button
-                onClick={handleLogoutAdmin}
-                className={`h-8 w-8 rounded-xl border flex items-center justify-center transition-colors cursor-pointer ${
-                  isDark
-                    ? "bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border-slate-700"
-                    : "bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 border-slate-200 shadow-2xs"
-                }`}
-                title="Keluar dari Portal Staff"
-              >
-                <SignOutIcon className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Logout Button */}
+            <button
+              onClick={handleLogoutAdmin}
+              className={`h-9 w-9 rounded-xl border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                isDark
+                  ? "bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border-slate-700"
+                  : "bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 border-slate-200 shadow-2xs"
+              }`}
+              title="Keluar dari Portal Staff"
+            >
+              <SignOutIcon className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </header>
@@ -1028,6 +1309,152 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* AUDIT KUALITAS & KELENGKAPAN DATA (NULL DETECTOR) */}
+        <div className={`p-5 rounded-3xl border shadow-xs transition-colors ${
+          isDark ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200/90"
+        }`}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className={`p-2 rounded-xl ${
+                metrics.missingImagesCount > 0
+                  ? "bg-amber-500/10 text-amber-500"
+                  : "bg-emerald-500/10 text-emerald-500"
+              }`}>
+                <WarningCircleIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className={`text-sm font-black tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                  Audit Kualitas & Kelengkapan Data Katalog
+                </h4>
+                <p className="text-xs text-slate-400">
+                  Monitoring kelengkapan URL gambar dan field spesifikasi untuk {metrics.total} entitas laptop & desktop.
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Export Button for Incomplete Data */}
+            {metrics.missingImagesCount > 0 && (
+              <button
+                onClick={() => {
+                  setCompletenessFilter("missing_image");
+                  setCurrentPage(1);
+                  setTimeout(() => handleExportXLSX(), 100);
+                }}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  isDark
+                    ? "bg-amber-950/40 border-amber-800/60 text-amber-300 hover:bg-amber-900/50"
+                    : "bg-amber-50 border-amber-200 text-amber-900 hover:bg-amber-100"
+                }`}
+                title="Ekspor baris yang belum ada gambar ke Excel untuk diperbarui"
+              >
+                <DownloadSimpleIcon className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span>Ekspor Data Butuh Gambar ({metrics.missingImagesCount})</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Card 1: Missing Image */}
+            <div
+              onClick={() => {
+                setCompletenessFilter(completenessFilter === "missing_image" ? "all" : "missing_image");
+                setCurrentPage(1);
+              }}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                completenessFilter === "missing_image"
+                  ? "ring-2 ring-amber-500 bg-amber-500/10 border-amber-500/30"
+                  : isDark
+                    ? "bg-slate-950/60 border-slate-800 hover:border-amber-500/40"
+                    : "bg-slate-50 border-slate-200 hover:border-amber-300"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-amber-500 uppercase tracking-wider font-mono">
+                  Belum Ada URL Gambar
+                </span>
+                <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                  {Math.round((metrics.missingImagesCount / (metrics.total || 1)) * 100)}%
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
+                  {metrics.missingImagesCount}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">dari {metrics.total} unit</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                {completenessFilter === "missing_image" ? "✓ Sedang memfilter tabel" : "Klik untuk memfilter tabel"}
+              </p>
+            </div>
+
+            {/* Card 2: Incomplete Data */}
+            <div
+              onClick={() => {
+                setCompletenessFilter(completenessFilter === "incomplete" ? "all" : "incomplete");
+                setCurrentPage(1);
+              }}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                completenessFilter === "incomplete"
+                  ? "ring-2 ring-rose-500 bg-rose-500/10 border-rose-500/30"
+                  : isDark
+                    ? "bg-slate-950/60 border-slate-800 hover:border-rose-500/40"
+                    : "bg-slate-50 border-slate-200 hover:border-rose-300"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-rose-500 uppercase tracking-wider font-mono">
+                  Data Belum Lengkap (Ada Null)
+                </span>
+                <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                  Perlu Dilengkapi
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-2xl font-black text-rose-600 dark:text-rose-400">
+                  {metrics.incompleteCount}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">unit perlu review</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                {completenessFilter === "incomplete" ? "✓ Sedang memfilter tabel" : "Klik untuk memfilter kolom kosong"}
+              </p>
+            </div>
+
+            {/* Card 3: Complete Verified */}
+            <div
+              onClick={() => {
+                setCompletenessFilter(completenessFilter === "complete" ? "all" : "complete");
+                setCurrentPage(1);
+              }}
+              className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                completenessFilter === "complete"
+                  ? "ring-2 ring-emerald-500 bg-emerald-500/10 border-emerald-500/30"
+                  : isDark
+                    ? "bg-slate-950/60 border-slate-800 hover:border-emerald-500/40"
+                    : "bg-slate-50 border-slate-200 hover:border-emerald-300"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-mono">
+                  100% Terverifikasi Lengkap
+                </span>
+                <span className="text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                  Siap Rilis
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                  {metrics.completeCount}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">dari {metrics.total} unit</span>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">
+                {completenessFilter === "complete" ? "✓ Sedang memfilter tabel" : "Klik untuk menampilkan data lengkap"}
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* 3. ADVANCED SEARCH & FILTER CONTROLS */}
         <div className={`rounded-3xl p-5 border shadow-xs space-y-4 transition-colors ${
           isDark ? "bg-slate-900/90 border-slate-800" : "bg-white border-slate-200/90"
@@ -1097,6 +1524,58 @@ export default function AdminPage() {
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Status Kelengkapan Data Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <span className="text-[11px] font-bold text-slate-400 uppercase mr-1">Status Data:</span>
+            <button
+              type="button"
+              onClick={() => { setCompletenessFilter("all"); setCurrentPage(1); }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors cursor-pointer ${
+                completenessFilter === "all"
+                  ? "bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-2xs"
+                  : isDark ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              Semua ({metrics.total})
+            </button>
+            <button
+              type="button"
+              onClick={() => { setCompletenessFilter("missing_image"); setCurrentPage(1); }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+                completenessFilter === "missing_image"
+                  ? "bg-amber-600 text-white shadow-2xs"
+                  : isDark ? "bg-amber-950/40 text-amber-300 border border-amber-800/50 hover:bg-amber-900/50" : "bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
+              }`}
+            >
+              <WarningCircleIcon className="w-3.5 h-3.5" />
+              <span>Gambar Belum Ada ({metrics.missingImagesCount})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setCompletenessFilter("incomplete"); setCurrentPage(1); }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+                completenessFilter === "incomplete"
+                  ? "bg-rose-600 text-white shadow-2xs"
+                  : isDark ? "bg-rose-950/40 text-rose-300 border border-rose-800/50 hover:bg-rose-900/50" : "bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100"
+              }`}
+            >
+              <WarningCircleIcon className="w-3.5 h-3.5" />
+              <span>Data Belum Lengkap ({metrics.incompleteCount})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setCompletenessFilter("complete"); setCurrentPage(1); }}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
+                completenessFilter === "complete"
+                  ? "bg-emerald-700 text-white shadow-2xs"
+                  : isDark ? "bg-emerald-950/40 text-emerald-300 border border-emerald-800/50 hover:bg-emerald-900/50" : "bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100"
+              }`}
+            >
+              <CheckCircleIcon className="w-3.5 h-3.5" />
+              <span>Lengkap 100% ({metrics.completeCount})</span>
+            </button>
           </div>
 
           {/* Secondary Filters Bar */}
@@ -1274,6 +1753,12 @@ export default function AdminPage() {
                                 <span className="text-[11px] font-bold text-slate-500">
                                   {l.Brand}
                                 </span>
+                                {(!l.Link_Gambar || !l.Link_Gambar.trim()) && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 flex items-center gap-0.5">
+                                    <WarningCircleIcon className="w-2.5 h-2.5" />
+                                    <span>Butuh Gambar</span>
+                                  </span>
+                                )}
                                 {(l.Tipe_Perangkat || "").toLowerCase().includes("mini") && (
                                   <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-teal-100 dark:bg-teal-500/20 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-500/30">
                                     Mini PC
@@ -1988,6 +2473,142 @@ export default function AdminPage() {
               </button>
             </div>
           </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==============================================================================
+          6. MODAL IMPOR & MERGE DATASET EXCEL (.xlsx)
+      ============================================================================== */}
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+          <div className={`border rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl transition-colors overflow-hidden ${
+            isDark ? "bg-slate-900 border-slate-700 text-white" : "bg-white border-slate-200 text-slate-900"
+          }`}>
+            {/* Header */}
+            <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
+              isDark ? "border-slate-800 bg-slate-900" : "border-slate-100 bg-white"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold border shrink-0 ${
+                  isDark ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-emerald-100 text-emerald-800 border-emerald-200"
+                }`}>
+                  <UploadSimpleIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className={`text-base sm:text-lg font-black leading-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+                    Pratinjau Impor & Merge Dataset Excel
+                  </h3>
+                  <p className="text-xs text-slate-400 font-mono mt-0.5">
+                    Berkas: <span className="font-bold text-emerald-600 dark:text-emerald-400">{importFileName}</span> • Ditemukan{" "}
+                    <span className="font-bold text-amber-500">{importMergeList.length}</span> perangkat dengan nilai baru untuk di-merge
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsImportModalOpen(false)}
+                className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                  isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white" : "bg-slate-100 hover:bg-slate-200 text-slate-600"
+                }`}
+                title="Tutup Modal"
+              >
+                <XIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Preview Table */}
+            <div className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+              <div className={`p-4 rounded-2xl border ${
+                isDark ? "bg-emerald-950/30 border-emerald-800/40 text-emerald-300" : "bg-emerald-50 border-emerald-200 text-emerald-900"
+              }`}>
+                <p className="font-semibold text-xs leading-relaxed">
+                  💡 <strong>Kebijakan Merge Pintar:</strong> Sistem hanya memperbarui kolom di database Supabase yang memiliki nilai baru di berkas Excel Anda. Kolom yang kosong atau tidak diubah di Excel <strong>tidak akan menimpa</strong> data lama yang sudah tersimpan.
+                </p>
+              </div>
+
+              <div className={`rounded-2xl border overflow-hidden ${
+                isDark ? "border-slate-800 bg-slate-950/60" : "border-slate-200 bg-slate-50/60"
+              }`}>
+                <div className="overflow-x-auto max-h-96">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className={`border-b ${isDark ? "border-slate-800 bg-slate-900 text-slate-400" : "border-slate-200 bg-white text-slate-600"}`}>
+                        <th className="py-2.5 px-3 font-mono font-bold">ID</th>
+                        <th className="py-2.5 px-3 font-bold">Perangkat / Model</th>
+                        <th className="py-2.5 px-3 font-bold">Kolom yang Diperbarui</th>
+                        <th className="py-2.5 px-3 font-bold">Perubahan Nilai (Lama → Baru)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800 font-sans">
+                      {importMergeList.map((item) => (
+                        <tr key={item.id} className={isDark ? "hover:bg-slate-900/60" : "hover:bg-white"}>
+                          <td className="py-2.5 px-3 font-mono font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
+                            {item.id}
+                          </td>
+                          <td className="py-2.5 px-3 font-medium whitespace-nowrap">
+                            <span className="font-bold block">{item.model}</span>
+                            <span className="text-[11px] text-slate-400">{item.brand}</span>
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <div className="flex flex-wrap gap-1">
+                              {item.changes.map((c, i) => (
+                                <span key={i} className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 whitespace-nowrap">
+                                  {c.field}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="py-2.5 px-3 max-w-sm">
+                            <div className="space-y-1">
+                              {item.changes.map((c, i) => (
+                                <div key={i} className="text-[11px] truncate font-mono">
+                                  <span className="text-slate-400">{c.oldVal}</span>
+                                  <span className="text-emerald-500 font-bold mx-1">→</span>
+                                  <span className="text-emerald-700 dark:text-emerald-300 font-semibold">{c.newVal}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Sticky Bottom Actions */}
+            <div className={`px-6 py-4 border-t flex items-center justify-between shrink-0 ${
+              isDark ? "border-slate-800 bg-slate-900" : "border-slate-100 bg-slate-50"
+            }`}>
+              <span className="text-xs text-slate-400">
+                Total <strong className="text-emerald-600 dark:text-emerald-400">{importMergeList.length}</strong> perangkat siap di-merge ke Supabase
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsImportModalOpen(false)}
+                  disabled={isMerging}
+                  className={`px-4 py-2.5 rounded-xl font-bold transition-colors cursor-pointer ${
+                    isDark ? "bg-slate-800 hover:bg-slate-700 text-slate-300" : "bg-slate-200/80 hover:bg-slate-200 text-slate-700"
+                  }`}
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExecuteMerge}
+                  disabled={isMerging}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-700/20 transition-colors"
+                >
+                  {isMerging && (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  )}
+                  <span>{isMerging ? "Sedang Memperbarui Database..." : "Konfirmasi & Terapkan Merge"}</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
