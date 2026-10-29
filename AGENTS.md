@@ -1,93 +1,108 @@
-# AGENTS.md — Petunjuk & Standar Kerja AI Assistant
+# AGENTS.md: Panduan & Standar Kerja AI Assistant (CariSpek / Speco)
 
-Selamat datang! File ini adalah panduan utama bagi AI Coding Assistant (Antigravity) saat berkolaborasi dalam proyek Rekayasa Perangkat Lunak (RPL) ini.
+Dokumen ini adalah instruksi wajib bagi AI Coding Assistant (Antigravity, Cursor, Claude, dll.) saat bekerja sama dengan Mas Affif dalam repositori Rekayasa Perangkat Lunak (RPL).
 
 ---
 
-## 👤 Profil Pengguna & Etika Komunikasi
+## 1. Profil Pengguna & Etika Komunikasi
 
 * **Nama Lengkap**: Muhammad Affif
-* **Panggilan Resmi**: **Mas Affif** *(Selalu panggil pengguna dengan sebutan "Mas Affif")*
-* **Peran Utama**: 
-  1. **Project Lead (Ketua Tim)**: Pengambil keputusan arah arsitektur, prioritas sprint, dan timeline tim.
-  2. **Backend Developer & Data Engineer**: Penanggung jawab utama perancangan database, implementasi REST API, dan algoritma sistem pendukung keputusan (SPK).
-* **Tim**: **NEXORA (Kelompok 7A)** — Mata Kuliah Rekayasa Perangkat Lunak (RPL).
+* **Panggilan Resmi**: **Mas Affif** (Selalu sapa pengguna dengan sebutan "Mas Affif").
+* **Peran Utama**:
+  1. **Project Lead**: Pengambil keputusan arah arsitektur, prioritas sprint, dan timeline teknis.
+  2. **Backend Developer & Data Engineer**: Penanggung jawab skema database MariaDB, implementasi REST API, dan algoritma sistem pendukung keputusan (SPK) SAW.
+* **Tim**: **NEXORA (Kelompok 7A)**: Mata Kuliah Rekayasa Perangkat Lunak (RPL).
 * **Susunan Anggota Tim**:
-  - **Mas Affif** (@muhammadaffif) — Project Lead & Backend/Data Engineer.
-  - **Zakky Fawwaz** (@zakyfawwaz701) — System Analyst & Koordinator Dosen Pengawas.
-  - **Muhamad Fahren Andrean Rangkuti** (@23215030muhamadfahrenandreanrangkuti) — Frontend Developer (Next.js).
-  - **Yesa Prayugo** (@yesaprayugo) — UI/UX Designer & QA / Testing Lead.
+  - **Mas Affif** (@nourivex / @muhammadaffif): Project Lead & Backend/Data Engineer.
+  - **Zakky Fawwaz** (@zakyfawwaz701): System Analyst & Koordinator Dosen Pengawas.
+  - **Muhamad Fahren Andrean Rangkuti** (@Renkaslana): Frontend Developer (Next.js).
+  - **Yesa Prayugo** (@yesaprayugo): UI/UX Designer & QA Lead.
   - **Dosen Pengawas**: redmouse studio (@redmousestudio).
 
 ---
 
-## 🛡️ Aturan Utama 1: Konfigurasi Brand & Nama Produk Dinamis (Single Source of Truth)
+## 2. Aturan Ketat Anti-AI-Slop & Gaya Bahasa (Zero Fluff Policy)
+
+> [!CAUTION]
+> **DILARANG KERAS MENGHASILKAN TEKS AI SLOP!**
+> Kualitas tulisan, dokumentasi, commit message, dan respons asisten harus bernilai teknis tinggi, padat, alami, dan bebas dari gaya bahasa generatif yang klise.
+
+### Larangan Khusus:
+1. **Dilarang Menggunakan Tanda Em-Dash (`—`)**:
+   - Jangan gunakan karakter tanda pisah panjang `—` di judul, narasi kalimat, maupun daftar poin.
+   - Gunakan tanda hubung biasa `-`, titik dua `:`, titik koma `;`, atau tanda kurung `()` sebagai pemisah kalimat.
+2. **Dilarang Menggunakan Frasa Klise Robotik Khas AI**:
+   - Contoh terlarang:
+     * *"Sebagai sebuah platform yang..."*
+     * *"Dalam era digital yang terus berkembang / dalam lanskap modern..."*
+     * *"Tidak dapat dipungkiri bahwa..."*
+     * *"Menyelami lebih dalam ke dalam..."*
+     * *"Patut dicatat bahwa..."* atau *"Penting untuk diingat bahwa..."*
+     * *"Merupakan bukti nyata dari komitmen..."*
+     * *"Bagaikan dua sisi mata uang..."*
+   - Tuliskan inti informasi secara langsung (*deductive, to-the-point*).
+3. **Hindari Buzzword Repetitif Tanpa Makna Riil**:
+   - Kurangi pengulangan kata generik seperti: *"komprehensif"*, *"holistik"*, *"robust"*, *"sinergis"*, *"revolusioner"*. Gantilah dengan penjelasan teknis konkret (misal: *"memiliki 13 automated tests dengan 51 assertions"* daripada sekadar *"sistem testing yang komprehensif dan robust"*).
+4. **Hindari Emoji Berlebihan**:
+   - Jangan menempelkan emoji di setiap awal kalimat atau baris paragraf. Gunakan emoji secara minimal hanya untuk badge status atau pemisah bab utama.
+5. **Bahasa Indonesia Formal Ragam Rekayasa & Ilmiah**:
+   - Ikuti kaidah PUEBI / EYD V. Kalimat harus ringkas, lugas, mengalir logis, dan objektif.
+
+---
+
+## 3. Kebijakan Git Remote & Repositori Resmi
 
 > [!IMPORTANT]
-> **DILARANG KERAS MELAKUKAN HARDCODE** nama produk (misalnya teks `"CariSpek"` atau `"NEXORA"`) maupun path logo di dalam business logic, controller, response envelope, query database, atau kode frontend/backend secara terpisah-pisah.
+> **DILARANG PUSH KE REPOSITORI `Renkaslana/NEXORA` LAGI!**
+> Seluruh pekerjaan dan push kode ke GitHub HANYA ditujukan ke repositori pribadi milik Mas Affif:
+> **`https://github.com/Nourivex/Speco`**
 
-1. **Centralized Brand Configuration**:
-   - Seluruh nama produk, singkatan, tagline, dan logo aset harus bersumber dari satu file konfigurasi terpusat (misal: `config/brand.php` dan file environment `.env`).
-   - Contoh environment variables yang wajib digunakan:
-     ```env
-     APP_NAME="CariSpek"
-     BRAND_NAME="CariSpek"
-     BRAND_TAGLINE="Sistem Rekomendasi & Pemilihan Laptop Cerdas Berbasis Kebutuhan & Budget"
-     BRAND_ORGANIZATION="NEXORA Kelompok 7A"
-     BRAND_LOGO_URL="/assets/images/logo.svg"
-     BRAND_FAVICON_URL="/assets/images/favicon.ico"
-     ```
-   - Dalam kode backend (Laravel), selalu panggil via:
-     `config('brand.name')`, `config('brand.tagline')`, atau `config('brand.logo_url')`.
-   - Di respons API envelope (misalnya metadata respons atau healthcheck), nama sistem harus mengambil nilai dari konfigurasi ini secara dinamis.
-   - **Tujuan**: Jika sewaktu-waktu nama produk atau logo diganti, Mas Affif hanya perlu mengubah 1 baris di `.env` / `config/brand.php`, dan seluruh aplikasi serta dokumen langsung tersinkronisasi tanpa repot mencari & mengganti (*find-and-replace*) satu per satu.
+### Pembagian Cabang Resmi di `Nourivex/Speco`:
+* **Cabang `main`**:
+  - Repositori utama untuk seluruh backend Laravel, DDEV container, skrip database, dataset 450 laptop, algoritma SPK SAW, automated tests, dan dokumen spesifikasi `docs/`.
+* **Cabang `UI`**:
+  - Repositori khusus untuk kode antarmuka Next.js App Router (Tailwind CSS, shadcn/ui, asset studio renders).
+* **Konfigurasi Remote Lokal**:
+  - Pastikan `git remote -v` di root maupun di folder `frontend/` hanya mengarah ke `git@github.com:Nourivex/Speco.git` sebagai remote `origin`.
 
 ---
 
-## 📚 Aturan Utama 2: Standar Dokumentasi Arsitektur & Spesifikasi Resmi (`docs/`)
+## 4. Konfigurasi Brand Dinamis (Single Source of Truth)
 
-Setiap pengembangan arsitektur dan endpoint backend harus didokumentasikan secara rinci, formal, dan rapi pada folder `docs/`:
+Dilarang keras melakukan hardcode nama produk (teks `"CariSpek"`, `"NEXORA"`, `"Speco"`) maupun path aset logo di dalam business logic, controller, response envelope, query database, atau kode antarmuka.
 
-1. 📐 **`docs/ARCHITECTURE.md`**
-   - Menjelaskan arsitektur backend secara komprehensif (Clean Architecture / Service-Repository Pattern).
-   - Topologi jaringan & komunikasi antar service (Frontend Next.js oleh Fahren $\leftrightarrow$ Backend API Laravel oleh Mas Affif).
-   - Skema database relasional (tabel `devices`, `categories`, `criteria_weights`, dll).
-   - Formula matematis algoritma **Simple Additive Weighting (SAW)** secara detail (Kriteria Benefit vs Cost, normalisasi matriks, dan penentuan Match Score %).
-   - Diagram arsitektur berbasis Mermaid (Flowchart, Sequence Diagram, ERD).
-
-2. 📋 **`docs/API_CONTRACT_STANDARDS.md`**
-   - Format standar JSON envelope response (`success`, `message`, `data`, `meta`, `errors`).
-   - Aturan HTTP Status Codes (200, 201, 400, 401, 403, 404, 422, 500).
-   - Standar pagination, filtering, sorting, dan standardisasi format error validation (Laravel FormRequest standard).
-
-3. 📝 **`docs/api-design.md`**
-   - Dokumen perancangan API resmi kelompok (API Design Document).
-   - Daftar seluruh endpoint API (Katalog Laptop, Filter Spek, Kuesioner Rekomendasi SPK, Komparasi Laptop, Kategori Persona).
-   - Contoh nyata Request Payload dan Expected Response JSON.
-
-4. 🌐 **`docs/openapi.yaml`**
-   - Spesifikasi formal kontrak **OpenAPI 3.1.0** lengkap untuk seluruh endpoint.
-   - Wajib valid dan memenuhi standar linter (Redocly / Swagger).
-
-5. 🧪 **`docs/TESTING_GUIDE.md`**
-   - Panduan praktis pengujian API menggunakan **Postman** dan **Thunder Client**.
-   - Menyertakan contoh cURL, variabel environment testing, dan sampel skenario pengujian endpoint (kuesioner persona mahasiswa dan pencarian katalog).
+* Seluruh metadata merek bersumber dari satu titik: `config/brand.php` dan file `.env`.
+* Panggilan wajib di backend:
+  `config('brand.name')`, `config('brand.tagline')`, `config('brand.logo_url')`.
+* Response API envelope harus mengambil konfigurasi ini secara dinamis pada metadata respons (`meta.system_name`).
 
 ---
 
-## 📌 Aturan Utama 3: Sinkronisasi & Pelaporan Otomatis di Trello
+## 5. Standar Dokumentasi Arsitektur & Spesifikasi (`docs/`)
 
-* **Active Board**: `7A 🏢 NEXORA | CariSpek` (ID: `6acc5f3711be9c6d5acaa85a`)
-* **Prosedur Sinkronisasi**:
-  - Setiap kali menyelesaikan suatu fitur, membuat modul baru, atau memperbarui dokumen penting, **wajib** melakukan pembaruan ke kartu Trello yang relevan (via Trello MCP).
-  - Berikan komentar progres yang jelas pada kartu Trello yang dikerjakan Mas Affif, centang checklist yang telah tuntas, dan pindahkan kartu ke daftar yang sesuai (*To Do* $\rightarrow$ *In Progress* $\rightarrow$ *Review* $\rightarrow$ *Done*).
+Setiap perubahan arsitektur, basis data, dan endpoint wajib tercatat rapi pada berkas di folder `docs/`:
+
+1. `docs/ARCHITECTURE.md`: Arsitektur Clean Architecture, topologi DDEV, ERD database, dan formulasi matematis SAW.
+2. `docs/API_CONTRACT_STANDARDS.md`: Format envelope JSON standar (`success`, `status_code`, `message`, `data`, `meta`, `errors`), aturan HTTP status code, dan validasi FormRequest.
+3. `docs/api-design.md`: Spesifikasi lengkap endpoint katalog, rekomendasi SAW, komparasi, dan konfigurasi.
+4. `docs/openapi.yaml`: Kontrak formal OpenAPI 3.1.0 (valid linter).
+5. `docs/TESTING_GUIDE.md`: Panduan pengujian dengan cURL, Postman, dan Thunder Client.
 
 ---
 
-## ⚙️ Lingkungan Pengembangan & Stack Teknologi
+## 6. Sinkronisasi Trello MCP
 
-* **Runtime & Framework**: PHP 8.5+ & Laravel
-* **Container & Dev Server**: **DDEV** (Docker-based local development environment)
-* **Web Server & DB di DDEV**: Nginx + MySQL / PostgreSQL
-* **Katalog Data Awal**: `Data Spek Komputer & Laptop Mahasiswa 2026.xlsx` (450 unit laptop/PC & 7 matriks persona)
-* **Frontend Partner**: Next.js App Router (dikelola Fahren di repo `Renkaslana/NEXORA`)
+* **Board Aktif**: `7A 🏢 NEXORA | CariSpek` (ID: `6acc5f3711be9c6d5acaa85a`).
+* Setiap penyelesaian milestone, pembaruan dataset, atau fitur backend selesai, lakukan pembaruan ke kartu Trello yang relevan:
+  - Berikan komentar progres yang ringkas, teknis, dan jelas.
+  - Perbarui checklist kartu dan set `dueComplete: true` jika milestone selesai.
+  - Pindahkan kartu ke daftar yang tepat (*To Do* -> *In Progress* -> *Review* -> *Done*).
+
+---
+
+## 7. Lingkungan Pengembangan & Eksekusi
+
+* **Runtime & Framework**: PHP 8.4+ & Laravel 12.
+* **Local Container**: DDEV (Nginx, PHP-FPM, MariaDB 11.8).
+* **Frontend Runtime**: Node.js 20+ (Next.js 16 App Router di folder `frontend/`).
+* **Katalog Awal**: `Data Spek Komputer & Laptop Mahasiswa 2026.xlsx` (450 entitas & 7 persona).

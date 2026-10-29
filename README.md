@@ -1,99 +1,95 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="320" alt="CariSpek - NEXORA Logo">
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="300" alt="CariSpek - Speco Logo">
 </p>
 
-<h1 align="center">💻 CariSpek — Sistem Pendukung Keputusan (SPK) Rekomendasi Laptop</h1>
+<h1 align="center">CariSpek: Sistem Pendukung Keputusan (SPK) Pemilihan Laptop</h1>
 
 <p align="center">
-  <strong>Platform Cerdas Pemilihan & Rekomendasi Laptop Berbasis Profil Kebutuhan, Anggaran, & Algoritma Simple Additive Weighting (SAW)</strong>
+  <strong>Implementasi Algoritma Simple Additive Weighting (SAW) untuk Rekomendasi Laptop Berbasis Profil Jurusan dan Anggaran Mahasiswa</strong>
 </p>
 
 <p align="center">
-  <a href="#-susunan-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/Tim-NEXORA%20Kelompok%207A-blue?style=for-the-badge" alt="Tim NEXORA"></a>
-  <a href="#-arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Backend-Laravel%2012%20%7C%20PHP%208.4-red?style=for-the-badge&logo=laravel" alt="Laravel"></a>
-  <a href="#-arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Frontend-Next.js%2016%20%7C%20React%2019-black?style=for-the-badge&logo=next.js" alt="Next.js"></a>
-  <a href="#-fondasi-ilmiah-algoritma-spk-simple-additive-weighting-saw"><img src="https://img.shields.io/badge/Metode%20SPK-Simple%20Additive%20Weighting%20(SAW)-green?style=for-the-badge" alt="Metode SAW"></a>
-  <a href="#-pengujian-sistem--automated-tests"><img src="https://img.shields.io/badge/Tests-13%20Passed%20(51%20Assertions)-success?style=for-the-badge" alt="Tests"></a>
+  <a href="#susunan-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/Tim-NEXORA%20Kelompok%207A-blue?style=for-the-badge" alt="Tim NEXORA"></a>
+  <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Backend-Laravel%2012%20%7C%20PHP%208.4-red?style=for-the-badge&logo=laravel" alt="Laravel"></a>
+  <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Frontend-Next.js%2016%20%7C%20React%2019-black?style=for-the-badge&logo=next.js" alt="Next.js"></a>
+  <a href="#fondasi-ilmiah-algoritma-spk-simple-additive-weighting-saw"><img src="https://img.shields.io/badge/Metode%20SPK-Simple%20Additive%20Weighting%20(SAW)-green?style=for-the-badge" alt="Metode SAW"></a>
+  <a href="#pengujian-sistem-dan-automated-tests"><img src="https://img.shields.io/badge/Tests-13%20Passed%20(51%20Assertions)-success?style=for-the-badge" alt="Tests"></a>
 </p>
 
 ---
 
-## 📌 Daftar Isi
-1. [Tentang CariSpek](#-tentang-carispek)
-2. [Susunan Tim Pengembang (Kelompok 7A)](#-susunan-tim-pengembang-kelompok-7a)
-3. [Fondasi Ilmiah Algoritma SPK: Simple Additive Weighting (SAW)](#-fondasi-ilmiah-algoritma-spk-simple-additive-weighting-saw)
-   - [Konsep & Alasan Pemilihan Metode](#1-konsep--alasan-pemilihan-metode)
+## Daftar Isi
+1. [Latar Belakang & Masalah](#latar-belakang--masalah)
+2. [Susunan Tim Pengembang (Kelompok 7A)](#susunan-tim-pengembang-kelompok-7a)
+3. [Fondasi Ilmiah Algoritma SPK: Simple Additive Weighting (SAW)](#fondasi-ilmiah-algoritma-spk-simple-additive-weighting-saw)
+   - [Konsep Dasar Metode SAW](#1-konsep-dasar-metode-saw)
    - [Kriteria Penilaian (Benefit vs Cost)](#2-kriteria-penilaian-benefit-vs-cost)
-   - [Tahapan Matematis Perhitungan SAW](#3-tahapan-matematis-perhitungan-saw)
-   - [Matriks Pembobotan 7 Klaster Persona Mahasiswa](#4-matriks-pembobotan-7-klaster-persona-mahasiswa)
-   - [Explainable Reasoning & Transparansi Skor](#5-explainable-reasoning--transparansi-skor)
-4. [Dataset Perangkat (450 Unit Laptop & PC)](#-dataset-perangkat-450-unit-laptop--pc)
-5. [Arsitektur & Stack Teknologi](#-arsitektur--stack-teknologi)
-6. [Panduan Menjalankan Sistem Secara Lokal](#-panduan-menjalankan-sistem-secara-lokal)
-7. [Struktur Repositori & Kontrak Dokumen](#-struktur-repositori--kontrak-dokumen)
-8. [Pengujian Sistem & Automated Tests](#-pengujian-sistem--automated-tests)
+   - [Tahapan Matematis Perhitungan](#3-tahapan-matematis-perhitungan)
+   - [Studi Kasus Perhitungan Riil](#4-studi-kasus-perhitungan-riil)
+   - [Matriks Pembobotan 7 Persona Mahasiswa](#5-matriks-pembobotan-7-persona-mahasiswa)
+4. [Dataset Perangkat (450 Unit Laptop & PC)](#dataset-perangkat-450-unit-laptop--pc)
+5. [Arsitektur dan Stack Teknologi](#arsitektur-dan-stack-teknologi)
+6. [Panduan Instalasi & Eksekusi Lokal](#panduan-instalasi--eksekusi-lokal)
+7. [Kebijakan Repositori & Percabangan Git](#kebijakan-repositori--percabangan-git)
+8. [Pengujian Sistem dan Automated Tests](#pengujian-sistem-dan-automated-tests)
 
 ---
 
-## 📖 Tentang CariSpek
+## Latar Belakang & Masalah
 
-**CariSpek** adalah aplikasi Sistem Pendukung Keputusan (SPK) berbasis web yang dirancang khusus untuk membantu mahasiswa, akademisi, dan profesional di Indonesia menemukan perangkat komputer/laptop paling ideal sesuai dengan program studi, beban kerja perangkat lunak, dan batasan anggaran finansial.
+Pemilihan laptop untuk kebutuhan akademik sering kali menghadapi dua masalah utama:
+1. **Under-specification**: Perangkat tidak sanggup menjalankan perangkat lunak perkuliahan (misal: IDE kompilasi berat, emulator Android, atau render 3D CAD) karena kapasitas RAM atau prosesor tidak mencukupi.
+2. **Over-budgeting**: Pengguna membeli laptop dengan harga tinggi untuk spesifikasi berlebih yang tidak digunakan dalam aktivitas studinya.
 
-Sering kali mahasiswa membeli laptop hanya berdasarkan rekomendasi penjual toko atau tren merek semata, yang berujung pada:
-- **Spek Kurang (*Under-spec*)**: Komputer lambat saat kompilasi kode/rendering 3D.
-- **Spek Terlalu Mahal (*Over-budget*)**: Membeli fitur berlebih yang sebenarnya tidak dibutuhkan.
-
-CariSpek menyelesaikan masalah tersebut dengan menerapkan **metode MADM (Multi-Attribute Decision Making)** yang objektif, transparan, dan dapat dipertanggungjawabkan secara ilmiah melalui algoritma **Simple Additive Weighting (SAW)**.
+CariSpek menyelesaikan permasalahan ini dengan menerapkan pendekatan **Multi-Attribute Decision Making (MADM)** melalui algoritma **Simple Additive Weighting (SAW)**. Sistem menyaring 450 unit laptop di pasar Indonesia dan menghasilkan skor kesesuaian matematis berdasarkan batasan dana dan kebutuhan jurusan pengguna.
 
 ---
 
-## 👥 Susunan Tim Pengembang (Kelompok 7A)
+## Susunan Tim Pengembang (Kelompok 7A)
 
-Proyek ini dikembangkan dalam rangka pemenuhan tugas besar mata kuliah **Rekayasa Perangkat Lunak (RPL)**:
+Proyek ini dikembangkan untuk tugas besar mata kuliah **Rekayasa Perangkat Lunak (RPL)**:
 
 | Nama Anggota | Akun GitHub | Peran Utama & Tanggung Jawab |
 | :--- | :--- | :--- |
-| **Muhammad Affif** | [@Nourivex](https://github.com/Nourivex) / [@muhammadaffif](https://github.com/muhammadaffif) | **Project Lead & Backend/Data Engineer**<br>• Perancangan arsitektur sistem & basis data MariaDB.<br>• Implementasi algoritma SPK SAW dinamis & REST API.<br>• Data engineering katalog 450 laptop & matriks persona. |
-| **Zakky Fawwaz** | [@zakyfawwaz701](https://github.com/zakyfawwaz701) | **System Analyst & Koordinator Dosen Pengawas**<br>• Penyusunan dokumen SRS (Software Requirements Specification).<br>• Analisis kebutuhan fungsional/non-fungsional & Use Case.<br>• Koordinasi bimbingan asistensi dengan dosen pengawas. |
-| **Muhamad Fahren Andrean Rangkuti** | [@Renkaslana](https://github.com/Renkaslana) | **Frontend Developer (Next.js)**<br>• Implementasi antarmuka Next.js App Router, Tailwind CSS, & Zustand.<br>• Integrasi Wizard Kuesioner dengan REST API headless.<br>• Optimasi performa web & client-side caching. |
-| **Yesa Prayugo** | [@yesaprayugo](https://github.com/yesaprayugo) | **UI/UX Designer & QA / Testing Lead**<br>• Perancangan Design System, Wireframe, & Prototyping Figma.<br>• Pembuatan aset 3D render laptop & arketipe visual produk.<br>• Pengujian kualitas antarmuka & kepatuhan aksesibilitas (WCAG). |
+| **Muhammad Affif** | [@Nourivex](https://github.com/Nourivex) | **Project Lead & Backend/Data Engineer**<br>- Perancangan arsitektur sistem dan skema database MariaDB.<br>- Implementasi algoritma SPK SAW dan REST API Laravel.<br>- Kurasi dataset 450 laptop dan matriks bobot persona. |
+| **Zakky Fawwaz** | [@zakyfawwaz701](https://github.com/zakyfawwaz701) | **System Analyst & Koordinator Dosen Pengawas**<br>- Penyusunan dokumen SRS (Software Requirements Specification).<br>- Pemodelan fungsional, Use Case, dan koordinasi asistensi dosen. |
+| **Muhamad Fahren Andrean Rangkuti** | [@Renkaslana](https://github.com/Renkaslana) | **Frontend Developer (Next.js)**<br>- Implementasi antarmuka Next.js App Router, Tailwind CSS, dan Zustand.<br>- Integrasi Wizard Kuesioner dengan REST API backend. |
+| **Yesa Prayugo** | [@yesaprayugo](https://github.com/yesaprayugo) | **UI/UX Designer & QA Lead**<br>- Desain wireframe, prototipe Figma, dan sistem render 3D produk.<br>- Pengujian fungsionalitas dan aksesibilitas antarmuka pengguna. |
 | **Dosen Pengawas** | [@redmousestudio](https://github.com/redmousestudio) | Dosen Pengawas & Evaluator Mata Kuliah RPL |
 
 ---
 
-## 🧮 Fondasi Ilmiah Algoritma SPK: Simple Additive Weighting (SAW)
+## Fondasi Ilmiah Algoritma SPK: Simple Additive Weighting (SAW)
 
-### 1. Konsep & Alasan Pemilihan Metode
-Metode **Simple Additive Weighting (SAW)**, yang sering juga dikenal sebagai *metode penjumlahan terbobot*, adalah salah satu metode penyelesaian masalah Multi-Attribute Decision Making (MADM) yang paling populer, efisien, dan transparan.
+### 1. Konsep Dasar Metode SAW
+Metode Simple Additive Weighting (SAW) adalah metode penjumlahan terbobot dari rating kinerja setiap alternatif pada seluruh kriteria. SAW mensyaratkan proses normalisasi matriks keputusan ($X$) ke skala yang dapat diperbandingkan ($R$).
 
-Konsep fundamental SAW adalah **mencari penjumlahan terbobot dari rating kinerja pada setiap alternatif di semua kriteria**.
-
-**Mengapa metode SAW dipilih untuk proyek CariSpek?**
-1. **Transparansi Matematis Penuh (*Explainable AI*)**: Hasil rekomendasi tidak berupa *black box*. Pengguna dapat melihat secara persis mengapa laptop A terpilih, berapa kontribusi skor prosesornya, dan bagaimana bobot harga memengaruhi peringkat akhir.
-2. **Efisiensi Komputasi Tinggi**: Kompleksitas komputasi linear $O(m \times n)$ memungkinkan penyaringan dan perangkingan 450 perangkat dalam waktu $< 50\text{ ms}$ langsung di backend.
-3. **Fleksibilitas Bobot Berbasis Persona**: Setiap mahasiswa memiliki prioritas berbeda (misal: mahasiswa informatika memprioritaskan RAM & CPU, sedangkan mahasiswa sastra memprioritaskan harga murah dan baterai awet). SAW mengakomodasi kebutuhan ini melalui vektor bobot $W$ yang adaptif.
+Karakteristik metode SAW:
+- **Transparansi Komputasi**: Setiap nilai rekomendasi dapat diverifikasi secara manual maupun otomatis (*explainable decision support*).
+- **Efisiensi Skalabilitas**: Kompleksitas komputasi linear $O(m \times n)$ memungkinkan evaluasi ratusan data laptop dalam waktu $< 50\text{ ms}$.
+- **Adaptabilitas Profil**: Bobot preferensi kriteria disesuaikan dinamis berdasarkan jurusan mahasiswa.
 
 ---
 
 ### 2. Kriteria Penilaian (Benefit vs Cost)
-Sistem mengevaluasi setiap unit laptop berdasarkan 7 kriteria utama yang dibagi ke dalam dua sifat atribut:
+Terdapat 7 kriteria evaluasi teknis yang dibagi menjadi dua jenis atribut:
 
-| Kode | Nama Kriteria | Tipe Atribut | Satuan | Deskripsi & Bobot Logika |
+| Kode | Kriteria | Sifat Atribut | Satuan | Aturan Normalisasi |
 | :---: | :--- | :---: | :---: | :--- |
-| **$C_1$** | **Performa Komputasi (CPU)** | **Benefit** | Skor Index (0–100) | Menilai kekuatan prosesor berdasarkan benchmark PassMark/Geekbench single-core & multi-core. Semakin tinggi skornya, semakin baik. |
-| **$C_2$** | **Kapasitas & Upgradability RAM** | **Benefit** | GB + Poin Bonus | Menilai kapasitas bawaan (GB) ditambah poin bonus jika RAM *dual-channel* atau memiliki slot ekspansi SODIMM. |
-| **$C_3$** | **Kartu Grafis (GPU)** | **Benefit** | Skor Index (0–100) | Menilai kemampuan grafis terintegrasi (iGPU) atau discrete GPU (NVIDIA RTX / AMD Radeon) untuk tugas render 3D, AI, dan gaming. |
-| **$C_4$** | **Kualitas Layar & Display** | **Benefit** | Skor Index (0–100) | Menilai resolusi (FHD/2K/OLED), panel IPS/OLED, akurasi gamut warna (100% sRGB), dan refresh rate (Hz). |
-| **$C_5$** | **Daya Tahan Baterai & Portabilitas** | **Benefit** | Jam / Wh | Estimasi ketahanan baterai untuk mobilitas kuliah tanpa tergantung colokan listrik. |
-| **$C_6$** | **Harga Pasar (Price IDR)** | **Cost** | Rupiah (IDR) | Nilai moneter yang harus dibayar. **Semakin murah harganya, nilai normalisasinya semakin tinggi (mendekati 1.0)**. |
-| **$C_7$** | **Bobot Fisik Perangkat** | **Cost** | Kilogram (kg) | Berat fisik unit laptop. **Semakin ringan bobotnya, semakin nyaman dibawa ke kampus (skor normalisasi semakin tinggi)**. |
+| **$C_1$** | Performa CPU | **Benefit** | Indeks Skor (0 - 100) | Nilai makin tinggi makin baik. Dihitung dari benchmark PassMark / Geekbench. |
+| **$C_2$** | RAM & Upgradability | **Benefit** | GB + Poin Bonus | Nilai makin tinggi makin baik. Kapasitas RAM dasar ditambah poin jika terdapat slot SODIMM ekspansi. |
+| **$C_3$** | Kemampuan GPU | **Benefit** | Indeks Skor (0 - 100) | Nilai makin tinggi makin baik. Evaluasi iGPU vs GPU diskrit (RTX / Radeon). |
+| **$C_4$** | Kualitas Layar | **Benefit** | Indeks Skor (0 - 100) | Nilai makin tinggi makin baik. Memperhitungkan resolusi, panel IPS/OLED, dan cakupan sRGB. |
+| **$C_5$** | Daya Tahan Baterai | **Benefit** | Wh / Jam Kerja | Nilai makin tinggi makin baik. Kapasitas baterai untuk mobilitas kuliah. |
+| **$C_6$** | Harga Perangkat | **Cost** | Rupiah (IDR) | **Nilai makin rendah makin baik**. Biaya yang harus dikeluarkan pengguna. |
+| **$C_7$** | Bobot Fisik | **Cost** | Kilogram (kg) | **Nilai makin ringan makin baik**. Beban bawaan di dalam ransel mahasiswa. |
 
 ---
 
-### 3. Tahapan Matematis Perhitungan SAW
+### 3. Tahapan Matematis Perhitungan
 
-#### Langkah 1: Pembentukan Matriks Keputusan ($X$)
-Matriks $X$ berukuran $m \times n$ dibentuk dari $m$ alternatif laptop yang lolos batas fleksibilitas anggaran pengguna ($Price \le Budget_{max} \times 1.10$) dan $n$ kriteria:
+#### Tahap 1: Matriks Keputusan ($X$)
+Matriks berukuran $m \times n$ dibentuk dari $m$ alternatif laptop yang memenuhi toleransi anggaran ($Price \le Budget_{max} \times 1.10$):
 
 $$
 X = \begin{bmatrix}
@@ -104,36 +100,31 @@ x_{m1} & x_{m2} & \dots & x_{mn}
 \end{bmatrix}
 $$
 
-*Di mana $x_{ij}$ menyatakan nilai kinerja alternatif ke-$i$ pada kriteria ke-$j$.*
-
-#### Langkah 2: Normalisasi Matriks Keputusan ($R$)
-Untuk menyamakan skala pengukuran dari kriteria yang memiliki satuan berbeda (Rupiah, Gigabyte, Kilogram, dll.), dilakukan normalisasi matriks $R = [r_{ij}]$ dengan formula:
+#### Tahap 2: Normalisasi Matriks ($R$)
+Formula normalisasi elemen matriks $r_{ij}$:
 
 $$
 r_{ij} = \begin{cases}
-\dfrac{x_{ij}}{\max\limits_{k} (x_{kj})} & \text{jika } j \text{ adalah kriteria keuntungan (Benefit)} \\[12pt]
-\dfrac{\min\limits_{k} (x_{kj})}{x_{ij}} & \text{jika } j \text{ adalah kriteria biaya (Cost)}
+\dfrac{x_{ij}}{\max\limits_{k} (x_{kj})} & \text{jika } j \text{ adalah kriteria Benefit} \\[12pt]
+\dfrac{\min\limits_{k} (x_{kj})}{x_{ij}} & \text{jika } j \text{ adalah kriteria Cost}
 \end{cases}
 $$
 
-* **Untuk Kriteria Benefit ($C_1, C_2, C_3, C_4, C_5$)**: Nilai kinerja dibagi dengan nilai maksimum dari seluruh alternatif pada kriteria tersebut.
-* **Untuk Kriteria Cost ($C_6, C_7$)**: Nilai minimum dari seluruh alternatif dibagi dengan nilai kinerja alternatif yang bersangkutan.
-
-#### Langkah 3: Penentuan Vektor Bobot ($W$)
-Ditetapkan vektor bobot preferensi $W = [w_1, w_2, \dots, w_n]$ sesuai dengan persona jurusan atau preferensi pengguna, di mana total seluruh bobot bernilai 1 (atau 100%):
+#### Tahap 3: Vektor Bobot Kriteria ($W$)
+Vektor preferensi bobot $W = [w_1, w_2, \dots, w_n]$ ditentukan berdasarkan jurusan/persona dengan ketentuan total:
 
 $$
-\sum_{j=1}^{n} w_j = 1 \quad \text{atau} \quad \sum_{j=1}^{n} w_j = 100\%
+\sum_{j=1}^{n} w_j = 1 \quad (100\%)
 $$
 
-#### Langkah 4: Perhitungan Nilai Preferensi Akhir ($V_i$) & Match Score %
-Nilai preferensi komprehensif ($V_i$) untuk setiap alternatif laptop ke-$i$ dihitung dengan menjumlahkan perkalian antara elemen matriks ternormalisasi ($r_{ij}$) dengan bobot kriterianya ($w_j$):
+#### Tahap 4: Nilai Preferensi Akhir ($V_i$) & Match Score %
+Nilai preferensi komprehensif dihitung dengan rumus:
 
 $$
 V_i = \sum_{j=1}^{n} w_j \cdot r_{ij}
 $$
 
-Untuk kemudahan pemahaman pengguna di antarmuka web, nilai $V_i$ ($0.0 \le V_i \le 1.0$) dikonversi ke dalam persentase **Match Score %**:
+Nilai $V_i$ ($0.0 \le V_i \le 1.0$) kemudian dikalikan 100 untuk menghasilkan **Match Score %**:
 
 $$
 \text{Match Score}_i = \text{round}(V_i \times 100\%)
@@ -141,171 +132,168 @@ $$
 
 ---
 
-### 4. Matriks Pembobotan 7 Klaster Persona Mahasiswa
+### 4. Studi Kasus Perhitungan Riil
 
-Sistem menyediakan matriks bobot terstandarisasi untuk 7 persona mahasiswa (tersimpan pada tabel `criteria_weights`):
+Contoh perhitungan untuk profil **Mahasiswa Informatika (CAT-02)** dengan 3 alternatif laptop:
+- Bobot Kriteria: $W = [w_{\text{CPU}}=0.30, w_{\text{RAM}}=0.25, w_{\text{Harga}}=0.20, w_{\text{Layar}}=0.15, w_{\text{Bobot}}=0.10]$
 
-```mermaid
-pie title Distribusi Bobot Kriteria Persona Informatika (CAT-02)
-    "Performa CPU (C1)" : 30
-    "Kapasitas RAM (C2)" : 25
-    "Harga Murah / Cost (C6)" : 20
-    "Kualitas Layar (C4)" : 15
-    "Bobot Ringan / Cost (C7)" : 10
-```
+#### Data Mentah Alternatif:
+| Alternatif | CPU ($C_1$, Benefit) | RAM ($C_2$, Benefit) | Harga ($C_6$, Cost) | Layar ($C_4$, Benefit) | Bobot ($C_7$, Cost) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Laptop A** | 90 | 16 GB | Rp 9.000.000 | 85 | 1.4 kg |
+| **Laptop B** | 98 | 32 GB | Rp 14.500.000 | 90 | 1.8 kg |
+| **Laptop C** | 75 | 8 GB | Rp 6.500.000 | 70 | 1.3 kg |
+| **Nilai Ekstrem** | **Max = 98** | **Max = 32** | **Min = 6.500.000** | **Max = 90** | **Min = 1.3** |
 
-| Kode Persona | Klaster Target & Jurusan | Prioritas Utama | $w_{\text{CPU}}$ | $w_{\text{RAM}}$ | $w_{\text{GPU}}$ | $w_{\text{Layar}}$ | $w_{\text{Harga}}$ | $w_{\text{Bobot}}$ |
+#### Normalisasi ($r_{ij}$):
+- **Laptop A**:
+  - $r_{11} = 90 / 98 = 0.918$
+  - $r_{12} = 16 / 32 = 0.500$
+  - $r_{16} = 6.500.000 / 9.000.000 = 0.722$
+  - $r_{14} = 85 / 90 = 0.944$
+  - $r_{17} = 1.3 / 1.4 = 0.929$
+  - **$V_A = (0.30 \times 0.918) + (0.25 \times 0.500) + (0.20 \times 0.722) + (0.15 \times 0.944) + (0.10 \times 0.929) = 0.779$** $\rightarrow$ **78% Match**
+
+- **Laptop B**:
+  - $r_{21} = 98 / 98 = 1.000$
+  - $r_{22} = 32 / 32 = 1.000$
+  - $r_{26} = 6.500.000 / 14.500.000 = 0.448$
+  - $r_{24} = 90 / 90 = 1.000$
+  - $r_{27} = 1.3 / 1.8 = 0.722$
+  - **$V_B = (0.30 \times 1.000) + (0.25 \times 1.000) + (0.20 \times 0.448) + (0.15 \times 1.000) + (0.10 \times 0.722) = 0.862$** $\rightarrow$ **86% Match (Best Match)**
+
+- **Laptop C**:
+  - $r_{31} = 75 / 98 = 0.765$
+  - $r_{32} = 8 / 32 = 0.250$
+  - $r_{36} = 6.500.000 / 6.500.000 = 1.000$
+  - $r_{34} = 70 / 90 = 0.778$
+  - $r_{37} = 1.3 / 1.3 = 1.000$
+  - **$V_C = (0.30 \times 0.765) + (0.25 \times 0.250) + (0.20 \times 1.000) + (0.15 \times 0.778) + (0.10 \times 1.000) = 0.709$** $\rightarrow$ **71% Match (Best Value)**
+
+---
+
+### 5. Matriks Pembobotan 7 Persona Mahasiswa
+
+| Kode | Persona & Jurusan | Prioritas | $w_{\text{CPU}}$ | $w_{\text{RAM}}$ | $w_{\text{GPU}}$ | $w_{\text{Layar}}$ | $w_{\text{Harga}}$ | $w_{\text{Bobot}}$ |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| `CAT-01` | **Dasar / Pelajar** *(Non-Teknik, Hukum, Sastra)* | Harga Hemat & Baterai Awet | 15% | 15% | 5% | 15% | **35%** | **15%** |
-| `CAT-02` | **Multitasking & Coding** *(Informatika, SI, Data Science)* | CPU Cepat & RAM Besar | **30%** | **25%** | 10% | 15% | 15% | 5% |
-| `CAT-03` | **Kreatif & Desain** *(DKV, Arsitektur, Animasi)* | Layar 100% sRGB & GPU Dedicated | 20% | 20% | **25%** | **25%** | 10% | 0% |
-| `CAT-04` | **Gaming & Teknik Berat** *(Mesin, Sipil, 3D CAD)* | GPU Flagship & Pendingin Bagus | **25%** | 20% | **30%** | 15% | 10% | 0% |
-| `CAT-05` | **PC Rakitan Hemat** *(Dormitory / Performa Maksimal)* | Rasio Performa per Rupiah | **35%** | 25% | 20% | 0% | 20% | 0% |
-| `CAT-06` | **Mobilitas Medis & Klinis** *(Kedokteran, Farmasi)* | Bobot Enteng & Baterai Tahan Seharian | 15% | 15% | 0% | 20% | 20% | **30%** |
-| `CAT-07` | **Komputasi Finansial & Bisnis** *(Akuntansi, Manajemen)* | CPU Multithread & Numpad Keyboard | 25% | 25% | 5% | 20% | 15% | 10% |
+| `CAT-01` | **Dasar / Pelajar** (Hukum, Sastra, Non-Teknik) | Harga & Baterai | 15% | 15% | 5% | 15% | 35% | 15% |
+| `CAT-02` | **Multitasking & Coding** (Informatika, SI, Data) | CPU & Kapasitas RAM | 30% | 25% | 10% | 15% | 15% | 5% |
+| `CAT-03` | **Kreatif & Desain** (DKV, Arsitektur, Animasi) | Akurasi Layar & GPU | 20% | 20% | 25% | 25% | 10% | 0% |
+| `CAT-04` | **Gaming & Teknik Berat** (Mesin, Sipil, 3D CAD) | GPU Diskrit & CPU | 25% | 20% | 30% | 15% | 10% | 0% |
+| `CAT-05` | **PC Rakitan Hemat** (Kamar Kos / Maksimalisasi Spek) | Rasio Performa/Rupiah | 35% | 25% | 20% | 0% | 20% | 0% |
+| `CAT-06` | **Mobilitas Medis** (Kedokteran, Keperawatan) | Bobot Ringan & Baterai | 15% | 15% | 0% | 20% | 20% | 30% |
+| `CAT-07` | **Komputasi Finansial** (Akuntansi, Manajemen) | CPU Multicore & RAM | 25% | 25% | 5% | 20% | 15% | 10% |
 
 ---
 
-### 5. Explainable Reasoning & Transparansi Skor
+## Dataset Perangkat (450 Unit Laptop & PC)
 
-Sistem tidak hanya memberikan nomor peringkat, melainkan membedah alasan rekomendasi:
-1. **Best Match**: Alternatif dengan nilai $V_i$ tertinggi dari seluruh kandidat yang lolos filter.
-2. **Best Value**: Alternatif yang menawarkan rasio performa tertinggi dengan harga paling efisien di bawah pagu anggaran.
-3. **Breakdown Tiap Kriteria**: Nilai murni $r_{ij} \times 100$ per kriteria ditampilkan dalam bentuk progress bar.
-4. **Trade-offs Transparan**: Menyajikan kelemahan komparatif perangkat (misal: *"RAM onboard tidak dapat di-upgrade"* atau *"Bobot 2.3 kg kurang nyaman dibawa jalan kaki"*).
+Data perangkat dihimpun langsung dari katalog pasar komputer Indonesia (2024 - 2026) melalui berkas `Data Spek Komputer & Laptop Mahasiswa 2026.xlsx`:
 
----
-
-## 📊 Dataset Perangkat (450 Unit Laptop & PC)
-
-Basis data katalog CariSpek dikurasi langsung dari pasar komputer resmi Indonesia (2024–2026) melalui berkas `Data Spek Komputer & Laptop Mahasiswa 2026.xlsx`:
-
-* **Total Entitas**: **450 Unit Perangkat**
-* **Distribusi Jenis Perangkat**:
-  - 💻 Laptop Standar (Clamshell): 363 unit
-  - 🖥️ PC Rakitan Desktop: 42 unit
-  - 🔄 Laptop 2-in-1 / Convertible: 25 unit
-  - 📦 Mini PC: 10 unit
-  - 🖥️ Desktop Branded (All-in-One): 10 unit
-* **Distribusi 17 Merek Terkemuka**: Lenovo (87), ASUS (75), HP (64), Acer (52), Custom PC (42), MSI (30), Axioo (22), Dell (21), Apple (18), Advan (14), Gigabyte, Huawei, Xiaomi, Colorful, Infinix, Minisforum.
-* **Rentang Harga Pasar**: Rp 2.349.000 s/d Rp 65.999.000 (Rata-rata: Rp 13,4 Juta).
-* **Kelengkapan Fitur (19 Atribut)**: ID, Brand, Model Seri, Tipe, CPU, Benchmark, GPU, RAM, Upgradability, Storage SSD, Ukuran Layar, Gamut sRGB, Bobot, Harga, Link Marketplace, Status Garansi, Tag Usecase, Pros, Cons.
+- **Total Entitas**: 450 unit perangkat.
+- **Rincian Tipe**: 363 Laptop Standar, 42 PC Rakitan, 25 Laptop 2-in-1, 10 Mini PC, 10 Desktop Branded.
+- **Merek Terdaftar (17 Brand)**: Lenovo (87), ASUS (75), HP (64), Acer (52), Custom PC (42), MSI (30), Axioo (22), Dell (21), Apple (18), Advan (14), Gigabyte, Huawei, Xiaomi, Colorful, Infinix, Minisforum.
+- **Rentang Harga**: Rp 2.349.000 s/d Rp 65.999.000 (Rata-rata: Rp 13,4 Juta).
+- **Atribut Lengkap (19 Kolom)**: ID, Kategori Target, Jurusan, Brand, Seri, Tipe, CPU, Benchmark, GPU, RAM, Upgradability, SSD, Layar, Gamut sRGB, Bobot, Harga, Link Toko, Garansi, Tag, Pros, Cons.
 
 ---
 
-## 🏗️ Arsitektur & Stack Teknologi
+## Arsitektur dan Stack Teknologi
 
-Aplikasi menggunakan arsitektur modern **Headless Decoupled Architecture**:
+Sistem mengadopsi pola **Headless Decoupled Architecture**:
 
 ```mermaid
 flowchart LR
-    subgraph Client ["Frontend (Next.js 16)"]
-        UI["Antarmuka Pengguna & Wizard"]
-        Zustand["State Management (Profile & Filter)"]
-        API_Lib["Service Layer (lib/api.ts)"]
+    subgraph Client ["Frontend: Next.js 16"]
+        UI["Antarmuka & Wizard"]
+        Store["Zustand Store"]
+        Service["lib/api.ts"]
     end
 
-    subgraph Server ["Backend (Laravel 12 via DDEV)"]
-        Router["API Routing (/api/v1/*)"]
+    subgraph Server ["Backend: Laravel 12 (DDEV)"]
+        Router["routes/api.php"]
         Controller["FrontendIntegrationController"]
-        Transformer["LaptopTransformer (DTO)"]
-        SAW_Engine["SawRecommendationService"]
+        SAW["SawRecommendationService"]
+        DTO["LaptopTransformer"]
     end
 
-    subgraph Database ["Persistensi Data"]
-        MariaDB[("MariaDB 11.8 (450 Laptop & 7 Persona)")]
+    subgraph DB ["Database"]
+        MariaDB[("MariaDB 11.8: 450 Perangkat")]
     end
 
-    UI --> Zustand --> API_Lib
-    API_Lib -- "HTTPS REST Request" --> Router
+    UI --> Store --> Service
+    Service -- "REST JSON" --> Router
     Router --> Controller
-    Controller --> SAW_Engine
-    SAW_Engine --> MariaDB
-    SAW_Engine --> Transformer
-    Transformer -- "Clean JSON Envelope & DTO" --> API_Lib
+    Controller --> SAW
+    SAW --> MariaDB
+    SAW --> DTO
+    DTO -- "Response Envelope" --> Service
 ```
 
-* **Backend Engine**: PHP 8.4 + Framework Laravel (Service-Repository Clean Pattern).
-* **Containerisasi & Dev Server**: **DDEV** (Nginx + PHP-FPM + MariaDB 11.8).
-* **Frontend Web App**: Next.js 16 App Router (Turbopack, TypeScript, Tailwind CSS v4, Radix UI/shadcn, Motion).
-* **Dynamic Branding SSoT**: Konfigurasi merek terpusat di `config/brand.php` dan `.env` tanpa hardcode nama sistem di logika kode.
+- **Backend**: Laravel 12 (PHP 8.4) dengan Service-Repository Pattern.
+- **Local Dev Container**: DDEV (Nginx, MariaDB 11.8, Traefik SSL).
+- **Frontend**: Next.js 16 App Router (Turbopack, TypeScript, Tailwind CSS v4, shadcn/ui, Framer Motion).
+- **Branding Terpusat**: Dynamic Branding via `config/brand.php` dan file environment `.env`.
 
 ---
 
-## 🚀 Panduan Menjalankan Sistem Secara Lokal
+## Panduan Instalasi & Eksekusi Lokal
 
-### Prasyarat Sistem
-- Docker & Docker Compose
+### Prasyarat
+- Docker Desktop / Docker Engine
 - DDEV CLI (`v1.24+`)
 - Node.js `v20+` & npm
 
 ### 1. Menjalankan Backend (Laravel + DDEV)
 ```bash
-# 1. Pastikan Anda berada di direktori root repositori
+# 1. Masuk ke direktori root
 cd "Rekayasa Perangkat Lunak"
 
-# 2. Nyalakan container DDEV (otomatis menyalakan Nginx, PHP 8.4, & MariaDB)
+# 2. Nyalakan container DDEV
 ddev start
 
-# 3. Jalankan migrasi dan seeder database 450 laptop (hanya saat setup pertama)
+# 3. Jalankan migrasi dan seeder database 450 laptop (setup pertama)
 ddev artisan migrate:fresh --seed
 
-# 4. Verifikasi status backend dan endpoint healthcheck
+# 4. Uji koneksi API healthcheck
 curl -k https://carispek-backend.ddev.site/api/v1/health
 ```
 
 ### 2. Menjalankan Frontend (Next.js)
 ```bash
-# 1. Masuk ke direktori frontend
+# 1. Masuk ke folder frontend
 cd frontend
 
-# 2. Install dependensi package
+# 2. Pasang paket dependensi
 npm install
 
-# 3. Jalankan server pengembangan
+# 3. Jalankan server lokal
 npm run dev
 ```
-Buka browser Anda dan akses:
-👉 **`http://localhost:3000`**
+Akses di peramban web: **`http://localhost:3000`**
 
 ---
 
-## 📁 Struktur Repositori & Kontrak Dokumen
+## Kebijakan Repositori & Percabangan Git
 
-```
-├── .ddev/                         # Konfigurasi container lokal DDEV
-├── app/
-│   ├── Http/Controllers/Api/     # RESTful Controller (Device, Category, Recommendation)
-│   ├── Models/                    # Model Eloquent (Device, Category, Brand, CriteriaWeight)
-│   └── Services/
-│       ├── SawRecommendationService.php  # Implementasi matematis algoritma SAW
-│       └── LaptopTransformer.php          # DTO adapter ke format antarmuka Next.js
-├── database/
-│   ├── data/                      # JSON dataset resmi (categories.json & devices.json)
-│   ├── migrations/                # Skema tabel basis data
-│   └── seeders/                   # Seeder otomatis untuk 450 unit laptop
-├── docs/                          # Spesifikasi & dokumen rekayasa perangkat lunak resmi
-│   ├── ARCHITECTURE.md            # Arsitektur sistem, ERD, dan topologi jaringan
-│   ├── API_CONTRACT_STANDARDS.md  # Standar JSON envelope respons & error handling
-│   ├── api-design.md              # Rincian kontrak 40 endpoint REST API
-│   ├── openapi.yaml               # Spesifikasi formal OpenAPI 3.1.0 (Swagger)
-│   └── TESTING_GUIDE.md           # Panduan pengujian via Postman, Thunder Client, & cURL
-├── frontend/                      # Repositori antarmuka Next.js App Router (Cabang UI)
-├── AGENTS.md                      # Pedoman AI Coding Assistant & profil pengguna
-└── README.md                      # Dokumentasi utama proyek
-```
+Seluruh pengembangan disinkronkan ke repositori resmi GitHub:
+👉 **[`https://github.com/Nourivex/Speco`](https://github.com/Nourivex/Speco)**
+
+### Aturan Cabang:
+- **`main`**: Seluruh backend Laravel, DDEV container, database, dataset 450 laptop, dokumen teknis `docs/`, dan automated tests.
+- **`UI`**: Khusus source code frontend Next.js App Router.
 
 ---
 
-## 🧪 Pengujian Sistem & Automated Tests
+## Pengujian Sistem dan Automated Tests
 
-Backend dilengkapi pengujian otomatis (*Automated Feature Tests*) untuk menjamin akurasi algoritma SAW dan kestabilan endpoint:
+Pengujian otomatis (*Automated Feature Tests*) dijalankan di lingkungan DDEV backend:
 
 ```bash
 ddev artisan test
 ```
 
-**Hasil Pengujian:**
+### Hasil Verifikasi:
 ```text
    PASS  Tests\Feature\ApiEndpointsTest
   ✓ config endpoint returns dynamic branding                             0.44s  
@@ -327,6 +315,5 @@ ddev artisan test
 ---
 
 <p align="center">
-  Dibuat dengan dedikasi tinggi oleh <strong>Tim NEXORA (Kelompok 7A)</strong><br>
-  Program Studi Teknik Informatika — Mata Kuliah Rekayasa Perangkat Lunak (RPL) 2026
+  Tim NEXORA (Kelompok 7A) | Program Studi Teknik Informatika | Rekayasa Perangkat Lunak 2026
 </p>
