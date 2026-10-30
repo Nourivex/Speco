@@ -1,8 +1,74 @@
-# SPECO: Sistem Pendukung Keputusan (SPK) Rekomendasi Laptop Mahasiswa
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/brand/speco-logo-white.png">
+    <img src="public/brand/speco-logo.png" width="340" alt="SPECO Logo">
+  </picture>
+</p>
 
-Platform Sistem Pendukung Keputusan (SPK) pemilihan laptop dan komputer ringkas berbasis profil jurusan, beban komputasi, dan batasan anggaran mahasiswa di Indonesia. Sistem memanfaatkan metode **Simple Additive Weighting (SAW)** dengan 7 matriks persona akademik dan katalog 450 data perangkat aktif yang terhubung langsung ke **Supabase Cloud**.
+<h1 align="center">SPECO : Sistem Pendukung Keputusan (SPK) Rekomendasi Laptop</h1>
 
-Dikembangkan oleh **TIM SPECO (Kelompok 7A)** untuk mata kuliah Rekayasa Perangkat Lunak (RPL), **Universitas Harkat Negeri**.
+<p align="center">
+  <strong>Platform Cerdas Rekomendasi 450 Laptop & Komputer Ringkas Mahasiswa Berbasis Simple Additive Weighting (SAW) & Supabase Cloud Realtime</strong>
+</p>
+
+<p align="center">
+  <a href="https://speco.nour.web.id"><img src="https://img.shields.io/badge/Live%20Demo-speco.nour.web.id-006C49?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo"></a>
+  <a href="https://github.com/Nourivex/Speco"><img src="https://img.shields.io/badge/GitHub-Nourivex%2FSpeco-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo"></a>
+  <a href="#2-struktur-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/TIM%20SPECO-Kelompok%207A-2563EB?style=for-the-badge&logo=trello&logoColor=white" alt="Tim SPECO"></a>
+  <a href="#2-struktur-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/Kampus-Universitas%20Harkat%20Negeri-4F46E5?style=for-the-badge" alt="Universitas Harkat Negeri"></a>
+  <a href="#7-skema-database-supabase-laptops"><img src="https://img.shields.io/badge/Dataset-450%20Perangkat%20Aktif-10B981?style=for-the-badge&logo=databricks&logoColor=white" alt="Dataset"></a>
+  <a href="https://supabase.com"><img src="https://img.shields.io/badge/Status-Online%20Production-success?style=for-the-badge&logo=statuspage&logoColor=white" alt="Status"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js%2016-000000?style=flat-square&logo=nextdotjs&logoColor=white" alt="Next.js 16">
+  <img src="https://img.shields.io/badge/React%2019-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React 19">
+  <img src="https://img.shields.io/badge/TypeScript%205.8-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Tailwind%20CSS%20v4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Supabase%20Cloud-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase Cloud">
+  <img src="https://img.shields.io/badge/PostgreSQL%2015-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Turbopack-000000?style=flat-square&logo=turbopack&logoColor=white" alt="Turbopack">
+  <img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=flat-square&logo=shadcnui&logoColor=white" alt="shadcn/ui">
+  <img src="https://img.shields.io/badge/Simple%20Icons-111111?style=flat-square&logo=simpleicons&logoColor=white" alt="Simple Icons">
+  <img src="https://img.shields.io/badge/Vercel%20Edge-000000?style=flat-square&logo=vercel&logoColor=white" alt="Vercel">
+</p>
+
+<p align="center">
+  <em>Platform Sistem Pendukung Keputusan (SPK) pemilihan laptop dan komputer ringkas berbasis profil jurusan, beban komputasi, dan batasan anggaran mahasiswa di Indonesia. Memanfaatkan metode <strong>Simple Additive Weighting (SAW)</strong> dengan 7 matriks persona akademik dan katalog 450 perangkat aktif yang terhubung langsung ke <strong>Supabase Cloud</strong>.</em>
+</p>
+
+<div align="center">
+
+### Ekosistem Brand Hardware & Silikon (450 Data Perangkat)
+
+**OEM Brand Laptop & Desktop Ringkas:**  
+<img src="https://img.shields.io/badge/ASUS-00539B?style=flat-square&logo=asus&logoColor=white" alt="ASUS">
+<img src="https://img.shields.io/badge/Lenovo-E2231A?style=flat-square&logo=lenovo&logoColor=white" alt="Lenovo">
+<img src="https://img.shields.io/badge/Apple%20MacBook-000000?style=flat-square&logo=apple&logoColor=white" alt="Apple">
+<img src="https://img.shields.io/badge/HP-0096D6?style=flat-square&logo=hp&logoColor=white" alt="HP">
+<img src="https://img.shields.io/badge/Acer-83B81A?style=flat-square&logo=acer&logoColor=white" alt="Acer">
+<img src="https://img.shields.io/badge/Dell-007DB8?style=flat-square&logo=dell&logoColor=white" alt="Dell">
+<img src="https://img.shields.io/badge/MSI%20Gaming-FF0000?style=flat-square&logo=msi&logoColor=white" alt="MSI">
+<img src="https://img.shields.io/badge/Huawei%20MateBook-FF0000?style=flat-square&logo=huawei&logoColor=white" alt="Huawei">
+<img src="https://img.shields.io/badge/Xiaomi%20Book-FF6900?style=flat-square&logo=xiaomi&logoColor=white" alt="Xiaomi">
+<img src="https://img.shields.io/badge/Samsung%20Galaxy%20Book-1428A0?style=flat-square&logo=samsung&logoColor=white" alt="Samsung">
+<img src="https://img.shields.io/badge/Gigabyte%20AORUS-FF6C00?style=flat-square&logo=gigabyte&logoColor=white" alt="Gigabyte">
+<img src="https://img.shields.io/badge/Infinix%20INBook-000000?style=flat-square&logo=laptop&logoColor=white" alt="Infinix">
+<img src="https://img.shields.io/badge/Advan%20Indonesia-006699?style=flat-square&logo=laptop&logoColor=white" alt="Advan">
+<img src="https://img.shields.io/badge/Axioo%20Indonesia-008080?style=flat-square&logo=laptop&logoColor=white" alt="Axioo">
+<img src="https://img.shields.io/badge/Zyrex%20Indonesia-2B4C7E?style=flat-square&logo=laptop&logoColor=white" alt="Zyrex">
+
+**Arsitektur CPU, Grafis (GPU), & Sistem Operasi:**  
+<img src="https://img.shields.io/badge/Intel%20Core%20%26%20Celeron-0071C5?style=flat-square&logo=intel&logoColor=white" alt="Intel">
+<img src="https://img.shields.io/badge/AMD%20Ryzen%20%26%20Radeon-ED1C24?style=flat-square&logo=amd&logoColor=white" alt="AMD">
+<img src="https://img.shields.io/badge/Apple%20Silicon%20(M%20Series)-000000?style=flat-square&logo=apple&logoColor=white" alt="Apple Silicon">
+<img src="https://img.shields.io/badge/NVIDIA%20GeForce%20RTX-76B900?style=flat-square&logo=nvidia&logoColor=white" alt="NVIDIA">
+<img src="https://img.shields.io/badge/Qualcomm%20Snapdragon%20X-3253DC?style=flat-square&logo=qualcomm&logoColor=white" alt="Qualcomm">
+<img src="https://img.shields.io/badge/Windows%2011-0078D4?style=flat-square&logo=windows11&logoColor=white" alt="Windows 11">
+<img src="https://img.shields.io/badge/macOS%20Sequoia-000000?style=flat-square&logo=apple&logoColor=white" alt="macOS">
+<img src="https://img.shields.io/badge/Linux%20Ubuntu-E95420?style=flat-square&logo=ubuntu&logoColor=white" alt="Ubuntu">
+
+</div>
 
 ---
 
