@@ -17,6 +17,10 @@
   <a href="#pengujian-sistem-dan-automated-tests"><img src="https://img.shields.io/badge/Tests-13%20Passed%20(51%20Assertions)-success?style=for-the-badge" alt="Tests"></a>
 </p>
 
+> [!NOTE]
+> **Pembaruan Arsitektur Produksi (Cabang `UI` & Folder `frontend/`):**  
+> Fungsionalitas backend dan antarmuka pengguna telah dialihkan sepenuhnya ke arsitektur modern terpadu **Next.js 16 Full-Stack & Supabase Cloud Serverless** pada cabang **`UI`**. Pembaruan ini menghilangkan kebutuhan dedicated server/VPS fisik, memangkas latensi CORS lintas domain, dan mengelola 450 katalog perangkat langsung di PostgreSQL Supabase Cloud. Cabang `main` dipertahankan sebagai dokumentasi dan arsip fondasi awal backend Laravel.
+
 ---
 
 ## Daftar Isi
@@ -278,11 +282,12 @@ Akses di peramban web: **`http://localhost:3000`**
 ## Kebijakan Repositori & Percabangan Git
 
 Seluruh pengembangan disinkronkan ke repositori resmi GitHub:
-👉 **[`https://github.com/Nourivex/Speco`](https://github.com/Nourivex/Speco)**
+👉 **[`https://github.com/Nourivex/Speco`](https://github.com/Nourivex/Speco)** (Repositori Utama)  
+👉 **[`https://github.com/Renkaslana/NEXORA`](https://github.com/Renkaslana/NEXORA)** (Sinkronisasi Cabang `UI`)
 
 ### Aturan Cabang:
-- **`main`**: Seluruh backend Laravel, DDEV container, database, dataset 450 laptop, dokumen teknis `docs/`, dan automated tests.
-- **`UI`**: Khusus source code frontend Next.js App Router.
+- **`UI`**: Repositori aktif untuk aplikasi produksi terpadu Next.js 16 Full-Stack (Serverless Route Handlers, Supabase Cloud, dan konsol portal staf `/admin`).
+- **`main`**: Arsip backend Laravel 12, DDEV container, skrip database, dataset 450 laptop, dokumen teknis `docs/`, dan automated tests awal.
 
 ---
 
@@ -316,5 +321,5 @@ ddev artisan test
 ---
 
 <p align="center">
-  Tim NEXORA (Kelompok 7A) | Program Studi Teknik Informatika | Rekayasa Perangkat Lunak 2026
+  TIM SPECO (Kelompok 7A) | Program Studi Teknik Informatika | Universitas Harkat Negeri - 2026
 </p>
