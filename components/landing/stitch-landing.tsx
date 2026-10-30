@@ -336,32 +336,15 @@ export function StitchLanding() {
 
           {/* Right Action Tools */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            {/* Quick Search Trigger (Compact < 2xl) */}
+            {/* Quick Search Trigger (Tetap ringkas, modal terbuka hanya saat diklik / ⌘K) */}
             <button
               type="button"
               onClick={() => setIsSearchOpen(true)}
               title="Cari tipe, spek, atau budget (⌘K)"
-              aria-label="Pencarian Cepat Laptop"
-              className="flex 2xl:hidden items-center justify-center w-10 h-10 bg-slate-100/90 hover:bg-white border border-slate-200 hover:border-emerald-400 rounded-xl text-slate-600 hover:text-emerald-700 transition-all shadow-2xs group shrink-0"
+              aria-label="Pencarian Cepat Laptop (⌘K)"
+              className="flex items-center justify-center w-10 h-10 bg-slate-100/90 hover:bg-white border border-slate-200 hover:border-emerald-400 rounded-xl text-slate-600 hover:text-emerald-700 transition-all shadow-2xs group shrink-0"
             >
               <MagnifyingGlassIcon className="w-4 h-4 text-slate-500 group-hover:text-emerald-700 transition-colors" />
-            </button>
-
-            {/* Quick Search Trigger (Expanded 2xl+) */}
-            <button
-              type="button"
-              onClick={() => setIsSearchOpen(true)}
-              className="hidden 2xl:flex items-center justify-between w-52 h-10 px-3 bg-slate-100/90 border border-slate-200 rounded-xl text-slate-500 hover:border-emerald-400 hover:bg-white transition-all shadow-2xs group shrink-0"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                <MagnifyingGlassIcon className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 shrink-0 transition-colors" />
-                <span className="text-xs truncate text-slate-500 group-hover:text-slate-800">
-                  Cari spek...
-                </span>
-              </div>
-              <kbd className="px-1.5 py-0.5 rounded bg-slate-200 group-hover:bg-emerald-100 text-[10px] font-mono text-slate-600 group-hover:text-emerald-800 font-semibold border border-slate-300 shrink-0 transition-colors">
-                ⌘K
-              </kbd>
             </button>
 
             {/* Riwayat Bookmark Drawer Trigger */}
