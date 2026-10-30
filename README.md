@@ -9,12 +9,28 @@
 </p>
 
 <p align="center">
-  <a href="https://speco.nour.web.id"><img src="https://img.shields.io/badge/Live%20Demo-speco.nour.web.id-blue?style=for-the-badge&logo=vercel" alt="Live Demo"></a>
-  <a href="#susunan-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/Tim-NEXORA%20Kelompok%207A-blue?style=for-the-badge" alt="Tim NEXORA"></a>
-  <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Backend-Laravel%2012%20%7C%20PHP%208.4-red?style=for-the-badge&logo=laravel" alt="Laravel"></a>
-  <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Frontend-Next.js%2016%20%7C%20React%2019-black?style=for-the-badge&logo=next.js" alt="Next.js"></a>
+  <a href="https://speco.nour.web.id"><img src="https://img.shields.io/badge/Live%20Demo-speco.nour.web.id-006C49?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live Demo"></a>
+  <a href="#susunan-tim-pengembang-kelompok-7a"><img src="https://img.shields.io/badge/Tim-SPECO%20Kelompok%207A-2563EB?style=for-the-badge&logo=trello&logoColor=white" alt="Tim SPECO"></a>
+  <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Full%20Stack-Next.js%2016%20%7C%20React%2019-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js"></a>
+  <a href="#arsitektur-dan-stack-teknologi"><img src="https://img.shields.io/badge/Cloud%20Database-Supabase%20PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase"></a>
   <a href="#fondasi-ilmiah-algoritma-spk-simple-additive-weighting-saw"><img src="https://img.shields.io/badge/Metode%20SPK-Simple%20Additive%20Weighting%20(SAW)-green?style=for-the-badge" alt="Metode SAW"></a>
   <a href="#pengujian-sistem-dan-automated-tests"><img src="https://img.shields.io/badge/Tests-13%20Passed%20(51%20Assertions)-success?style=for-the-badge" alt="Tests"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/ASUS-00539B?style=flat-square&logo=asus&logoColor=white" alt="ASUS">
+  <img src="https://img.shields.io/badge/Lenovo-E2231A?style=flat-square&logo=lenovo&logoColor=white" alt="Lenovo">
+  <img src="https://img.shields.io/badge/Apple-000000?style=flat-square&logo=apple&logoColor=white" alt="Apple">
+  <img src="https://img.shields.io/badge/HP-0096D6?style=flat-square&logo=hp&logoColor=white" alt="HP">
+  <img src="https://img.shields.io/badge/Acer-83B81A?style=flat-square&logo=acer&logoColor=white" alt="Acer">
+  <img src="https://img.shields.io/badge/Dell-007DB8?style=flat-square&logo=dell&logoColor=white" alt="Dell">
+  <img src="https://img.shields.io/badge/MSI-FF0000?style=flat-square&logo=msi&logoColor=white" alt="MSI">
+  <img src="https://img.shields.io/badge/Huawei-FF0000?style=flat-square&logo=huawei&logoColor=white" alt="Huawei">
+  <img src="https://img.shields.io/badge/Xiaomi-FF6900?style=flat-square&logo=xiaomi&logoColor=white" alt="Xiaomi">
+  <img src="https://img.shields.io/badge/Samsung-1428A0?style=flat-square&logo=samsung&logoColor=white" alt="Samsung">
+  <img src="https://img.shields.io/badge/Intel-0071C5?style=flat-square&logo=intel&logoColor=white" alt="Intel">
+  <img src="https://img.shields.io/badge/AMD-ED1C24?style=flat-square&logo=amd&logoColor=white" alt="AMD">
+  <img src="https://img.shields.io/badge/NVIDIA-76B900?style=flat-square&logo=nvidia&logoColor=white" alt="NVIDIA">
 </p>
 
 > [!NOTE]
