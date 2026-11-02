@@ -1,6 +1,7 @@
 import { glossary } from "@/data/glossary";
 import { budgetNeedFit, budgetNeeds, budgetPreviewRange, criterionHints, demoBudget } from "@/data/landing";
 import { laptops } from "@/data/laptops";
+import { catalogLaptops } from "@/lib/catalog-service";
 import { requirementProfiles } from "@/data/mock-requirements";
 import { scenarios } from "@/data/mock-results";
 import {
@@ -143,8 +144,8 @@ export function getGlossary() {
 export function getBudgetInsight(budget: number, flexible = false) {
   const preset = getBudgetPreset(budget);
   const limit = flexible ? budget * 1.1 : budget;
-  const laptopCount = laptops.filter((l) => l.priceIdr <= limit).length;
-  return { preset, typicalSpec: preset.typicalSpec, laptopCount, catalogSize: laptops.length };
+  const laptopCount = catalogLaptops.filter((l) => l.numericPrice > 0 && l.numericPrice <= limit).length;
+  return { preset, typicalSpec: preset.typicalSpec, laptopCount, catalogSize: catalogLaptops.length };
 }
 
 const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -238,6 +239,8 @@ export function getCatalogPreview() {
     name: `${l.brand} ${l.model}`,
     priceIdr: l.priceIdr,
     image: l.image,
+    imageUrl: l.imageUrl,
+    customImageUrl: l.customImageUrl,
   }));
 }
 

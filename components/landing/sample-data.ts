@@ -10,6 +10,7 @@ import {
   getWizardOptions,
 } from "@/lib/api";
 import { landingMeterRows } from "@/lib/need-meter";
+import { catalogLaptops } from "@/lib/catalog-service";
 import type { BudgetNeedId, LandingMeterRef } from "@/types";
 
 /**
@@ -103,7 +104,7 @@ export async function getLandingSample() {
       result: best.result,
     },
     breakdown,
-    catalogSize: catalog.length,
+    catalogSize: catalogLaptops.length,
     resultCount: recommendations.items.length,
   }
 }

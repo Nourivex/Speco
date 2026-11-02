@@ -385,7 +385,7 @@ function ProfileParts() {
 
 const demoAnalysisSteps = [
   { label: "Membaca profilmu", detail: "Informatika · Rp8 jt · Programming" },
-  { label: "Menyaring laptop sesuai budget", detail: "12 laptop di katalog → 9 dalam budget" },
+  { label: "Menyaring laptop sesuai budget", detail: "450 laptop di katalog → 385 dalam budget" },
   { label: "Menghitung kecocokan per kriteria", detail: "Prioritasmu: Performa, Ringan dibawa" },
   { label: "Menyusun alasan dan trade-off", detail: "Untuk Best Match dan alternatifnya" },
 ];

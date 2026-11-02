@@ -171,6 +171,7 @@ function AnalysisRun({ mock, hold, onRetry }: { mock: MockMode | null; hold: Hol
   }
 
   const results = state.status === "success" ? state.data.items.map((i) => i.result) : null
+  const bestLaptop = state.status === "success" && state.data.items.length > 0 ? state.data.items[0].laptop : null
   const limit = profile.budget.max * (profile.budget.flexible ? 1.1 : 1)
   const counts = catalogCounts(limit, results)
   const current = steps[Math.min(completed, steps.length - 1)]
@@ -232,7 +233,7 @@ function AnalysisRun({ mock, hold, onRetry }: { mock: MockMode | null; hold: Hol
           <p className="text-sm font-extrabold text-emerald-200 tabular-nums" aria-live="polite">
             {countText}
           </p>
-          <AnalysisCatalog stage={completed} limit={limit} results={results} />
+          <AnalysisCatalog stage={completed} limit={limit} results={results} bestLaptop={bestLaptop} />
         </div>
 
         <div className="flex flex-col gap-6 lg:col-span-4 lg:row-start-2">

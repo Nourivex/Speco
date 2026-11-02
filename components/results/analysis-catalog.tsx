@@ -7,7 +7,9 @@ import { getCatalogPreview } from "@/lib/api"
 import { formatRupiahShort } from "@/lib/format"
 import { renderKey, renderSrc } from "@/lib/laptop-image"
 import { DURATION, EASE_IN_OUT, EASE_OUT } from "@/lib/motion"
-import type { RecommendationResult } from "@/types"
+import { LaptopRender } from "@/components/ui/laptop-render"
+import { catalogLaptops } from "@/lib/catalog-service"
+import type { Laptop, RecommendationResult } from "@/types"
 
 // Katalog tersaring di layar Analisis, redesign "Garis kebutuhan menyapu katalog" (disetujui
 // Fahren, Okt 2026; REDESIGN §14). Aturannya tetap bukan SAW:
@@ -23,9 +25,10 @@ const SWEEP = 0.7
 
 export function catalogCounts(limit: number, results: RecommendationResult[] | null) {
   const price = new Map(catalog.map((l) => [l.id, l.priceIdr]))
+  const inBudgetCount = catalogLaptops.filter((l) => l.numericPrice > 0 && l.numericPrice <= limit).length
   return {
-    total: catalog.length,
-    inBudget: catalog.filter((l) => l.priceIdr <= limit).length,
+    total: catalogLaptops.length,
+    inBudget: inBudgetCount,
     matched: results ? results.length : null,
     /** Hasil yang sedikit melewati budget (Hasil menulisnya sebagai trade-off). */
     overBudget: results ? results.filter((r) => (price.get(r.laptopId) ?? 0) > limit).length : 0,
@@ -57,17 +60,20 @@ export function AnalysisCatalog({
   stage,
   limit,
   results,
+  bestLaptop,
 }: {
   /** Jumlah tahap selesai (0–4). */
   stage: number
   /** Batas harga, sudah termasuk toleransi fleksibel. */
   limit: number
   results: RecommendationResult[] | null
+  bestLaptop?: Laptop | null
 }) {
   const reduce = useReducedMotion()
   const scores = new Map(results?.map((r) => [r.laptopId, r.matchScore]))
   const ranked = stage >= 3 && results !== null
-  const best = stage >= 4 && results?.[0] ? catalog.find((l) => l.id === results[0].laptopId) : undefined
+  const bestFromCatalog = stage >= 4 && results?.[0] ? catalog.find((l) => l.id === results[0].laptopId) : undefined
+  const best = bestLaptop || bestFromCatalog
 
   // Urutan: tahap 3 ke atas, hasil (urut skor API) di depan, lalu sisanya sesuai katalog.
   const order = ranked
@@ -109,7 +115,14 @@ export function AnalysisCatalog({
               }}
             >
               <div className="relative aspect-[4/3] overflow-hidden rounded-[10px] bg-studio">
-                <Render image={l.image} sizes="(min-width: 1024px) 160px, 30vw" />
+                <LaptopRender
+                  image={l.image}
+                  customSrc={l.customImageUrl || l.imageUrl}
+                  sizes="(min-width: 1024px) 160px, 30vw"
+                  label={false}
+                  className="h-full w-full bg-slate-900/40"
+                  imageClassName="p-1.5"
+                />
                 {overBudget && !ranked && (
                   <span
                     className="absolute inset-x-1.5 bottom-1.5 animate-in rounded-full bg-signal-ink px-2 py-0.5 text-center text-[10px] leading-4 font-semibold text-white fade-in zoom-in-95 fill-mode-both sm:text-[11px]"
@@ -156,21 +169,33 @@ export function AnalysisCatalog({
         {best && (
           <motion.div
             key="best"
-            className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-studio sm:flex-row"
+            className="absolute inset-0 flex flex-col overflow-hidden rounded-[20px] bg-white sm:flex-row shadow-2xl border border-emerald-100"
             initial={reduce ? false : { opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: reduce ? 0 : DURATION.slow, ease: EASE_OUT }}
           >
-            <div className="relative min-h-0 flex-1">
-              <Render image={best.image} sizes="(min-width: 1024px) 40vw, 90vw" />
-              <span className="absolute top-3 left-3 type-micro text-text-muted">Ilustrasi</span>
+            <div className="relative min-h-0 flex-1 bg-slate-50 flex items-center justify-center p-3">
+              <LaptopRender
+                image={best.image}
+                customSrc={(best as any).customImageUrl || (best as any).imageUrl}
+                sizes="(min-width: 1024px) 40vw, 90vw"
+                label={false}
+                eager
+                className="h-full w-full bg-transparent"
+                imageClassName="p-2"
+              />
+              <span className="absolute top-3 left-3 type-micro rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 font-medium shadow-xs">
+                Foto Produk Terverifikasi
+              </span>
             </div>
-            <div className="flex flex-col justify-center gap-1 p-4 text-text sm:w-[42%] sm:p-6">
-              <span className="self-start rounded-full bg-cobalt-600 px-2.5 py-1 type-micro text-white">Best Match</span>
-              <p className="text-6xl leading-none font-extrabold tracking-[-0.05em] text-cobalt-600 tabular-nums sm:text-7xl">
+            <div className="flex flex-col justify-center gap-1 p-4 text-text sm:w-[42%] sm:p-6 bg-white">
+              <span className="self-start rounded-full bg-emerald-700 px-2.5 py-1 type-micro text-white font-semibold">Best Match</span>
+              <p className="text-6xl leading-none font-extrabold tracking-[-0.05em] text-emerald-700 tabular-nums sm:text-7xl">
                 <CountUp value={results![0].matchScore} duration={0.9} />%
               </p>
-              <p className="type-h3 text-text">{best.name}</p>
+              <p className="type-h3 text-text font-bold">
+                {"brand" in best && "model" in best && best.brand ? `${best.brand} ${best.model}` : (best as any).name}
+              </p>
               <p className="type-small font-normal text-text-muted tabular-nums">{formatRupiahShort(best.priceIdr)}</p>
             </div>
           </motion.div>
