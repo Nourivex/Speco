@@ -64,7 +64,12 @@ function RecCard({ sample, stage }: { sample: Sample; stage: number }) {
   return (
     <div className="flex flex-col overflow-hidden rounded-[24px] border border-canvas-line bg-white">
       <div className="relative">
-        <LaptopRender image={laptop.image} sizes="(min-width: 1024px) 32vw, 90vw" className="aspect-[2/1] lg:aspect-[3/1]" />
+        <LaptopRender
+          image={laptop.image}
+          customSrc={laptop.customImageUrl || (laptop.imageUrl?.startsWith("http") ? laptop.imageUrl : undefined)}
+          sizes="(min-width: 1024px) 32vw, 90vw"
+          className="aspect-[2/1] lg:aspect-[3/1]"
+        />
         <motion.span
           initial={false}
           animate={{ opacity: stage >= 4 ? 1 : 0, y: stage >= 4 ? 0 : 6 }}

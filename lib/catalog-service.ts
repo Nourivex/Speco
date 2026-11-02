@@ -239,7 +239,7 @@ export const HERO_SHOWCASE_MODELS = [
     battery: "Baterai 45Wh (6 Jam)",
     matchScore: 94,
     matchReason: "Prosesor 6 Core termurah di Indonesia dengan slot RAM yang bisa ditambah sendiri saat semester atas.",
-    image: "/images/laptops/premium/hero-lt-6.webp",
+    image: "https://axiooworld.com/uploads/products/a6db26b9-a01e-40f2-a45a-79c275d6a4ed.png",
     defaultBudget: 5500000,
   },
   {
@@ -256,7 +256,7 @@ export const HERO_SHOWCASE_MODELS = [
     battery: "Baterai 60Wh (8 Jam)",
     matchScore: 96,
     matchReason: "Performa prosesor kelas workstation H-Series di bawah 7 juta dengan layar 100% sRGB untuk desain grafis.",
-    image: "/images/laptops/premium/hero-6-8.webp",
+    image: "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/14/c84fe72f-372f-4a72-a098-94d3aab15f2d.jpg.webp",
     defaultBudget: 7500000,
   },
   {
@@ -273,7 +273,7 @@ export const HERO_SHOWCASE_MODELS = [
     battery: "Baterai 47Wh Rapid Charge",
     matchScore: 95,
     matchReason: "Keyboard Lenovo legendaris nyaman untuk coding maraton dengan efisiensi daya dingin dan garansi resmi 2 tahun.",
-    image: "/images/laptops/premium/hero-8-10.webp",
+    image: "https://p3-ofp.static.pub//fes/cms/2024/04/29/09bkal2ihkgzk5u7ztpfx54w8xeitl660072.png",
     defaultBudget: 9000000,
   },
   {
@@ -290,7 +290,7 @@ export const HERO_SHOWCASE_MODELS = [
     battery: "Baterai 75Wh (12 Jam Aktif)",
     matchScore: 97,
     matchReason: "Layar OLED 2.8K 120Hz tertipis dan terakurat di kelasnya, bobot hanya 1.2 kg dengan chip Intel AI NPU.",
-    image: "/images/laptops/premium/hero-10-15.webp",
+    image: "https://dlcdnwebimgs.asus.com/gain/7b6485d2-2950-485c-92c9-58692b928766/w800",
     defaultBudget: 13500000,
   },
   {
@@ -307,25 +307,46 @@ export const HERO_SHOWCASE_MODELS = [
     battery: "Baterai 73Wh Power Delivery",
     matchScore: 98,
     matchReason: "GPU NVIDIA RTX 4060 dengan VRAM 8GB untuk rendering Blender, pelatihan PyTorch, dan tugas akhir Teknik.",
-    image: "/images/laptops/premium/hero-15-plus.webp",
+    image: "https://dlcdnwebimgs.asus.com/gain/427ec618-b14b-4302-9e7d-441f2d2a71b4/w800",
     defaultBudget: 19000000,
   },
 ];
 
 /**
- * Fallback gambar laptop berkualitas tinggi jika url eksternal bermasalah
+ * Fallback gambar produk resmi per brand jika URL spesifik kosong
+ */
+const BRAND_PRODUCT_IMAGES: Record<string, string> = {
+  ASUS: "https://dlcdnwebimgs.asus.com/gain/7b6485d2-2950-485c-92c9-58692b928766/w800",
+  Lenovo: "https://p3-ofp.static.pub//fes/cms/2024/04/29/09bkal2ihkgzk5u7ztpfx54w8xeitl660072.png",
+  Acer: "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/8/11c82b17-a5fb-47a9-9e99-9b2de47ba735.png.webp",
+  HP: "https://www.hp.com/content/dam/sites/omen/worldwide/laptops/2022-victus-15-intel/Hero%20Image%201.png",
+  Apple: "https://cdsassets.apple.com/live/SZLF0YNV/images/sp/111867_SP869-2022-macbook-air-m2-colors.png",
+  Axioo: "https://axiooworld.com/uploads/products/a6db26b9-a01e-40f2-a45a-79c275d6a4ed.png",
+  Advan: "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/14/c84fe72f-372f-4a72-a098-94d3aab15f2d.jpg.webp",
+  MSI: "https://storage-asset.msi.com/global/picture/product/product_168974719493480c4e090deebe413ef445cef0ec7d.webp",
+  Dell: "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-3440-laptop/spi/non-touch/ng/notebook-latitude-14-3440-uma-hd-gray-relsize-500-ng.psd?fmt=png-alpha&wid=800&hei=800&fit=constrain,1",
+  Custom: "https://images.tokopedia.net/img/cache/700/aphluv/1997/1/1/f92a2ea3bdb9499e872dd0e5e34fc09c~.jpeg.webp",
+  Zyrex: "https://images.tokopedia.net/img/cache/700/VqbcmM/2023/10/30/8a715a3c-b038-4e55-89ff-96b6d80a1ae1.jpg.webp",
+  Infinix: "https://images.tokopedia.net/img/cache/700/VqbcmM/2023/12/12/288faeef-93a0-410a-9bc5-220b33beae7a.jpg.webp",
+  Huawei: "https://consumer.huawei.com/content/dam/huawei-cbg-site/common/mkt/pdp/pc/matebook-d-14-2024/img/huawei-matebook-d-14-2024-kv.png",
+  Xiaomi: "https://i02.appmifile.com/138_operator_sg/27/02/2024/3c05faae5414d4850fa9869e5d4cb077.png",
+  Samsung: "https://images.samsung.com/is/image/samsung/p6pim/id/galaxy-book4/gallery/id-galaxy-book4-15inch-np750-np750xgk-kg1id-540131435?$650_519_PNG$",
+  Tecno: "https://images.tokopedia.net/img/cache/700/VqbcmM/2023/12/12/288faeef-93a0-410a-9bc5-220b33beae7a.jpg.webp",
+  LG: "https://images.tokopedia.net/img/cache/700/VqbcmM/2024/5/8/11c82b17-a5fb-47a9-9e99-9b2de47ba735.png.webp",
+  Microsoft: "https://support.microsoft.com/en-us/surface/media/surface-pro-9-side.png",
+  MINISFORUM: "https://cdn.shopify.com/s/files/1/0401/1032/5921/files/Compressed_UM790_Pro.png",
+};
+
+/**
+ * Mengambil gambar laptop riil dari database Supabase / CDN resmi
  */
 export function getLaptopImage(item: CatalogLaptop): string {
   if (item.Link_Gambar && item.Link_Gambar.startsWith("http")) {
     return item.Link_Gambar;
   }
-  const gpu = (item.Kartu_Grafis_GPU || "").toLowerCase();
-  const model = (item.Model_Seri || "").toLowerCase();
-  if (gpu.includes("rtx") || gpu.includes("gtx") || model.includes("gaming") || model.includes("rog")) {
-    return "/images/laptops/creator-graphite-34.webp";
+  const brandFallback = BRAND_PRODUCT_IMAGES[item.Brand];
+  if (brandFallback) {
+    return brandFallback;
   }
-  if (model.includes("zenbook") || model.includes("slim") || model.includes("swift") || model.includes("air")) {
-    return "/images/laptops/ultrabook-silver-34.webp";
-  }
-  return "/images/laptops/mainstream-silver-34.webp";
+  return BRAND_PRODUCT_IMAGES.ASUS;
 }

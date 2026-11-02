@@ -435,6 +435,7 @@ function PreviewCard({
         <div className="relative overflow-hidden rounded-[14px]">
           <LaptopRender
             image={pick.render}
+            customSrc={pick.customImageUrl || (pick.imageUrl?.startsWith("http") ? pick.imageUrl : undefined)}
             sizes="(min-width: 1280px) 220px, (min-width: 768px) 30vw, 78vw"
             decorative
             className="rounded-[14px]"
