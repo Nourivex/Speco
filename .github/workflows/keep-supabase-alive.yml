@@ -1,0 +1,26 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Jalan otomatis setiap 3 hari sekali pukul 01:00 UTC (08:00 WIB)
+    - cron: '0 1 */3 * *'
+  workflow_dispatch: # Bisa dijalankan manual kapan saja
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query Supabase REST API
+        env:
+          SUPABASE_URL: https://jirpzpqnrnzcsgiecogm.supabase.co
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppcnB6cHFucm56Y3NnaWVjb2dtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyNjcxOTYsImV4cCI6MjEwODg0MzE5Nn0.l0Gp0MCcqu22xHMgWqlSt1goUb3947mSCvL8bQAFMF8' }}
+        run: |
+          STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/laptops?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+          echo "Supabase Keep-Alive HTTP Status: ${STATUS_CODE}"
+          if [ "${STATUS_CODE}" != "200" ]; then
+            echo "Supabase ping failed with HTTP ${STATUS_CODE}"
+            exit 1
+          fi

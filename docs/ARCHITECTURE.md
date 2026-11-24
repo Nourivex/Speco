@@ -79,9 +79,21 @@ flowchart TD
 ```mermaid
 erDiagram
     BRANDS ||--o{ DEVICES : produces
+    PARTNER_STORES ||--o{ DEVICES : distributes
     CATEGORIES ||--o{ DEVICES : categorizes
     CATEGORIES ||--o{ CRITERIA_WEIGHTS : configures
     DEVICES ||--o{ RECOMMENDATION_ITEMS : matched_in
+
+    PARTNER_STORES {
+        string id PK "PS-LENOVO-01, PS-ASUS-01, dsb"
+        string store_name "Lenovo Exclusive Store Indonesia"
+        string slug "lenovo-exclusive-store"
+        string brand_focus "Lenovo, ASUS, Acer, Axioo, dsb"
+        string store_tier "Exclusive Brand Store / Official Brand Partner"
+        boolean is_official_partner "Status dealer resmi brand"
+        string warranty_benefit "Jaminan garansi resmi distributor"
+        string badge_label "Official Brand Partner"
+    }
 
     CATEGORIES {
         string id PK "CAT-01 s/d CAT-07"
@@ -106,6 +118,8 @@ erDiagram
         string id PK "LP001, LP002, dsb"
         string category_id FK
         int brand_id FK
+        string partner_store_id FK "Relasi ke public.partner_stores"
+        boolean is_official_brand_partner "Penanda badge Official Brand Partner"
         string model_name "Contoh: Vivobook Go 14"
         string device_type "Laptop, PC Rakitan, 2-in-1, Mini PC"
         string processor "CPU Model"
