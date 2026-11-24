@@ -46,7 +46,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    google:
+      process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ||
+      "EWrh4q0ZwOnmK8nm5GHIdcSAP7NUYveKvC3-aiEF2k8",
     other: process.env.NEXT_PUBLIC_BING_VERIFICATION
       ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_VERIFICATION }
       : undefined,
