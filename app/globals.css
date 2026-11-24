@@ -323,9 +323,11 @@
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
   }
   body {
     @apply bg-bg text-text type-body antialiased;
+    overflow-x: clip;
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {

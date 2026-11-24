@@ -21,6 +21,7 @@ import { MemoryIcon } from "@phosphor-icons/react/dist/ssr/Memory"
 import { MinusIcon } from "@phosphor-icons/react/dist/ssr/Minus"
 import { MonitorIcon } from "@phosphor-icons/react/dist/ssr/Monitor"
 import { PlugsIcon } from "@phosphor-icons/react/dist/ssr/Plugs"
+import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck"
 import { StarIcon } from "@phosphor-icons/react/dist/ssr/Star"
 import { WarningIcon } from "@phosphor-icons/react/dist/ssr/Warning"
 import { FullSpecs } from "@/components/laptop/full-specs"
@@ -37,6 +38,7 @@ import { getWizardOptions } from "@/lib/api"
 import { formatDecimal, formatRupiah, formatStorage, formatWeight } from "@/lib/format"
 import { ANGLE_LABEL, availableAngles } from "@/lib/laptop-image"
 import { EASE_OUT } from "@/lib/motion"
+import { getPartnerStoreByBrand } from "@/lib/partner-stores"
 import type { SpecCheckResult } from "@/lib/spec-check"
 import type { Laptop, LaptopAngle, RecommendationResult, RequirementProfile } from "@/types"
 
@@ -195,6 +197,7 @@ export function DetailHero({
   const reduce = useReducedMotion()
   const name = `${laptop.brand} ${laptop.model}`
   const status = budget ? budgetStatus(laptop.priceIdr, budget) : null
+  const partnerStore = laptop.partnerStore || getPartnerStoreByBrand(laptop.brand)
   const up = (delay: number) => (reduce ? {} : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.45, ease: EASE_OUT, delay } })
   const highlights = [
     { Icon: CpuIcon, label: "Prosesor", value: laptop.cpu.name },
@@ -230,6 +233,10 @@ export function DetailHero({
               #{rank} dari <span className="num">{total}</span>
             </span>
           )}
+          <span className="inline-flex items-center gap-1 rounded-full border border-info/20 bg-info-soft px-3 py-1 type-micro font-semibold text-info">
+            <ShieldCheckIcon weight="fill" className="size-3.5" aria-hidden="true" />
+            {partnerStore.badgeLabel}: {partnerStore.storeName}
+          </span>
         </motion.div>
         <motion.div {...up(0.05)} className="flex flex-col gap-2">
           <h1 className="text-[2rem] leading-[1.08] font-extrabold tracking-[-0.04em] text-text md:text-[2.5rem]">{name}</h1>

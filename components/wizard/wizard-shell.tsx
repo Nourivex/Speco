@@ -110,16 +110,16 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
     router.push(nextHref);
   };
 
-  const nav = (
-    <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
+  const renderNav = (compact = false) => (
+    <div className={cn("flex items-center gap-2 sm:gap-3", !compact && "pt-4 border-t border-slate-200")}>
       {prev ? (
         <Button
           asChild
           variant="secondary"
-          className="rounded-xl border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2.5 h-11"
+          className="rounded-xl border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs px-3 sm:px-4 py-2.5 h-10 sm:h-11 shrink-0"
         >
           <Link href={stepHref(prev.id)}>
-            <ArrowLeftIcon weight="bold" className="w-4 h-4 mr-1.5" aria-hidden="true" />
+            <ArrowLeftIcon weight="bold" className="w-4 h-4 mr-1 sm:mr-1.5" aria-hidden="true" />
             <span>Kembali</span>
           </Link>
         </Button>
@@ -127,23 +127,24 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
         <Button
           asChild
           variant="secondary"
-          className="rounded-xl border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs px-4 py-2.5 h-11"
+          className="rounded-xl border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs px-3 sm:px-4 py-2.5 h-10 sm:h-11 shrink-0"
         >
           <Link href="/">
-            <ArrowLeftIcon weight="bold" className="w-4 h-4 mr-1.5" aria-hidden="true" />
+            <ArrowLeftIcon weight="bold" className="w-4 h-4 mr-1 sm:mr-1.5" aria-hidden="true" />
             <span>Beranda</span>
           </Link>
         </Button>
       )}
 
-      <div className="ml-auto flex items-center gap-2.5">
+      <div className="ml-auto flex items-center gap-2 sm:gap-2.5 min-w-0">
         {step.skippable && (
           <Button
             variant="ghost"
             onClick={skip}
-            className="rounded-xl text-slate-500 hover:text-slate-900 font-semibold text-xs px-3.5 h-11"
+            className="rounded-xl text-slate-500 hover:text-slate-900 font-semibold text-xs px-2.5 sm:px-3.5 h-10 sm:h-11 shrink-0"
           >
-            Lewati Langkah Ini
+            <span className="sm:hidden">Lewati</span>
+            <span className="hidden sm:inline">Lewati Langkah Ini</span>
           </Button>
         )}
         <button
@@ -152,18 +153,24 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
           aria-disabled={Boolean(error) || !hydrated}
           aria-describedby={error ? "step-error" : undefined}
           className={cn(
-            "h-11 px-6 rounded-xl font-black text-xs shadow-md flex items-center gap-2 transition-all",
+            "h-10 sm:h-11 px-4 sm:px-6 rounded-xl font-black text-xs shadow-md flex items-center gap-1.5 sm:gap-2 transition-all whitespace-nowrap shrink-0",
             error || !hydrated
               ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none"
               : "bg-emerald-700 hover:bg-emerald-800 text-white shadow-emerald-700/20 hover:scale-[1.02] active:scale-[0.98]"
           )}
         >
           {next ? (
-            <span>Lanjut Langkah Berikutnya</span>
+            <>
+              <span className="sm:hidden">Lanjut</span>
+              <span className="hidden sm:inline">Lanjut Langkah Berikutnya</span>
+            </>
           ) : (
-            <span>Lihat Profil Kebutuhan & Rekomendasi</span>
+            <>
+              <span className="sm:hidden">Lihat Hasil</span>
+              <span className="hidden sm:inline">Lihat Profil Kebutuhan & Rekomendasi</span>
+            </>
           )}
-          <ArrowRightIcon weight="bold" className="w-4 h-4" aria-hidden="true" />
+          <ArrowRightIcon weight="bold" className="w-4 h-4 shrink-0" aria-hidden="true" />
         </button>
       </div>
     </div>
@@ -255,7 +262,7 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
               </div>
             </motion.div>
 
-            <div className="hidden lg:block">{nav}</div>
+            <div className="hidden lg:block">{renderNav(false)}</div>
           </main>
 
           {/* Right Forming Profile Card */}
@@ -267,7 +274,7 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="flex items-center gap-2 text-xs text-slate-500 pt-2">
-          <ShieldCheckIcon weight="fill" className="text-emerald-700 w-4 h-4" />
+          <ShieldCheckIcon weight="fill" className="text-emerald-700 w-4 h-4 shrink-0" />
           <span>
             Dihitung berdasarkan dataset 450 laptop mahasiswa & algoritma Simple Additive Weighting (SAW).
           </span>
@@ -275,8 +282,8 @@ export function WizardShell({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Mobile Sticky Action Bar */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md py-3 lg:hidden shadow-lg">
-        <div className="px-4">{nav}</div>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md py-2.5 sm:py-3 lg:hidden shadow-lg">
+        <div className="px-3 sm:px-4">{renderNav(true)}</div>
       </div>
     </div>
   );

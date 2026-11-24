@@ -85,7 +85,7 @@ export function AnalysisCatalog({
 
   return (
     <div aria-hidden="true" className="relative">
-      <ul className="grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-4">
+      <ul className={best ? "grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-4 min-h-[22rem] sm:min-h-[24rem]" : "grid grid-cols-3 gap-2 sm:gap-3 lg:grid-cols-4"}>
         {order.map((l) => {
           const index = catalog.indexOf(l)
           const overBudget = stage >= 2 && l.priceIdr > limit
@@ -190,7 +190,7 @@ export function AnalysisCatalog({
             </div>
             <div className="flex flex-col justify-center gap-1 p-4 text-text sm:w-[42%] sm:p-6 bg-white">
               <span className="self-start rounded-full bg-emerald-700 px-2.5 py-1 type-micro text-white font-semibold">Best Match</span>
-              <p className="text-6xl leading-none font-extrabold tracking-[-0.05em] text-emerald-700 tabular-nums sm:text-7xl">
+              <p className="text-4xl leading-none font-extrabold tracking-[-0.05em] text-emerald-700 tabular-nums sm:text-6xl md:text-7xl">
                 <CountUp value={results![0].matchScore} duration={0.9} />%
               </p>
               <p className="type-h3 text-text font-bold">

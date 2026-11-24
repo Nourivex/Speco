@@ -1,4 +1,5 @@
 import rawCatalog from "@/data/devices-catalog.json";
+import { getPartnerStoreByBrand, PartnerStore } from "@/lib/partner-stores";
 
 export interface DeviceRecord {
   ID_Perangkat: string;
@@ -171,6 +172,8 @@ export interface RecommendationQuery {
   persona?: string;
   major?: string;
   needs?: string[];
+  brand?: string;
+  partnerStoreId?: string;
   limit?: number;
 }
 
@@ -196,6 +199,8 @@ export interface ScoredLaptop {
   cons: string;
   warranty: string;
   buyUrl: string;
+  isOfficialBrandPartner: boolean;
+  partnerStore: PartnerStore;
 }
 
 /**
@@ -209,18 +214,39 @@ export function calculateSawRecommendations(query: RecommendationQuery = {}): Sc
   const personaKey = query.persona && PERSONA_WEIGHTS[query.persona] ? query.persona : "informatika";
   const { weights } = PERSONA_WEIGHTS[personaKey];
 
+  // Filter awal berdasarkan brand / toko mitra resmi (jika dipilih)
+  const brandQuery = (query.brand || "").trim().toLowerCase();
+  const partnerQuery = (query.partnerStoreId || "").trim().toLowerCase();
+
+  const matchesPartner = (d: DeviceRecord) => {
+    const store = getPartnerStoreByBrand(d.Brand);
+    if (brandQuery && brandQuery !== "all") {
+      if (brandQuery === "local" || brandQuery === "lokal") {
+        if (!["axioo", "advan", "zyrex"].includes((d.Brand || "").toLowerCase())) return false;
+      } else if ((d.Brand || "").toLowerCase() !== brandQuery && store.slug.toLowerCase() !== brandQuery) {
+        return false;
+      }
+    }
+    if (partnerQuery && store.id.toLowerCase() !== partnerQuery && store.slug.toLowerCase() !== partnerQuery) {
+      return false;
+    }
+    return true;
+  };
+
+  const partnerScopedCatalog = brandQuery || partnerQuery ? catalog.filter(matchesPartner) : catalog;
+
   // Filter awal berdasarkan budget
   const budgetMax = query.budgetMax ? query.budgetMax * 1.15 : 999999999; // toleransi 15%
   const budgetMin = query.budgetMin ? query.budgetMin * 0.85 : 0;
 
-  let candidates = catalog.filter((d) => {
+  let candidates = partnerScopedCatalog.filter((d) => {
     const p = parseFloat(String(d.Estimasi_Harga_Pasar_IDR)) || 0;
     return p >= budgetMin && p <= budgetMax;
   });
 
   if (candidates.length < 5) {
-    // Jika filter terlalu ketat, buka ke seluruh katalog
-    candidates = catalog;
+    // Jika filter budget terlalu ketat, buka ke seluruh katalog dalam cakupan toko mitra
+    candidates = partnerScopedCatalog.length > 0 ? partnerScopedCatalog : catalog;
   }
 
   // Langkah 1: Ekstraksi metrik semua kandidat
@@ -264,6 +290,7 @@ export function calculateSawRecommendations(query: RecommendationQuery = {}): Sc
       weights.c6_price * r6;
 
     const scorePercent = Math.min(99, Math.max(65, Math.round(v * 100)));
+    const partnerStore = getPartnerStoreByBrand(item.Brand);
 
     return {
       id: item.ID_Perangkat,
@@ -286,7 +313,9 @@ export function calculateSawRecommendations(query: RecommendationQuery = {}): Sc
       pros: item.Pros_Kelebihan || "Performa seimbang di kelasnya",
       cons: item.Cons_Kekurangan || "Ketersediaan stok berkala",
       warranty: item.Status_Garansi_Resmi || "Garansi Resmi 1 Tahun",
-      buyUrl: item.Platform_Rekomendasi_Beli || "https://www.tokopedia.com",
+      buyUrl: item.Platform_Rekomendasi_Beli || partnerStore.storeUrl,
+      isOfficialBrandPartner: partnerStore.isOfficialPartner,
+      partnerStore,
     };
   });
 

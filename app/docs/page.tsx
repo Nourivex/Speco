@@ -32,36 +32,38 @@ export default function DocsPage() {
     <div className="min-h-screen bg-[#faf8ff] text-[#131b2e] font-sans antialiased selection:bg-emerald-200">
       {/* 1. TOP NAVBAR */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-17 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-3 group">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-17 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
               <Image
                 src="/brand/speco-logo.png"
                 alt="SPECO Indonesia"
                 width={130}
                 height={44}
                 priority
-                className="h-8.5 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-7 sm:h-8.5 w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
-            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                Dokumentasi Resmi
+            <div className="h-5 w-px bg-slate-200 hidden sm:block shrink-0" />
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="px-2 sm:px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
+                <span className="sm:hidden">Docs</span>
+                <span className="hidden sm:inline">Dokumentasi Resmi</span>
               </span>
-              <span className="text-xs text-slate-500 font-semibold hidden md:inline">
+              <span className="text-xs text-slate-500 font-semibold hidden md:inline truncate">
                 TIM SPECO (Kelompok 7A) • Rekayasa Perangkat Lunak
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/"
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap"
             >
-              <ArrowLeftIcon className="w-3.5 h-3.5" />
-              <span>Kembali ke Aplikasi</span>
+              <ArrowLeftIcon className="w-3.5 h-3.5 shrink-0" />
+              <span className="sm:hidden">Kembali</span>
+              <span className="hidden sm:inline">Kembali ke Aplikasi</span>
             </Link>
             <a
               href="https://github.com/Nourivex/Speco"
@@ -77,39 +79,41 @@ export default function DocsPage() {
       </header>
 
       {/* 2. BODY LAYOUT WITH SIDEBAR */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 lg:gap-8">
           {/* SIDEBAR NAVIGATION */}
-          <aside className="lg:col-span-1">
-            <div className="sticky top-24 bg-white rounded-3xl border border-slate-200 p-4 shadow-sm space-y-1">
-              <div className="px-3 py-2 text-[11px] font-black uppercase tracking-wider text-slate-400">
+          <aside className="lg:col-span-1 min-w-0">
+            <div className="lg:sticky lg:top-24 bg-white rounded-2xl lg:rounded-3xl border border-slate-200 p-3 lg:p-4 shadow-sm space-y-2 lg:space-y-1">
+              <div className="px-2 lg:px-3 py-1 lg:py-2 text-[10px] lg:text-[11px] font-black uppercase tracking-wider text-slate-400">
                 Daftar Isi Dokumentasi
               </div>
-              {SECTIONS.map((sec) => {
-                const IconComponent = sec.icon;
-                const isActive = activeSection === sec.id;
-                return (
-                  <button
-                    key={sec.id}
-                    onClick={() => setActiveSection(sec.id)}
-                    className={`w-full px-3 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2.5 text-left transition-all cursor-pointer ${
-                      isActive
-                        ? "bg-emerald-50 text-emerald-900 shadow-2xs border border-emerald-200"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                    }`}
-                  >
-                    <IconComponent
-                      weight={isActive ? "fill" : "regular"}
-                      className={`w-4 h-4 shrink-0 ${
-                        isActive ? "text-emerald-700" : "text-slate-400"
+              <div className="flex lg:flex-col gap-1.5 lg:gap-1 overflow-x-auto pb-1 lg:pb-0">
+                {SECTIONS.map((sec) => {
+                  const IconComponent = sec.icon;
+                  const isActive = activeSection === sec.id;
+                  return (
+                    <button
+                      key={sec.id}
+                      onClick={() => setActiveSection(sec.id)}
+                      className={`shrink-0 lg:w-full px-3 py-2 lg:py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 lg:gap-2.5 text-left transition-all cursor-pointer whitespace-nowrap lg:whitespace-normal ${
+                        isActive
+                          ? "bg-emerald-50 text-emerald-900 shadow-2xs border border-emerald-200"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent"
                       }`}
-                    />
-                    <span>{sec.label}</span>
-                  </button>
-                );
-              })}
+                    >
+                      <IconComponent
+                        weight={isActive ? "fill" : "regular"}
+                        className={`w-4 h-4 shrink-0 ${
+                          isActive ? "text-emerald-700" : "text-slate-400"
+                        }`}
+                      />
+                      <span>{sec.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
 
-              <div className="pt-4 mt-4 border-t border-slate-100">
+              <div className="pt-2 lg:pt-4 mt-2 lg:mt-4 border-t border-slate-100">
                 <Link
                   href="/admin"
                   className="w-full px-3 py-2 rounded-xl bg-slate-900 hover:bg-emerald-900 text-white text-xs font-bold flex items-center justify-between transition-colors shadow-2xs"
@@ -127,7 +131,7 @@ export default function DocsPage() {
           </aside>
 
           {/* MAIN CONTENT AREA */}
-          <main className="lg:col-span-3 space-y-8">
+          <main className="lg:col-span-3 min-w-0 space-y-6 sm:space-y-8">
             {/* SECTION 1: RINGKASAN & VISI SISTEM */}
             {activeSection === "ringkasan" && (
               <section className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
@@ -397,7 +401,26 @@ export default function DocsPage() {
                 <div className="space-y-4 text-xs">
                   <div className="p-4 rounded-2xl bg-slate-900 text-white font-mono space-y-2">
                     <span className="text-sky-400 font-bold text-[11px] block">
-                      Tabel: public.laptops (450 Entitas)
+                      Tabel: public.partner_stores (Dealer &amp; Toko Mitra Brand Resmi)
+                    </span>
+                    <pre className="text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
+{`CREATE TABLE public.partner_stores (
+    id TEXT PRIMARY KEY,
+    brand TEXT NOT NULL UNIQUE,
+    store_name TEXT NOT NULL,
+    store_slug TEXT NOT NULL UNIQUE,
+    store_tier TEXT NOT NULL DEFAULT 'Official Brand Partner',
+    store_url TEXT NOT NULL,
+    warranty_benefit TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT now()
+);`}
+                    </pre>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-900 text-white font-mono space-y-2">
+                    <span className="text-sky-400 font-bold text-[11px] block">
+                      Tabel: public.laptops (450 Entitas + Relasi Toko Mitra)
                     </span>
                     <pre className="text-[11px] text-slate-300 leading-relaxed overflow-x-auto">
 {`CREATE TABLE public.laptops (
@@ -417,12 +440,14 @@ export default function DocsPage() {
     buy_url TEXT,
     pros TEXT,
     cons TEXT,
+    partner_store_id TEXT REFERENCES public.partner_stores(id) ON DELETE SET NULL,
+    is_official_brand_partner BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now()
 );`}
                     </pre>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                       <span className="font-bold text-slate-900">
                         Row Level Security (RLS)
@@ -430,6 +455,16 @@ export default function DocsPage() {
                       <p className="text-slate-600">
                         Akses BACA terbuka untuk publik; akses TULIS (insert, update, delete)
                         dibatasi khusus otoritas admin via token atau service key.
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                      <span className="font-bold text-slate-900">
+                        Relasi Toko Mitra Brand Resmi
+                      </span>
+                      <p className="text-slate-600">
+                        Mendukung dealer eksklusif per merek (contoh: Lenovo Exclusive Store Indonesia)
+                        melalui FK partner_store_id, filter brand/toko mitra, dan lencana Official Brand Partner.
                       </p>
                     </div>
 

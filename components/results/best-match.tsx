@@ -11,6 +11,7 @@ import { CheckIcon } from "@phosphor-icons/react/dist/ssr/Check"
 import { CpuIcon } from "@phosphor-icons/react/dist/ssr/Cpu"
 import { HardDrivesIcon } from "@phosphor-icons/react/dist/ssr/HardDrives"
 import { MemoryIcon } from "@phosphor-icons/react/dist/ssr/Memory"
+import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck"
 import { StarIcon } from "@phosphor-icons/react/dist/ssr/Star"
 import { BookmarkButton } from "@/components/results/bookmark-button"
 import { ScoreExplainer } from "@/components/results/score-explainer"
@@ -20,6 +21,7 @@ import { LaptopRender } from "@/components/ui/laptop-render"
 import type { RecommendationItem } from "@/lib/api"
 import { formatRupiah, formatStorage, formatWeight } from "@/lib/format"
 import { EASE_OUT } from "@/lib/motion"
+import { getPartnerStoreByBrand } from "@/lib/partner-stores"
 
 // Best Match (brief Hasil §5): gambar | info utama | skor + breakdown. Mobile: gambar → info → skor → tombol.
 // Breakdown = `subScores` dari hasil (bukan dihitung di frontend). Status budget = harga vs budget profil.
@@ -67,6 +69,7 @@ export function BestMatch({
   const shown = reduce || inView
   const status = budgetStatus(laptop.priceIdr, budget)
   const tier = scoreTier(result.matchScore)
+  const partnerStore = laptop.partnerStore || getPartnerStoreByBrand(laptop.brand)
   const specs = [
     { Icon: CpuIcon, label: "Prosesor", value: laptop.cpu.name },
     { Icon: MemoryIcon, label: "RAM", value: `${laptop.ram.gb} GB` },
@@ -110,6 +113,10 @@ export function BestMatch({
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-signal px-3 py-1 type-micro font-semibold text-signal-ink">
             <StarIcon weight="fill" className="size-3.5" aria-hidden="true" /> Best Match
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-info-soft border border-info/20 px-2.5 py-1 type-micro font-semibold text-info">
+            <ShieldCheckIcon weight="fill" className="size-3.5" aria-hidden="true" />
+            {partnerStore.badgeLabel} ({partnerStore.storeName})
           </span>
           <span className="rounded-full border border-border px-3 py-1 type-micro text-text-muted">
             #1 dari <span className="num">{total}</span>
@@ -208,22 +215,24 @@ export function BestMatch({
       </div>
 
       {/* Tombol: di bawah info (lg), paling akhir di mobile. */}
-      <div className="flex flex-wrap items-center gap-2 px-5 pb-6 sm:px-6 lg:col-start-2 lg:row-start-2 lg:px-8 lg:pb-8">
-        <Button asChild variant="signal" className="h-12 rounded-[14px] px-5 hover:[&_[data-arrow]]:translate-x-1">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 px-5 pb-6 sm:px-6 lg:col-start-2 lg:row-start-2 lg:px-8 lg:pb-8">
+        <Button asChild variant="signal" className="h-12 w-full sm:w-auto justify-center rounded-[14px] px-5 hover:[&_[data-arrow]]:translate-x-1">
           <Link href={`/laptop/${laptop.slug}`}>
             Lihat alasan lengkap <ArrowRightIcon weight="bold" data-arrow aria-hidden="true" />
           </Link>
         </Button>
-        <Button
-          variant="secondary"
-          aria-pressed={compared}
-          onClick={onCompareChange}
-          className={cn("h-12 rounded-[14px] px-4", compared && "border-primary bg-primary-soft text-primary")}
-        >
-          {compared ? <CheckIcon weight="bold" aria-hidden="true" /> : <ArrowsLeftRightIcon weight="bold" aria-hidden="true" />}
-          {compared ? "Dipilih" : "Bandingkan"}
-        </Button>
-        <BookmarkButton saved={saved} name={name} onToggle={onSaveChange} size="lg" />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            aria-pressed={compared}
+            onClick={onCompareChange}
+            className={cn("h-12 flex-1 sm:flex-none rounded-[14px] px-4", compared && "border-primary bg-primary-soft text-primary")}
+          >
+            {compared ? <CheckIcon weight="bold" aria-hidden="true" /> : <ArrowsLeftRightIcon weight="bold" aria-hidden="true" />}
+            {compared ? "Dipilih" : "Bandingkan"}
+          </Button>
+          <BookmarkButton saved={saved} name={name} onToggle={onSaveChange} size="lg" />
+        </div>
       </div>
     </motion.article>
   )

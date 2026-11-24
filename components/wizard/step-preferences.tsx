@@ -42,7 +42,7 @@ export function SoftwareStep() {
   const others = matches.filter((s) => !s.suggestedFor.includes(major))
 
   const grid = (list: typeof matches) => (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 md:grid-cols-3 lg:grid-cols-4">
       {list.map((s) => (
         <SelectCard
           key={s.id}
@@ -231,7 +231,7 @@ function WeightMode() {
       </div>
       <ul className="flex flex-col gap-1">
         {WEIGHT_CRITERIA.map((c) => (
-          <li key={c} className="grid grid-cols-[7.5rem_1fr_3rem] items-center gap-4 py-1.5 sm:grid-cols-[9rem_1fr_3.5rem]">
+          <li key={c} className="grid grid-cols-[6.5rem_1fr_2.75rem] items-center gap-2.5 py-1.5 sm:grid-cols-[9rem_1fr_3.5rem] sm:gap-4">
             <span id={`w-${c}`} className="type-small text-text">
               {priorityLabel(c)}
             </span>

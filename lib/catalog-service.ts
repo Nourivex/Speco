@@ -1,5 +1,6 @@
 import rawCatalog from "@/data/devices-catalog.json";
 import { supabase } from "@/lib/supabase";
+import { getPartnerStoreByBrand, PartnerStore } from "@/lib/partner-stores";
 
 export interface CatalogLaptop {
   ID_Perangkat: string;
@@ -22,6 +23,10 @@ export interface CatalogLaptop {
   Pros_Kelebihan: string;
   Cons_Kekurangan: string;
   Link_Gambar: string;
+  // Relasi toko mitra resmi brand
+  partnerStoreId: string;
+  isOfficialBrandPartner: boolean;
+  partnerStore: PartnerStore;
   // Computed fields
   numericPrice: number;
   numericRam: number;
@@ -34,19 +39,36 @@ export interface CatalogLaptop {
   };
 }
 
-// Parsing awal 450 laptop dengan data numerik terstandardisasi
+// Parsing awal 450 laptop dengan data numerik terstandardisasi & relasi toko mitra resmi
 export const catalogLaptops: CatalogLaptop[] = (rawCatalog as any[]).map((item) => {
   const numericPrice = parseFloat(String(item.Estimasi_Harga_Pasar_IDR || "0").replace(/[^0-9.]/g, "")) || 0;
   const numericRam = parseInt(String(item.RAM_GB || "8").replace(/[^0-9]/g, ""), 10) || 8;
   const numericWeight = parseFloat(String(item.Bobot_kg || "1.5").replace(/[^0-9.]/g, "")) || 1.5;
+  const partnerStore = getPartnerStoreByBrand(item.Brand || "", item.partner_store_id);
 
   return {
     ...item,
+    partnerStoreId: partnerStore.id,
+    isOfficialBrandPartner: partnerStore.isOfficialPartner,
+    partnerStore,
     numericPrice,
     numericRam,
     numericWeight,
   };
 });
+
+function matchesBrandOrPartner(item: CatalogLaptop, brandFilter?: string): boolean {
+  if (!brandFilter || brandFilter === "all") return true;
+  const f = brandFilter.trim().toLowerCase();
+  if (f === "local" || f === "lokal") {
+    return ["axioo", "advan", "zyrex"].includes((item.Brand || "").toLowerCase());
+  }
+  return (
+    (item.Brand || "").toLowerCase() === f ||
+    item.partnerStoreId.toLowerCase() === f ||
+    item.partnerStore.slug.toLowerCase() === f
+  );
+}
 
 /**
  * Filter dan Ranking laptop dengan algoritma SAW sesuai docs/ARCHITECTURE.md
@@ -75,9 +97,9 @@ export function getRecommendedForSimulator(
     // Berikan kelonggaran jika budget tinggi
     if (l.numericPrice < minBudget) return false;
 
-    // Filter Brand opsional
-    if (brandFilter && brandFilter !== "all") {
-      if (l.Brand.toLowerCase() !== brandFilter.toLowerCase()) return false;
+    // Filter Brand / Toko Mitra Resmi opsional
+    if (!matchesBrandOrPartner(l, brandFilter)) {
+      return false;
     }
 
     // Filter Tambahan Kebutuhan Kampus
@@ -106,15 +128,19 @@ export function getRecommendedForSimulator(
     return true;
   });
 
-  // Jika terlalu sedikit karena filter ketat, ambil kandidat terdekat dengan budget
+  // Jika terlalu sedikit karena filter ketat, ambil kandidat terdekat sambil tetap menghormati filter brand/toko mitra
   if (candidates.length < 3) {
-    candidates = catalogLaptops
-      .filter((l) => l.numericPrice > 0 && Math.abs(l.numericPrice - budget) < budget * 0.5)
-      .slice(0, 15);
+    const brandScoped = catalogLaptops.filter((l) => l.numericPrice > 0 && matchesBrandOrPartner(l, brandFilter));
+    const closeByBudget = brandScoped
+      .sort((a, b) => Math.abs(a.numericPrice - budget) - Math.abs(b.numericPrice - budget))
+      .slice(0, 12);
+    if (closeByBudget.length > 0) {
+      candidates = closeByBudget;
+    }
   }
 
   if (candidates.length === 0) {
-    candidates = catalogLaptops.slice(0, 10);
+    candidates = catalogLaptops.filter((l) => matchesBrandOrPartner(l, brandFilter)).slice(0, 10);
   }
 
   // 3. Normalisasi Matriks & SAW Preference Value

@@ -42,7 +42,7 @@ export function MajorStep() {
   const setMajor = useProfileStore((s) => s.setMajor)
 
   return (
-    <div role="group" aria-labelledby="step-question" className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+    <div role="group" aria-labelledby="step-question" className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
       {options.majors.map((m) => (
         <SelectCard
           key={m.id}
@@ -69,7 +69,7 @@ export function ActivityStep() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div role="group" aria-labelledby="step-question" className="grid grid-cols-2 gap-3 md:grid-cols-3">
+      <div role="group" aria-labelledby="step-question" className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:grid-cols-3">
         {options.activities.map((a) => (
           <SelectCard
             key={a.id}

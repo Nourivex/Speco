@@ -43,6 +43,7 @@ import { UserProfileMenu } from "@/components/landing/user-profile-menu";
 import { BrandModal } from "@/components/landing/brand-modal";
 import { BrandIcon } from "@/components/ui/brand-icon";
 import { supabase, isAdminUser } from "@/lib/supabase";
+import { getAllPartnerStores, getPartnerStoreByBrand } from "@/lib/partner-stores";
 
 // Data Tier Budget Hero
 const HERO_TIERS = [
@@ -122,6 +123,7 @@ export function StitchLanding() {
     dedicatedGpu: false,
     warranty2Plus: false,
   });
+  const [selectedPartnerBrand, setSelectedPartnerBrand] = React.useState<string>("all");
   const [simulatorPage, setSimulatorPage] = React.useState(0);
 
   // Kuis Teaser State
@@ -232,12 +234,18 @@ export function StitchLanding() {
   // Data Tier & Showcase Hero
   const activeTier = HERO_TIERS[activeTierIdx];
   const activeHeroModel = HERO_SHOWCASE_MODELS[activeTierIdx] || HERO_SHOWCASE_MODELS[3];
+  const activeHeroPartner = getPartnerStoreByBrand(activeHeroModel.brand);
   const activeWorkloadData = WORKLOADS.find((w) => w.id === selectedWorkload) || WORKLOADS[0];
+  const allPartnerStores = React.useMemo(() => getAllPartnerStores(), []);
+  const activePartnerStore =
+    selectedPartnerBrand !== "all" && selectedPartnerBrand !== "local"
+      ? getPartnerStoreByBrand(selectedPartnerBrand)
+      : null;
 
   // Hasil Rekomendasi Simulator Dinamis (menggunakan algoritma SAW dari 450 laptop)
   const simulatorRecommendations = React.useMemo(() => {
-    return getRecommendedForSimulator(budget, selectedWorkload, campusFilters);
-  }, [budget, selectedWorkload, campusFilters]);
+    return getRecommendedForSimulator(budget, selectedWorkload, campusFilters, selectedPartnerBrand);
+  }, [budget, selectedWorkload, campusFilters, selectedPartnerBrand]);
 
   // Pagination 3 item per halaman
   const totalPages = Math.ceil(simulatorRecommendations.length / 3);
@@ -276,17 +284,17 @@ export function StitchLanding() {
           1. STICKY MODERN HEADER
       ============================================================================== */}
       <header className="fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
-        <div className="h-[74px] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+        <div className="h-[68px] sm:h-[74px] max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-3">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-4 2xl:gap-6 min-w-0">
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
+          <div className="flex items-center gap-3 2xl:gap-6 min-w-0">
+            <Link href="/" className="flex items-center gap-2 group shrink-0">
               <Image
                 src="/brand/speco-logo.png"
                 alt="SPECO Indonesia"
                 width={136}
                 height={48}
                 priority
-                className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
+                className="h-7 sm:h-9 w-auto object-contain transition-transform group-hover:scale-105"
               />
             </Link>
 
@@ -322,7 +330,7 @@ export function StitchLanding() {
                 href="#katalog-brand"
                 className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all rounded-lg whitespace-nowrap"
               >
-                Katalog Brand
+                Mitra Brand
               </a>
               <Link
                 href="/docs"
@@ -335,14 +343,14 @@ export function StitchLanding() {
           </div>
 
           {/* Right Action Tools */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Quick Search Trigger (Tetap ringkas, modal terbuka hanya saat diklik / ⌘K) */}
             <button
               type="button"
               onClick={() => setIsSearchOpen(true)}
               title="Cari tipe, spek, atau budget (⌘K)"
               aria-label="Pencarian Cepat Laptop (⌘K)"
-              className="flex items-center justify-center w-10 h-10 bg-slate-100/90 hover:bg-white border border-slate-200 hover:border-emerald-400 rounded-xl text-slate-600 hover:text-emerald-700 transition-all shadow-2xs group shrink-0"
+              className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-slate-100/90 hover:bg-white border border-slate-200 hover:border-emerald-400 rounded-xl text-slate-600 hover:text-emerald-700 transition-all shadow-2xs group shrink-0"
             >
               <MagnifyingGlassIcon className="w-4 h-4 text-slate-500 group-hover:text-emerald-700 transition-colors" />
             </button>
@@ -351,7 +359,7 @@ export function StitchLanding() {
             <button
               type="button"
               onClick={() => setIsBookmarksOpen(true)}
-              className="flex items-center gap-2 h-10 px-3 sm:px-3.5 bg-white border border-slate-200 rounded-xl text-slate-800 hover:bg-slate-50 hover:border-emerald-300 transition-all shadow-2xs shrink-0"
+              className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2.5 sm:px-3.5 bg-white border border-slate-200 rounded-xl text-slate-800 hover:bg-slate-50 hover:border-emerald-300 transition-all shadow-2xs shrink-0"
             >
               <BookmarkSimpleIcon weight="fill" className="text-emerald-600 w-4 h-4" />
               <span className="text-xs font-bold hidden sm:inline">Riwayat</span>
@@ -365,14 +373,14 @@ export function StitchLanding() {
               <button
                 type="button"
                 onClick={() => setIsProfileOpen((prev) => !prev)}
-                className="flex items-center gap-2 h-10 px-2.5 sm:px-3 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-400 transition-colors"
+                className="flex items-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-2 sm:px-3 bg-white border border-slate-200 rounded-xl shadow-2xs hover:border-emerald-400 transition-colors"
               >
                 {currentUser ? (
                   <>
                     <div className="w-6 h-6 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-[11px] font-black shadow-2xs">
                       {currentUser.role === "admin" ? "MA" : (currentUser.name || "U").slice(0, 2).toUpperCase()}
                     </div>
-                    <div className="flex items-center gap-1 max-w-[80px] sm:max-w-none">
+                    <div className="hidden xs:flex sm:flex items-center gap-1 max-w-[70px] sm:max-w-none">
                       <span className="text-xs text-slate-900 font-bold leading-tight truncate">
                         {currentUser.role === "admin" ? "M. Affif" : currentUser.name}
                       </span>
@@ -402,19 +410,44 @@ export function StitchLanding() {
             {/* Primary Action Button */}
             <Link
               href="/rekomendasi/budget"
-              className="h-10 px-3.5 sm:px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/15 flex items-center gap-1.5 transition-all hover:-translate-y-0.5 shrink-0"
+              className="h-9 sm:h-10 px-3 sm:px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/15 flex items-center gap-1.5 transition-all hover:-translate-y-0.5 shrink-0"
             >
               <span>Mulai</span>
               <ArrowRightIcon weight="bold" className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
+
+        {/* Mobile & Tablet Quick Navigation Strip */}
+        <nav
+          aria-label="Navigasi cepat mobile"
+          className="xl:hidden border-t border-slate-100 bg-white/95 px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto scrollbar-none text-[11px]"
+        >
+          <a href="#beranda" className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold whitespace-nowrap shrink-0">
+            Beranda
+          </a>
+          <a href="#simulasi-budget" className="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold whitespace-nowrap shrink-0">
+            Simulasi Budget
+          </a>
+          <a href="#katalog-brand" className="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold whitespace-nowrap shrink-0">
+            Mitra Brand
+          </a>
+          <Link href="/bandingkan" className="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold whitespace-nowrap shrink-0">
+            Komparasi
+          </Link>
+          <Link href="/dashboard" className="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100 font-semibold whitespace-nowrap shrink-0">
+            Dashboard
+          </Link>
+          <Link href="/docs" className="px-2.5 py-1 rounded-lg text-emerald-800 hover:bg-emerald-50 font-bold whitespace-nowrap shrink-0">
+            Dokumentasi
+          </Link>
+        </nav>
       </header>
 
       {/* ==============================================================================
           2. ATMOSPHERIC HERO SECTION
       ============================================================================== */}
-      <section id="beranda" className="pt-28 pb-16 md:py-24 bg-gradient-to-b from-white via-[#f3faf8] to-[#faf8ff] relative overflow-hidden">
+      <section id="beranda" className="pt-34 pb-14 xl:pt-28 md:py-24 bg-gradient-to-b from-white via-[#f3faf8] to-[#faf8ff] relative overflow-hidden">
         {/* Glow ambient background */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-tr from-emerald-200/40 via-teal-100/30 to-transparent blur-3xl pointer-events-none -z-10" />
 
@@ -439,10 +472,10 @@ export function StitchLanding() {
                 Bukan kata promotor toko, tanpa bias e-commerce.
               </p>
 
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 pt-2 w-full sm:w-auto">
                 <Link
                   href="/rekomendasi/budget"
-                  className="px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-lg shadow-emerald-700/20 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="px-6 py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-lg shadow-emerald-700/20 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <span>Mulai Kuis Diagnosa</span>
                   <ArrowRightIcon weight="bold" className="w-4 h-4" />
@@ -450,7 +483,7 @@ export function StitchLanding() {
 
                 <a
                   href="#simulasi-budget"
-                  className="px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-2xs flex items-center gap-2 transition-all"
+                  className="px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-2xs flex items-center justify-center gap-2 transition-all"
                 >
                   <FadersIcon weight="bold" className="w-4 h-4 text-emerald-700" />
                   <span>Simulasi Budget Langsung</span>
@@ -493,9 +526,9 @@ export function StitchLanding() {
 
             {/* Right Live Benchmark Showcase Card */}
             <div className="lg:col-span-5">
-              <div className="relative bg-white rounded-3xl p-6 shadow-xl border border-slate-200/90 overflow-hidden">
+              <div className="relative bg-white rounded-3xl p-4 sm:p-6 shadow-xl border border-slate-200/90 overflow-hidden">
                 {/* Glow Badge */}
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div className="flex items-center justify-between gap-2 flex-wrap pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="text-xs font-extrabold text-slate-900">
@@ -508,7 +541,7 @@ export function StitchLanding() {
                 </div>
 
                 {/* Hero Showcase Image */}
-                <div className="relative w-full h-48 my-3 rounded-2xl bg-gradient-to-b from-slate-50 to-emerald-50/20 border border-slate-100 flex items-center justify-center p-3 overflow-hidden">
+                <div className="relative w-full h-44 sm:h-48 my-3 rounded-2xl bg-gradient-to-b from-slate-50 to-emerald-50/20 border border-slate-100 flex items-center justify-center p-3 overflow-hidden">
                   <img
                     src={activeHeroModel.image}
                     alt={activeHeroModel.name}
@@ -522,15 +555,26 @@ export function StitchLanding() {
                 {/* Specs Overview */}
                 <div className="space-y-3">
                   <div>
-                    <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                      {activeHeroModel.brand}
-                    </span>
-                    <h3 className="text-lg font-extrabold text-slate-900 leading-snug">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                        {activeHeroModel.brand}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-[10px] font-bold text-sky-900">
+                        <ShieldCheckIcon weight="fill" className="w-3 h-3 text-sky-700" />
+                        <span>{activeHeroPartner.badgeLabel}</span>
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-extrabold text-slate-900 leading-snug mt-0.5">
                       {activeHeroModel.name}
                     </h3>
-                    <p className="text-sm font-black text-slate-900 mt-0.5">
-                      {formatRupiah(activeHeroModel.price)}
-                    </p>
+                    <div className="flex items-center justify-between gap-2 flex-wrap mt-0.5">
+                      <p className="text-sm font-black text-slate-900">
+                        {formatRupiah(activeHeroModel.price)}
+                      </p>
+                      <span className="text-[11px] font-semibold text-slate-500">
+                        {activeHeroPartner.storeName}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-slate-100">
@@ -771,23 +815,94 @@ export function StitchLanding() {
                   </label>
                 </div>
               </div>
+
+              {/* Filter Toko Mitra & Brand Resmi (Skenario Exclusive Brand Dealer) */}
+              <div className="pt-4 border-t border-slate-100 space-y-2.5">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    Filter Toko Mitra & Brand Resmi:
+                  </span>
+                  {selectedPartnerBrand !== "all" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPartnerBrand("all");
+                        setSimulatorPage(0);
+                      }}
+                      className="text-[11px] font-bold text-emerald-700 hover:underline"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+
+                <select
+                  aria-label="Pilih Toko Mitra atau Brand Resmi"
+                  value={selectedPartnerBrand}
+                  onChange={(e) => {
+                    setSelectedPartnerBrand(e.target.value);
+                    setSimulatorPage(0);
+                  }}
+                  className="w-full h-10 px-3 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-800 outline-none focus:border-emerald-600 focus:bg-white"
+                >
+                  <option value="all">Semua Toko Mitra Resmi (17 Brand)</option>
+                  <option value="local">Mitra Brand Lokal Indonesia (Axioo, Advan, Zyrex)</option>
+                  {allPartnerStores.map((store) => (
+                    <option key={store.id} value={store.brandFocus}>
+                      {store.storeName} ({store.brandFocus})
+                    </option>
+                  ))}
+                </select>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { key: "all", label: "Semua" },
+                    { key: "Lenovo", label: "Lenovo Exclusive" },
+                    { key: "ASUS", label: "ASUS Exclusive" },
+                    { key: "Acer", label: "Acer Exclusive" },
+                    { key: "Apple", label: "Apple Campus" },
+                    { key: "local", label: "Lokal ID" },
+                  ].map((opt) => {
+                    const active = selectedPartnerBrand.toLowerCase() === opt.key.toLowerCase();
+                    return (
+                      <button
+                        key={opt.key}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPartnerBrand(opt.key);
+                          setSimulatorPage(0);
+                        }}
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors ${
+                          active
+                            ? "bg-emerald-700 text-white border-emerald-700"
+                            : "bg-white text-slate-600 border-slate-200 hover:border-emerald-300"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* Right Results Column */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="flex items-center justify-between pb-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
                 <div>
                   <h3 className="text-base font-extrabold text-slate-900">
                     Kandidat Terbaik untuk {activeWorkloadData.title}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Ditemukan {simulatorRecommendations.length} laptop dalam batas {formatRupiah(budget)} (+15%)
+                    Ditemukan {simulatorRecommendations.length} laptop{" "}
+                    {activePartnerStore ? `di ${activePartnerStore.storeName} ` : ""}
+                    dalam batas {formatRupiah(budget)} (+15%)
                   </p>
                 </div>
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 self-start sm:self-auto">
                     <button
                       type="button"
                       disabled={simulatorPage === 0}
@@ -811,6 +926,41 @@ export function StitchLanding() {
                 )}
               </div>
 
+              {/* Kartu Identitas Brand Resmi Toko Mitra saat Filter Aktif */}
+              {activePartnerStore && (
+                <div className="p-4 rounded-2xl bg-sky-50/90 border border-sky-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start sm:items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-sky-200 flex items-center justify-center shrink-0 shadow-2xs">
+                      <BrandIcon brand={activePartnerStore.brandFocus} useBrandColor className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-black text-slate-900">
+                          {activePartnerStore.storeName}
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-700 text-white text-[10px] font-black">
+                          <ShieldCheckIcon weight="fill" className="w-3 h-3" />
+                          <span>{activePartnerStore.badgeLabel}</span>
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-sky-900 mt-0.5">
+                        {activePartnerStore.storeTier} • {activePartnerStore.warrantyBenefit}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedPartnerBrand("all");
+                      setSimulatorPage(0);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-sky-200 text-sky-900 text-xs font-bold hover:bg-sky-100/70 shrink-0 self-start sm:self-center"
+                  >
+                    Tampilkan Semua Brand
+                  </button>
+                </div>
+              )}
+
               {/* 3 Matched Laptop Cards */}
               <div className="space-y-3.5">
                 {currentMatchedLaptops.map((item, idx) => {
@@ -821,13 +971,13 @@ export function StitchLanding() {
                   return (
                     <div
                       key={item.ID_Perangkat}
-                      className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-emerald-300 transition-all flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
+                      className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm hover:border-emerald-300 transition-all flex flex-col sm:flex-row gap-4 sm:gap-5 items-stretch sm:items-center justify-between"
                     >
                       {/* Left thumbnail & basic info */}
-                      <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="flex items-start sm:items-center gap-3.5 sm:gap-4 min-w-0 flex-1">
                         <div
                           onClick={() => setQuickViewLaptop(item)}
-                          className="w-20 h-20 rounded-xl bg-slate-50 border border-slate-100 shrink-0 p-2 flex items-center justify-center cursor-pointer overflow-hidden shadow-2xs"
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-slate-50 border border-slate-100 shrink-0 p-2 flex items-center justify-center cursor-pointer overflow-hidden shadow-2xs"
                         >
                           <img
                             src={imgSrc}
@@ -840,7 +990,7 @@ export function StitchLanding() {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-0.5">
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
                             <span className="text-[11px] font-black text-emerald-800 uppercase tracking-wider">
                               {item.Brand}
                             </span>
@@ -849,6 +999,10 @@ export function StitchLanding() {
                                 Lokal ID
                               </span>
                             )}
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-50 text-sky-800 border border-sky-200">
+                              <ShieldCheckIcon weight="fill" className="w-2.5 h-2.5 text-sky-700" />
+                              <span>{item.partnerStore.badgeLabel}</span>
+                            </span>
                             <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-100 text-slate-600">
                               Rank #{simulatorPage * 3 + idx + 1}
                             </span>
@@ -864,16 +1018,19 @@ export function StitchLanding() {
                           <p className="text-xs font-black text-slate-900 mt-0.5">
                             {formatRupiah(item.numericPrice)}
                           </p>
+                          <p className="text-[10px] font-semibold text-slate-500 truncate mt-0.5">
+                            {item.partnerStore.storeName}
+                          </p>
 
                           {/* Quick specs pill */}
                           <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-500 mt-2">
-                            <span className="px-1.5 py-0.5 rounded bg-slate-100 font-semibold truncate max-w-[130px]">
+                            <span className="px-1.5 py-0.5 rounded bg-slate-100 font-semibold truncate max-w-[140px]">
                               {item.Processor_CPU}
                             </span>
                             <span className="px-1.5 py-0.5 rounded bg-slate-100 font-semibold">
                               RAM {item.RAM_GB}GB
                             </span>
-                            <span className="px-1.5 py-0.5 rounded bg-slate-100 font-semibold">
+                            <span className="px-1.5 py-0.5 rounded bg-slate-100 font-semibold truncate max-w-[140px]">
                               {item.Storage_GB_Tipe}
                             </span>
                           </div>
@@ -906,7 +1063,7 @@ export function StitchLanding() {
                           <button
                             type="button"
                             onClick={() => setQuickViewLaptop(item)}
-                            className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors shadow-2xs"
+                            className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-800 text-white font-bold text-xs transition-colors shadow-2xs whitespace-nowrap"
                           >
                             Lihat Spek
                           </button>
@@ -1205,7 +1362,7 @@ export function StitchLanding() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
             {[
               { name: "Axioo", isLocal: true, count: 28, highlight: "Hype Series & Pongo Gaming" },
               { name: "Advan", isLocal: true, count: 22, highlight: "Workplus & Workpro 16:10" },
@@ -1217,37 +1374,47 @@ export function StitchLanding() {
               { name: "MSI", isLocal: false, count: 42, highlight: "Modern & Cyborg Gaming" },
               { name: "HP", isLocal: false, count: 52, highlight: "Pavilion, Victus & Envy" },
               { name: "Dell", isLocal: false, count: 26, highlight: "Inspiron & Vostro Series" },
-            ].map((b) => (
-              <div
-                key={b.name}
-                onClick={() => setSelectedBrandModal(b.name)}
-                className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all cursor-pointer group flex flex-col justify-between h-36"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <BrandIcon brand={b.name} useBrandColor className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
-                      <span className="text-sm font-black text-slate-900 group-hover:text-emerald-800 truncate">
-                        {b.name}
-                      </span>
+            ].map((b) => {
+              const store = getPartnerStoreByBrand(b.name);
+              return (
+                <div
+                  key={b.name}
+                  onClick={() => setSelectedBrandModal(b.name)}
+                  className="p-4 rounded-2xl border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/30 transition-all cursor-pointer group flex flex-col justify-between min-h-[9.5rem]"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <BrandIcon brand={b.name} useBrandColor className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
+                        <span className="text-sm font-black text-slate-900 group-hover:text-emerald-800 truncate">
+                          {b.name}
+                        </span>
+                      </div>
+                      {b.isLocal ? (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase shrink-0">
+                          Lokal
+                        </span>
+                      ) : (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-sky-50 text-sky-800 border border-sky-200 shrink-0">
+                          Official
+                        </span>
+                      )}
                     </div>
-                    {b.isLocal && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase shrink-0">
-                        Lokal
-                      </span>
-                    )}
+                    <p className="text-[10px] font-bold text-sky-900 mt-1.5 truncate">
+                      {store.storeName}
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{b.highlight}</p>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-2 line-clamp-2">{b.highlight}</p>
-                </div>
 
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">{b.count} model</span>
-                  <span className="font-bold text-emerald-700 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
-                    Lihat <ArrowRightIcon className="w-3 h-3" />
-                  </span>
+                  <div className="pt-2 mt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">{b.count} model</span>
+                    <span className="font-bold text-emerald-700 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                      Lihat <ArrowRightIcon className="w-3 h-3" />
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1272,7 +1439,7 @@ export function StitchLanding() {
                 Platform rekomendasi laptop berbasis data dan algoritma SAW untuk mahasiswa Indonesia.
                 Dibuat oleh TIM SPECO (Kelompok 7A) untuk Mata Kuliah Rekayasa Perangkat Lunak - Universitas Harkat Negeri.
               </p>
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold">
                   Algoritma Bebas Afiliasi Toko
                 </span>

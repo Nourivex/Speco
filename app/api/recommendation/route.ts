@@ -9,6 +9,8 @@ export async function POST(req: NextRequest) {
       budgetMin: body.budgetMin ? Number(body.budgetMin) : undefined,
       persona: body.persona || (body.major ? mapMajorToPersona(body.major) : "informatika"),
       needs: body.needs || body.activities || [],
+      brand: body.brand || undefined,
+      partnerStoreId: body.partnerStoreId || body.partner_store_id || undefined,
       limit: body.limit ? Number(body.limit) : 10,
     };
 
@@ -21,10 +23,12 @@ export async function POST(req: NextRequest) {
       data: {
         total: results.length,
         persona: query.persona,
+        brandFilter: query.brand || null,
+        partnerStoreId: query.partnerStoreId || null,
         recommendations: results,
       },
       meta: {
-        system_name: "Speco",
+        system_name: process.env.NEXT_PUBLIC_BRAND_NAME || "SPECO",
         engine: "Next.js Native SAW Engine",
         dataset_records: 450,
         timestamp: new Date().toISOString(),
@@ -37,7 +41,7 @@ export async function POST(req: NextRequest) {
         status_code: 500,
         message: "Gagal memproses rekomendasi SPK SAW: " + (error?.message || "Unknown error"),
         meta: {
-          system_name: "Speco",
+          system_name: process.env.NEXT_PUBLIC_BRAND_NAME || "SPECO",
           timestamp: new Date().toISOString(),
         },
       },

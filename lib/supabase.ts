@@ -48,6 +48,8 @@ export interface SupabaseLaptop {
   pros?: string;
   cons?: string;
   device_type?: string;
+  partner_store_id?: string;
+  is_official_brand_partner?: boolean;
   created_at?: string;
   updated_at?: string;
 }

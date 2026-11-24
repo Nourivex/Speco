@@ -6,12 +6,14 @@ import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight"
 import { ArrowsLeftRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowsLeftRight"
 import { BookmarkSimpleIcon } from "@phosphor-icons/react/dist/ssr/BookmarkSimple"
 import { CheckIcon } from "@phosphor-icons/react/dist/ssr/Check"
+import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck"
 import { WarningIcon } from "@phosphor-icons/react/dist/ssr/Warning"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { LaptopRender } from "@/components/ui/laptop-render"
 import { ScoreRing } from "@/components/results/score-ring"
 import { formatRupiah, formatStorage, formatWeight } from "@/lib/format"
+import { getPartnerStoreByBrand } from "@/lib/partner-stores"
 import type { Laptop, RecommendationResult, ResultCategory } from "@/types"
 
 // PRD §23 Laptop Card ★: Best Match (besar), Default, Compact ·
@@ -125,6 +127,7 @@ function LaptopCard({
   const name = `${laptop.brand} ${laptop.model}`
   const shownCategory = category === null ? undefined : (category ?? result.category)
   const href = `/laptop/${laptop.slug}`
+  const partnerStore = laptop.partnerStore || getPartnerStoreByBrand(laptop.brand)
 
   const frame = cn(
     "group/card relative rounded-card border bg-bg transition-[transform,box-shadow,border-color] duration-150 ease-out",
@@ -216,6 +219,10 @@ function LaptopCard({
                     {categoryLabels[shownCategory]}
                   </span>
                 )}
+                <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-800 px-2.5 py-0.5 type-micro text-white">
+                  <ShieldCheckIcon weight="fill" className="size-3.5" aria-hidden="true" />
+                  {partnerStore.badgeLabel}
+                </span>
                 {compared && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-cobalt-800 px-2.5 py-0.5 type-micro text-white">
                     <ArrowsLeftRightIcon weight="bold" className="size-3.5" aria-hidden="true" /> Di daftar banding
@@ -311,6 +318,10 @@ function LaptopCard({
           <div className="flex flex-col gap-1.5">
             <div className="flex flex-wrap gap-1.5">
               {shownCategory && <Chip tone="primary">{categoryLabels[shownCategory]}</Chip>}
+              <Chip tone="muted">
+                <ShieldCheckIcon weight="fill" className="size-3.5 text-info" aria-hidden="true" />
+                {partnerStore.badgeLabel}
+              </Chip>
               {stateBadges}
             </div>
             {result.categoryReason && <p className="type-small font-normal text-text">{result.categoryReason}</p>}

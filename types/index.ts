@@ -1,3 +1,5 @@
+import type { PartnerStore } from "@/lib/partner-stores";
+
 // Tipe domain SPECO (nama kode: NEXORA). Field mengikuti PRD §29 (skema kartu Modul 2 Trello)
 // supaya nanti tinggal disambung ke REST API tanpa mengubah komponen.
 
@@ -74,6 +76,8 @@ export interface Laptop {
   /** Render ilustrasi yang mewakili laptop ini; URL per sudut disusun `lib/laptop-image.ts`. */
   image: { shape: LaptopShape; color: LaptopColor };
   marketplaceUrl: string;
+  partnerStore?: PartnerStore;
+  isOfficialBrandPartner?: boolean;
   isMock?: boolean;
 }
 

@@ -116,9 +116,9 @@ export function BudgetSlider({
         </div>
 
         {showInput && (
-          <label className="flex flex-col gap-1 sm:text-right">
+          <label className="flex flex-col gap-1 w-full sm:w-auto sm:text-right">
             <span className="text-xs font-bold text-slate-500">Atau ketik angka manual</span>
-            <span className="flex h-11 items-center rounded-xl border border-slate-300 bg-white px-3 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 shadow-2xs">
+            <span className="flex h-11 w-full sm:w-auto items-center justify-between sm:justify-start rounded-xl border border-slate-300 bg-white px-3 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-500/20 shadow-2xs">
               <span className="text-xs font-bold text-slate-400 mr-1.5" aria-hidden="true">
                 Rp
               </span>
@@ -126,7 +126,7 @@ export function BudgetSlider({
                 id={`${id}-input`}
                 inputMode="numeric"
                 autoComplete="off"
-                className="w-32 bg-transparent text-right font-black text-sm text-slate-900 outline-none"
+                className="flex-1 min-w-0 sm:w-32 bg-transparent text-right font-black text-sm text-slate-900 outline-none"
                 value={draft ?? new Intl.NumberFormat("id-ID").format(value)}
                 onChange={(e) => setDraft(e.target.value)}
                 onBlur={commitDraft}

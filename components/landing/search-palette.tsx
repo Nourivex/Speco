@@ -11,6 +11,7 @@ import { BookmarkSimpleIcon } from "@phosphor-icons/react/dist/ssr/BookmarkSimpl
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import { formatRupiah } from "@/lib/format";
 import { searchCatalog, getLaptopImage, CatalogLaptop } from "@/lib/catalog-service";
+import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 
 interface SearchPaletteProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ export function SearchPalette({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-start justify-center p-4 sm:p-6 md:p-20 overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-6 md:p-20 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -160,10 +161,10 @@ export function SearchPalette({
                 return (
                   <div
                     key={item.ID_Perangkat}
-                    className="group flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-emerald-50/50 transition-colors cursor-pointer"
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 p-3 rounded-xl hover:bg-emerald-50/50 transition-colors cursor-pointer"
                     onClick={() => onSelectLaptop(item)}
                   >
-                    <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
                       {/* Image Thumbnail */}
                       <div className="relative w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 shrink-0 overflow-hidden flex items-center justify-center">
                         <img
@@ -178,7 +179,7 @@ export function SearchPalette({
 
                       {/* Info */}
                       <div className="min-w-0 flex flex-col">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-xs font-extrabold text-slate-900 truncate">
                             {item.Brand} {item.Model_Seri}
                           </span>
@@ -187,20 +188,24 @@ export function SearchPalette({
                               Lokal ID
                             </span>
                           )}
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-50 text-sky-800 border border-sky-200 shrink-0">
+                            <ShieldCheckIcon weight="fill" className="w-2.5 h-2.5 text-sky-700" />
+                            <span>Official Brand Partner</span>
+                          </span>
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5 truncate">
+                        <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5 truncate">
                           <span className="truncate">{item.Processor_CPU}</span>
                           <span>•</span>
-                          <span>RAM {item.RAM_GB}GB</span>
-                          <span>•</span>
-                          <span className="truncate">{item.Layar_Ukuran_Panel_ColorGamut}</span>
+                          <span className="shrink-0">RAM {item.RAM_GB}GB</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="hidden sm:inline truncate">{item.Layar_Ukuran_Panel_ColorGamut}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Price & Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="text-right">
+                    <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pl-15 sm:pl-0">
+                      <div className="text-left sm:text-right">
                         <span className="text-xs font-black text-emerald-800 block">
                           {formatRupiah(item.numericPrice)}
                         </span>

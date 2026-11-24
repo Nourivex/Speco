@@ -16,6 +16,7 @@ import {
   software,
 } from "@/data/options";
 import { checkScenarios } from "@/lib/mock-check";
+import { getPartnerStoreByBrand } from "@/lib/partner-stores";
 import type {
   BudgetPreset,
   BudgetPresetId,
@@ -190,6 +191,16 @@ export interface RecommendationSet {
   isMock?: boolean;
 }
 
+function withPartnerStore(laptop: Laptop): Laptop {
+  if (laptop.partnerStore) return laptop;
+  const partnerStore = getPartnerStoreByBrand(laptop.brand);
+  return {
+    ...laptop,
+    partnerStore,
+    isOfficialBrandPartner: partnerStore.isOfficialPartner,
+  };
+}
+
 export async function getRecommendations(profile: UserProfile, options?: ApiOptions): Promise<RecommendationSet> {
   if (API_URL && !options?.mock) {
     try {
@@ -213,7 +224,7 @@ export async function getRecommendations(profile: UserProfile, options?: ApiOpti
       ? []
       : scenario.results.map((result) => ({
           result,
-          laptop: laptops.find((l) => l.id === result.laptopId)!,
+          laptop: withPartnerStore(laptops.find((l) => l.id === result.laptopId)!),
         }));
   return respond(
     {
@@ -260,7 +271,8 @@ export async function getLaptop(slug: string, options?: ApiOptions): Promise<Lap
       console.warn(`Backend /laptops/${slug} unreachable, falling back to local:`, e);
     }
   }
-  return respond(laptops.find((l) => l.slug === slug) ?? null, options);
+  const found = laptops.find((l) => l.slug === slug) ?? null;
+  return respond(found ? withPartnerStore(found) : null, options);
 }
 
 export async function getLaptops(ids: string[], options?: ApiOptions): Promise<Laptop[]> {
@@ -274,7 +286,10 @@ export async function getLaptops(ids: string[], options?: ApiOptions): Promise<L
   }
   const byId = new Map(laptops.map((l) => [l.id, l]));
   return respond(
-    ids.map((id) => byId.get(id)).filter((l): l is Laptop => Boolean(l)),
+    ids
+      .map((id) => byId.get(id))
+      .filter((l): l is Laptop => Boolean(l))
+      .map(withPartnerStore),
     options
   );
 }

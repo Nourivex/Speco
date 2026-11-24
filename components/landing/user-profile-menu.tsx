@@ -78,7 +78,7 @@ export function UserProfileMenu({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.95 }}
         transition={{ duration: 0.15 }}
-        className="absolute top-full right-0 mt-2 w-84 bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-4.5 z-50 text-left"
+        className="fixed inset-x-3 top-20 sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-80 max-w-[calc(100vw-1.5rem)] bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-4 sm:p-4.5 z-50 text-left max-h-[80vh] overflow-y-auto"
       >
         {/* Header User / Status */}
         <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">

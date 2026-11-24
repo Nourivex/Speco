@@ -33,6 +33,7 @@ import {
   catalogLaptops,
   CatalogLaptop,
 } from "@/lib/catalog-service";
+import { getPartnerStoreByBrand } from "@/lib/partner-stores";
 import {
   getLaptopsFromSupabase,
   insertLaptopToSupabase,
@@ -223,31 +224,37 @@ export default function AdminPage() {
       try {
         const data = await getLaptopsFromSupabase();
         if (data && data.length > 0) {
-          const mapped: CatalogLaptop[] = data.map((d) => ({
-            ID_Perangkat: d.id,
-            Kategori_Target: d.category || "Mahasiswa",
-            Target_Mahasiswa_Jurusan: d.major_target || "Semua Jurusan",
-            Brand: d.brand,
-            Model_Seri: d.model,
-            Tipe_Perangkat: d.device_type || (d.model.toLowerCase().includes("mini") ? "Mini PC" : "Laptop"),
-            Processor_CPU: d.cpu,
-            Kartu_Grafis_GPU: d.gpu,
-            RAM_GB: d.ram_gb,
-            Upgradeable_RAM: d.ram_upgradable ? "Ya" : "Tidak",
-            Storage_GB_Tipe: d.storage,
-            Layar_Ukuran_Panel_ColorGamut: d.display,
-            Bobot_kg: d.weight_kg,
-            Estimasi_Harga_Pasar_IDR: d.price_idr,
-            Platform_Rekomendasi_Beli: d.buy_url || "Tokopedia",
-            Status_Garansi_Resmi: d.warranty || "Resmi",
-            Rekomendasi_UseCase_Tag: d.usecase_tag || "#kuliah",
-            Pros_Kelebihan: d.pros || "",
-            Cons_Kekurangan: d.cons || "",
-            Link_Gambar: d.image_url || "",
-            numericPrice: Number(d.price_idr) || 0,
-            numericRam: Number(d.ram_gb) || 8,
-            numericWeight: Number(d.weight_kg) || 1.4,
-          }));
+          const mapped: CatalogLaptop[] = data.map((d) => {
+            const partnerStore = getPartnerStoreByBrand(d.brand);
+            return {
+              ID_Perangkat: d.id,
+              Kategori_Target: d.category || "Mahasiswa",
+              Target_Mahasiswa_Jurusan: d.major_target || "Semua Jurusan",
+              Brand: d.brand,
+              Model_Seri: d.model,
+              Tipe_Perangkat: d.device_type || (d.model.toLowerCase().includes("mini") ? "Mini PC" : "Laptop"),
+              Processor_CPU: d.cpu,
+              Kartu_Grafis_GPU: d.gpu,
+              RAM_GB: d.ram_gb,
+              Upgradeable_RAM: d.ram_upgradable ? "Ya" : "Tidak",
+              Storage_GB_Tipe: d.storage,
+              Layar_Ukuran_Panel_ColorGamut: d.display,
+              Bobot_kg: d.weight_kg,
+              Estimasi_Harga_Pasar_IDR: d.price_idr,
+              Platform_Rekomendasi_Beli: d.buy_url || "Tokopedia",
+              Status_Garansi_Resmi: d.warranty || "Resmi",
+              Rekomendasi_UseCase_Tag: d.usecase_tag || "#kuliah",
+              Pros_Kelebihan: d.pros || "",
+              Cons_Kekurangan: d.cons || "",
+              Link_Gambar: d.image_url || "",
+              numericPrice: Number(d.price_idr) || 0,
+              numericRam: Number(d.ram_gb) || 8,
+              numericWeight: Number(d.weight_kg) || 1.4,
+              partnerStoreId: d.partner_store_id ?? partnerStore?.id ?? null,
+              isOfficialBrandPartner: Boolean(d.is_official_brand_partner ?? partnerStore),
+              partnerStore,
+            };
+          });
           setLaptops(mapped);
         }
       } catch (err) {
@@ -534,6 +541,7 @@ export default function AdminPage() {
     setLoading(true);
 
     try {
+      const partnerStore = getPartnerStoreByBrand(formData.Brand);
       const itemToSave: CatalogLaptop = {
         ID_Perangkat: formData.ID_Perangkat,
         Kategori_Target: formData.Kategori_Target,
@@ -558,6 +566,9 @@ export default function AdminPage() {
         numericPrice: Number(formData.Estimasi_Harga_Pasar_IDR) || 0,
         numericRam: Number(formData.RAM_GB) || 8,
         numericWeight: Number(formData.Bobot_kg) || 1.4,
+        partnerStoreId: partnerStore?.id ?? null,
+        isOfficialBrandPartner: Boolean(partnerStore),
+        partnerStore,
       };
 
       if (isSupabaseConfigured) {
@@ -1094,34 +1105,34 @@ export default function AdminPage() {
           ? "bg-slate-900/90 border-slate-800/80"
           : "bg-white/90 border-slate-200/80"
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-17 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-17 flex items-center justify-between gap-2 sm:gap-4">
           {/* Left: Brand + Staff Engine Badge + Separator + Supabase Status */}
-          <div className="flex items-center gap-3.5 shrink-0">
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 shrink-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
               <Image
                 src="/brand/speco-logo.png"
                 alt="SPECO"
                 width={112}
                 height={38}
                 priority
-                className={`h-8 w-auto object-contain transition-transform group-hover:scale-105 ${
+                className={`h-7 sm:h-8 w-auto object-contain transition-transform group-hover:scale-105 ${
                   isDark ? "brightness-0 invert" : ""
                 }`}
               />
             </Link>
 
             {/* Staff Engine Badge */}
-            <div className={`px-2.5 py-1 rounded-xl text-[10px] font-black tracking-wider uppercase leading-tight border flex flex-col items-center justify-center shrink-0 ${
+            <div className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[9px] sm:text-[10px] font-black tracking-wider uppercase leading-tight border flex flex-col items-center justify-center shrink-0 ${
               isDark
                 ? "bg-emerald-950/70 text-emerald-400 border-emerald-500/30"
                 : "bg-emerald-100 text-emerald-800 border-emerald-200"
             }`}>
               <span>STAFF</span>
-              <span>ENGINE</span>
+              <span className="hidden sm:inline">ENGINE</span>
             </div>
 
             {/* Vertical Separator */}
-            <span className={`h-6 w-px shrink-0 ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+            <span className={`hidden md:block h-6 w-px shrink-0 ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
 
             {/* Realtime Supabase Connection Status */}
             <div className="hidden md:flex items-center gap-2 text-xs font-mono shrink-0">
@@ -1140,11 +1151,11 @@ export default function AdminPage() {
           </div>
 
           {/* Right: Actions Group */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             {/* Theme Toggle Pill */}
             <button
               onClick={toggleTheme}
-              className={`h-9 px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all cursor-pointer shrink-0 shadow-2xs whitespace-nowrap ${
+              className={`h-9 px-2.5 sm:px-3.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all cursor-pointer shrink-0 shadow-2xs whitespace-nowrap ${
                 isDark
                   ? "bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700"
                   : "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
@@ -1152,7 +1163,7 @@ export default function AdminPage() {
               title={isDark ? "Ganti ke Mode Terang (Light Mode)" : "Ganti ke Mode Gelap (Dark Mode)"}
             >
               {isDark ? <SunIcon className="w-4 h-4 text-amber-400 shrink-0" /> : <MoonIcon className="w-4 h-4 text-slate-600 shrink-0" />}
-              <span className="font-semibold">{isDark ? "Terang" : "Gelap"}</span>
+              <span className="hidden sm:inline font-semibold">{isDark ? "Terang" : "Gelap"}</span>
             </button>
 
             {/* Unified Data Actions Group: Impor Excel | Ekspor Excel | SQL */}
@@ -1209,10 +1220,11 @@ export default function AdminPage() {
             {/* Tambah Perangkat Primary CTA */}
             <button
               onClick={handleAddNewClick}
-              className="h-9 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-2 transition-all shadow-md shadow-emerald-700/20 hover:shadow-lg hover:shadow-emerald-700/30 cursor-pointer shrink-0 whitespace-nowrap"
+              className="h-9 px-3 sm:px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-extrabold flex items-center gap-1.5 sm:gap-2 transition-all shadow-md shadow-emerald-700/20 hover:shadow-lg hover:shadow-emerald-700/30 cursor-pointer shrink-0 whitespace-nowrap"
             >
               <PlusIcon weight="bold" className="w-4 h-4 shrink-0" />
-              <span>Tambah Perangkat</span>
+              <span className="sm:hidden">Tambah</span>
+              <span className="hidden sm:inline">Tambah Perangkat</span>
             </button>
 
             {/* Logout Button */}
@@ -1232,7 +1244,44 @@ export default function AdminPage() {
       </header>
 
       {/* 2. BODY WORKSPACE */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-5 sm:space-y-6">
+        {/* Mobile Quick Data Actions Row */}
+        <div className={`flex sm:hidden items-center justify-between gap-2 p-2 rounded-2xl border shadow-2xs ${
+          isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+        }`}>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`flex-1 h-9 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${
+              isDark ? "hover:bg-slate-800 text-slate-200" : "hover:bg-slate-100 text-slate-700"
+            }`}
+          >
+            <UploadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span>Impor</span>
+          </button>
+          <span className={`h-4 w-px ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+          <button
+            type="button"
+            onClick={handleExportXLSX}
+            className={`flex-1 h-9 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${
+              isDark ? "hover:bg-slate-800 text-slate-200" : "hover:bg-slate-100 text-slate-700"
+            }`}
+          >
+            <DownloadSimpleIcon className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span>Excel</span>
+          </button>
+          <span className={`h-4 w-px ${isDark ? "bg-slate-800" : "bg-slate-200"}`} />
+          <button
+            type="button"
+            onClick={handleExportSQL}
+            className={`flex-1 h-9 px-2.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-1.5 ${
+              isDark ? "hover:bg-slate-800 text-slate-200" : "hover:bg-slate-100 text-slate-700"
+            }`}
+          >
+            <DatabaseIcon className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+            <span>SQL</span>
+          </button>
+        </div>
         {/* Status Toast Alert */}
         {statusMsg && (
           <div className={`p-4 rounded-2xl border text-xs font-semibold flex items-center justify-between shadow-xs ${
@@ -1248,7 +1297,7 @@ export default function AdminPage() {
         )}
 
         {/* 4-BENTO METRIC OVERVIEW */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className={`rounded-3xl p-5 border shadow-xs transition-colors ${
             isDark ? "bg-slate-900/80 border-slate-800" : "bg-white border-slate-200/90"
           }`}>
@@ -1461,7 +1510,7 @@ export default function AdminPage() {
         }`}>
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
             {/* Type Filter Pills */}
-            <div className={`flex items-center gap-1.5 p-1 rounded-2xl border self-start ${
+            <div className={`flex flex-wrap items-center gap-1.5 p-1 rounded-2xl border self-start max-w-full ${
               isDark ? "bg-slate-950 border-slate-800" : "bg-slate-100 border-slate-200"
             }`}>
               <button
@@ -1614,11 +1663,11 @@ export default function AdminPage() {
             </div>
 
             {/* Jurusan Target & Sorting Dropdown */}
-            <div className="ml-auto flex items-center gap-2">
+            <div className="w-full lg:w-auto lg:ml-auto flex flex-wrap items-center gap-2">
               <select
                 value={jurusanFilter}
                 onChange={(e) => { setJurusanFilter(e.target.value); setCurrentPage(1); }}
-                className={`h-9 px-3 rounded-xl border text-xs outline-none ${
+                className={`h-9 flex-1 sm:flex-none min-w-0 px-3 rounded-xl border text-xs outline-none ${
                   isDark ? "bg-slate-950 border-slate-700 text-slate-300" : "bg-white border-slate-300 text-slate-800"
                 }`}
               >
@@ -1633,7 +1682,7 @@ export default function AdminPage() {
               <select
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value as any)}
-                className={`h-9 px-3 rounded-xl border text-xs outline-none ${
+                className={`h-9 flex-1 sm:flex-none min-w-0 px-3 rounded-xl border text-xs outline-none ${
                   isDark ? "bg-slate-950 border-slate-700 text-slate-300" : "bg-white border-slate-300 text-slate-800"
                 }`}
               >
@@ -1668,7 +1717,7 @@ export default function AdminPage() {
               }`}>
                 <tr>
                   {/* Pinned Sticky First Column */}
-                  <th className={`py-4 px-4 sticky left-0 z-20 min-w-[280px] sm:min-w-[320px] shadow-[2px_0_5px_rgba(0,0,0,0.04)] ${
+                  <th className={`py-4 px-3 sm:px-4 sticky left-0 z-20 min-w-[185px] sm:min-w-[280px] lg:min-w-[320px] shadow-[2px_0_5px_rgba(0,0,0,0.04)] ${
                     isDark ? "bg-slate-950 text-white" : "bg-slate-100 text-slate-900 font-extrabold"
                   }`}>
                     Perangkat & Model
@@ -1740,7 +1789,7 @@ export default function AdminPage() {
 
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className={`font-black text-xs truncate max-w-[200px] ${
+                                <span className={`font-black text-xs truncate max-w-[130px] sm:max-w-[200px] ${
                                   isDark ? "text-white" : "text-slate-900"
                                 }`}>
                                   {l.Model_Seri}
@@ -1956,7 +2005,7 @@ export default function AdminPage() {
           <div className={`p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-3 text-xs transition-colors ${
             isDark ? "bg-slate-950 border-slate-800 text-slate-400" : "bg-slate-50 border-slate-200 text-slate-600"
           }`}>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
               <span>Menampilkan {filteredLaptops.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredLaptops.length)} dari {filteredLaptops.length} perangkat</span>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span>Baris per halaman:</span>
@@ -2156,7 +2205,7 @@ export default function AdminPage() {
               </div>
 
               {/* Row 4: RAM, Upgradeable, Bobot */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-slate-500 font-bold mb-1">RAM (GB)</label>
                   <input

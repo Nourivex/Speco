@@ -12,6 +12,7 @@ import { CpuIcon } from "@phosphor-icons/react/dist/ssr/Cpu";
 import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck";
 import { formatRupiah } from "@/lib/format";
 import { getLaptopImage, CatalogLaptop } from "@/lib/catalog-service";
+import { getPartnerStoreByBrand } from "@/lib/partner-stores";
 
 interface LaptopQuickModalProps {
   laptop: CatalogLaptop | null;
@@ -42,10 +43,16 @@ export function LaptopQuickModal({
 
   const imgSrc = getLaptopImage(laptop);
   const isLocal = ["Axioo", "Advan", "Zyrex"].includes(laptop.Brand);
+  const partnerStore = laptop.partnerStore || getPartnerStoreByBrand(laptop.Brand, laptop.partnerStoreId);
+  const officialBuyUrl =
+    laptop.Platform_Rekomendasi_Beli && laptop.Platform_Rekomendasi_Beli.startsWith("http")
+      ? laptop.Platform_Rekomendasi_Beli
+      : partnerStore.storeUrl ||
+        "https://www.tokopedia.com/search?q=" + encodeURIComponent(`${laptop.Brand} ${laptop.Model_Seri}`);
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -64,10 +71,14 @@ export function LaptopQuickModal({
           className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 flex flex-col max-h-[90vh]"
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-slate-50/70">
-            <div className="flex items-center gap-2">
+          <div className="flex items-start sm:items-center justify-between gap-2 px-4 sm:px-5 py-3.5 border-b border-slate-100 bg-slate-50/70">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
               <span className="text-xs font-black text-emerald-800 tracking-wider uppercase">
                 {laptop.Brand}
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-sky-50 text-sky-900 border border-sky-200">
+                <ShieldCheckIcon weight="fill" className="w-3 h-3 text-sky-700" />
+                <span>{partnerStore.badgeLabel}</span>
               </span>
               {isLocal && (
                 <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">
@@ -82,7 +93,7 @@ export function LaptopQuickModal({
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors shrink-0"
             >
               <XIcon className="w-5 h-5" />
             </button>
@@ -123,6 +134,19 @@ export function LaptopQuickModal({
                     <span className="font-bold text-slate-800">Target Jurusan:</span> {laptop.Target_Mahasiswa_Jurusan}
                   </p>
                 )}
+
+                <div className="mt-2.5 p-2.5 rounded-xl bg-sky-50/80 border border-sky-200/80 text-left space-y-1">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-extrabold text-sky-950">
+                      <ShieldCheckIcon weight="fill" className="w-3.5 h-3.5 text-sky-700" />
+                      {partnerStore.storeName}
+                    </span>
+                    <span className="text-[10px] font-bold text-sky-800 bg-white px-2 py-0.5 rounded-full border border-sky-200">
+                      {partnerStore.storeTier}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-sky-900/90 leading-snug">{partnerStore.warrantyBenefit}</p>
+                </div>
               </div>
             </div>
 
@@ -201,7 +225,7 @@ export function LaptopQuickModal({
               <span>{isBookmarked ? "Tersimpan di Riwayat" : "Simpan ke Riwayat"}</span>
             </button>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
               <Link
                 href="/bandingkan"
                 className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold text-center"
@@ -209,12 +233,12 @@ export function LaptopQuickModal({
                 Buka Komparasi
               </Link>
               <a
-                href={laptop.Link_Gambar && laptop.Link_Gambar.startsWith("http") ? laptop.Link_Gambar : "https://www.tokopedia.com/search?q=" + encodeURIComponent(`${laptop.Brand} ${laptop.Model_Seri}`)}
+                href={officialBuyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
               >
-                <span>Cek di Toko Resmi</span>
+                <span>Kunjungi {partnerStore.brandFocus} Partner</span>
                 <ArrowSquareOutIcon weight="bold" className="w-3.5 h-3.5" />
               </a>
             </div>

@@ -15,6 +15,7 @@ import { HardDrivesIcon } from "@phosphor-icons/react/dist/ssr/HardDrives"
 import { MemoryIcon } from "@phosphor-icons/react/dist/ssr/Memory"
 import { MonitorIcon } from "@phosphor-icons/react/dist/ssr/Monitor"
 import { ScalesIcon } from "@phosphor-icons/react/dist/ssr/Scales"
+import { ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr/ShieldCheck"
 import { SparkleIcon } from "@phosphor-icons/react/dist/ssr/Sparkle"
 import { WalletIcon } from "@phosphor-icons/react/dist/ssr/Wallet"
 import { WarningCircleIcon } from "@phosphor-icons/react/dist/ssr/WarningCircle"
@@ -29,6 +30,7 @@ import { LaptopRender } from "@/components/ui/laptop-render"
 import type { RecommendationItem } from "@/lib/api"
 import { formatRupiah, formatStorage } from "@/lib/format"
 import { EASE_OUT } from "@/lib/motion"
+import { getPartnerStoreByBrand } from "@/lib/partner-stores"
 import { useCompareStore } from "@/store/compare"
 
 // Bagian halaman Hasil setelah Best Match (brief Hasil §6–9, §14): alasan, alternatif + filter/urutan,
@@ -131,6 +133,7 @@ export function AlternativeCard({ item, rank, extra, state, index }: { item: Rec
   const { laptop, result } = item
   const name = `${laptop.brand} ${laptop.model}`
   const reduce = useReducedMotion()
+  const partnerStore = laptop.partnerStore || getPartnerStoreByBrand(laptop.brand)
   const badges = [result.category ? categoryLabels[result.category] : null, extra].filter(
     (b, i, all): b is string => !!b && all.indexOf(b) === i
   )
@@ -173,6 +176,10 @@ export function AlternativeCard({ item, rank, extra, state, index }: { item: Rec
               </Link>
             </h3>
             <p className="num type-small text-text-muted">{formatRupiah(laptop.priceIdr)}</p>
+            <p className="inline-flex items-center gap-1 type-micro text-info font-semibold truncate">
+              <ShieldCheckIcon weight="fill" className="size-3.5 shrink-0" aria-hidden="true" />
+              <span className="truncate">{partnerStore.badgeLabel}</span>
+            </p>
           </div>
           <ul className="flex flex-wrap gap-x-3 gap-y-1 type-micro text-text-muted">
             <li className="flex items-center gap-1">
@@ -282,7 +289,10 @@ export function Alternatives({
           <p className="type-body text-text-muted">Masih ragu? Berikut pilihan lain yang sesuai dengan kebutuhanmu.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div role="group" aria-label="Filter merek" className="flex flex-wrap gap-1.5">
+          <div role="group" aria-label="Filter Brand & Toko Mitra Resmi" className="flex flex-wrap items-center gap-1.5">
+            <span className="w-full type-micro font-semibold text-text-muted sm:w-auto sm:mr-1">
+              Filter Brand / Toko Mitra:
+            </span>
             {pill(null, "Semua")}
             {pills.map((b) => pill(b, b))}
             {others.length > 0 && pill(OTHER, "Lainnya")}
@@ -306,6 +316,29 @@ export function Alternatives({
             </span>
           </label>
         </div>
+
+        {brand && brand !== OTHER && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-[16px] border border-info/20 bg-info-soft p-3.5 type-small text-text">
+            <div className="flex items-start sm:items-center gap-2.5 min-w-0">
+              <ShieldCheckIcon weight="fill" className="size-5 shrink-0 text-info mt-0.5 sm:mt-0" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="font-semibold text-text">
+                  {getPartnerStoreByBrand(brand).storeName} - {getPartnerStoreByBrand(brand).badgeLabel}
+                </p>
+                <p className="type-micro font-normal text-text-muted">
+                  {getPartnerStoreByBrand(brand).storeTier} • {getPartnerStoreByBrand(brand).warrantyBenefit}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setBrand(null)}
+              className="self-start sm:self-center type-micro font-semibold text-primary hover:underline shrink-0"
+            >
+              Reset filter
+            </button>
+          </div>
+        )}
       </div>
 
       <p className="sr-only" aria-live="polite">
@@ -361,13 +394,13 @@ export function CompareCta({ fallbackIds }: { fallbackIds: string[] }) {
           Pilih beberapa laptop untuk dibandingkan spesifikasi, kelebihan, dan kekurangannya dalam satu tampilan.
         </p>
       </div>
-      <div className="flex flex-col items-start gap-1.5 sm:items-end">
-        <Button asChild size="lg" className="rounded-[14px] hover:[&_[data-arrow]]:translate-x-1">
+      <div className="flex flex-col items-stretch gap-1.5 sm:items-end w-full sm:w-auto">
+        <Button asChild size="lg" className="w-full sm:w-auto justify-center rounded-[14px] hover:[&_[data-arrow]]:translate-x-1">
           <Link href={compareHref(ids)}>
             Mulai Bandingkan <ArrowRightIcon weight="bold" data-arrow aria-hidden="true" />
           </Link>
         </Button>
-        <span className="type-micro text-text-muted">
+        <span className="type-micro text-text-muted text-center sm:text-right">
           {chosen ? `${items.length} laptop pilihanmu` : "Dimulai dari Best Match dan 2 alternatif teratas"}
         </span>
       </div>
@@ -391,7 +424,7 @@ export function CompareBar({ raised = false }: { raised?: boolean }) {
           animate={{ opacity: 1, y: 0 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.3, ease: EASE_OUT }}
-          className={cn("fixed inset-x-3 z-40 mx-auto flex max-w-[40rem] items-center gap-3 rounded-[18px] border border-border bg-bg p-2.5 pl-4 shadow-lg sm:inset-x-6", raised ? "bottom-[5.5rem] lg:bottom-6" : "bottom-3 sm:bottom-6")} // taste-skill-ignore: bar menempel (overlay)
+          className={cn("fixed inset-x-3 z-40 mx-auto flex max-w-[40rem] items-center gap-2 rounded-[18px] border border-border bg-bg p-2 pl-3 shadow-lg sm:inset-x-6 sm:gap-3 sm:p-2.5 sm:pl-4", raised ? "bottom-[5.5rem] lg:bottom-6" : "bottom-3 sm:bottom-6")} // taste-skill-ignore: bar menempel (overlay)
         >
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary">
             <ArrowsLeftRightIcon weight="bold" className="size-4" aria-hidden="true" />

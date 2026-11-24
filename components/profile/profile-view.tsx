@@ -45,8 +45,10 @@ function ProfileContent({
   onRetry,
   focusOnLoadRef,
   actions,
+  mobileActions,
 }: {
   actions: React.ReactNode;
+  mobileActions?: React.ReactNode;
   mock: MockMode | null;
   onRetry: () => void;
   focusOnLoadRef: React.RefObject<boolean>;
@@ -156,8 +158,8 @@ function ProfileContent({
       </section>
 
       <div className="hidden lg:block">{actions}</div>
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md py-3 lg:hidden shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">{actions}</div>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-md py-2.5 sm:py-3 lg:hidden shadow-lg">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">{mobileActions ?? actions}</div>
       </div>
     </div>
   );
@@ -178,22 +180,26 @@ export function ProfileView() {
   const missing = hydrated ? firstMissingStep(profile) : undefined;
   const ready = hydrated && !missing;
 
-  const actions = (
-    <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
-      <Button asChild variant="secondary" className="rounded-xl border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs h-11 px-4">
-        <Link href={stepHref("budget")}>
-          <ArrowLeftIcon weight="bold" className="w-4 h-4 mr-1.5" aria-hidden="true" />
-          <span>Ubah Jawaban Kuis</span>
-        </Link>
-      </Button>
-      <Button asChild className="ml-auto rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs h-11 px-6 shadow-md shadow-emerald-700/20">
-        <Link href={ANALYSIS_HREF}>
-          <span>Lihat Laptop yang Cocok di Analisis SAW</span>
-          <ArrowRightIcon weight="bold" className="w-4 h-4 ml-1.5" aria-hidden="true" />
-        </Link>
-      </Button>
-    </div>
-  );
+  function renderActions(compact = false) {
+    return (
+      <div className={`flex items-center gap-2 sm:gap-3 ${compact ? "w-full justify-between" : "pt-4 border-t border-slate-200"}`}>
+        <Button asChild variant="secondary" className="rounded-xl border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs h-10 sm:h-11 px-3 sm:px-4 shrink-0">
+          <Link href={stepHref("budget")}>
+            <ArrowLeftIcon weight="bold" className="w-4 h-4 mr-1 sm:mr-1.5" aria-hidden="true" />
+            <span className="sm:hidden">Ubah</span>
+            <span className="hidden sm:inline">Ubah Jawaban Kuis</span>
+          </Link>
+        </Button>
+        <Button asChild className="ml-auto rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs h-10 sm:h-11 px-4 sm:px-6 shadow-md shadow-emerald-700/20 shrink-0 whitespace-nowrap">
+          <Link href={ANALYSIS_HREF}>
+            <span className="sm:hidden">Analisis SAW</span>
+            <span className="hidden sm:inline">Lihat Laptop yang Cocok di Analisis SAW</span>
+            <ArrowRightIcon weight="bold" className="w-4 h-4 ml-1 sm:ml-1.5" aria-hidden="true" />
+          </Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#faf8ff] text-[#131b2e] antialiased flex flex-col">
@@ -238,7 +244,8 @@ export function ProfileView() {
             mock={mock}
             focusOnLoadRef={focusOnLoadRef}
             onRetry={() => setAttempt((a) => a + 1)}
-            actions={actions}
+            actions={renderActions(false)}
+            mobileActions={renderActions(true)}
           />
         )}
       </main>
